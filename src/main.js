@@ -10,11 +10,7 @@ import router from "./router"; // 🟢 Import router
 const pinia = createPinia();
 
 const app = createApp(App);
-app.mixin({
-  mounted() {
-    AOS.init();
-  },
-});
 app.use(router);
 app.use(pinia);
 app.mount("#app");
+AOS.init();
