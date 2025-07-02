@@ -1,151 +1,176 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* RESET CƠ BẢN */
+* {
     margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    background: url('@/assets/background.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
-
-.form-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
+    padding: 0;
     box-sizing: border-box;
 }
 
-.login-form,
-.signform {
-    background-color: rgba(30, 30, 30, 0.9);
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* BACKGROUND CHUNG */
+body {
+    background: url('@/assets/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+/* CONTAINER */
+.form-container {
+    width: 100%;
+    max-width: 1100px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* BOX CHUNG CHO CẢ LOGIN VÀ REGISTER */
+.signup-form,
+.login-form {
+    background-color: rgba(30, 30, 30, 0.95);
     color: white;
     border-radius: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    margin-top: 0px;
-    /* tránh bị navbar che */
-}
-
-.login-form {
-    padding: 60px;
-    max-width: 900px;
-    width: 90%;
-}
-
-.signform {
     padding: 40px;
-    max-width: 500px;
-    width: 90%;
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
 }
 
+/* LOGO CHUNG */
 .logo_Login {
-    width: 180px;
+    width: 140px;
     height: auto;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-.login-form h2,
-.signform h2 {
-    color: #3498db;
-    margin-bottom: 35px;
-}
-
+/* TIÊU ĐỀ */
+.signup-form h2,
 .login-form h2 {
-    font-size: 36px;
+    font-size: 28px;
+    color: #3498db;
+    margin-bottom: 30px;
 }
 
-.signform h2 {
-    font-size: 32px;
-}
-
-.login-form form,
-.signform form {
+/* FORM ĐĂNG KÝ (2 CỘT) */
+.signup-form form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
     text-align: left;
 }
 
-.login-form form div,
-.signform form div {
-    margin-bottom: 25px;
+/* FORM ĐĂNG NHẬP (1 CỘT) */
+.login-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
 }
 
-.login-form label,
-.signform label {
-    display: block;
-    margin-bottom: 10px;
+/* CÁC Ô INPUT - ĐĂNG KÝ 2 CỘT */
+.signup-form form div {
+    flex: 1 1 47%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* FULL WIDTH DÒNG GIỚI TÍNH TRONG FORM ĐĂNG KÝ */
+.signup-form form div:nth-child(4) {
+    flex: 1 1 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+/* CÁC Ô INPUT - ĐĂNG NHẬP */
+.login-form form div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* NHÃN */
+.signup-form label,
+.login-form label {
     font-weight: 600;
+    margin-bottom: 8px;
 }
 
-/* Style chung cho các input */
-.login-form input[type="text"],
-.login-form input[type="password"],
-.login-form input[type="email"],
-.login-form input[type="tel"],
-.login-form input[type="date"],
-.signform input[type="text"],
-.signform input[type="password"] {
-    width: 100%;
-    padding: 18px 25px;
+/* INPUT CHUNG */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="date"] {
+    padding: 12px 16px;
     border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 25px;
+    border: 1px solid #ccc;
+    font-size: 15px;
     outline: none;
     transition: border-color 0.3s;
 }
 
-/* Chỉnh placeholder nhỏ hơn, chuyên nghiệp hơn */
-.login-form input::placeholder,
-.signform input::placeholder {
-    font-size: 15px;
-    /* nhỏ hơn so với text người dùng nhập */
-    color: #424040;
+input::placeholder {
+    font-size: 14px;
+    color: #777;
 }
 
-.login-form input:focus,
-.signform input:focus {
+input:focus {
     border-color: #3498db;
 }
 
-.login-form button,
-.signform button {
+/* RADIO */
+input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+/* NÚT */
+.signup-form button,
+.login-form button {
     width: 100%;
     padding: 14px;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-top: 10px;
 }
 
-.login-form button:hover,
-.signform button:hover {
+.signup-form button:hover,
+.login-form button:hover {
     background-color: #2980b9;
 }
 
-.login-form input[type="radio"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-/* Thông báo alert và kết quả thành công/thất bại */
+/* THÔNG BÁO */
 .success,
 .error,
 .alert {
     padding: 14px;
     margin-top: 20px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     text-align: center;
 }
 
 .success,
 .alert-success {
-    background-color: #27ae60;
+    background-color: #2ecc71;
     color: white;
 }
 
@@ -155,27 +180,38 @@ body {
     color: white;
 }
 
-/* Responsive cho mobile */
+/* RESPONSIVE CHO MOBILE */
 @media (max-width: 768px) {
-
-    .login-form,
-    .signform {
-        padding: 30px 20px;
-        max-width: 100%;
-        margin-top: 120px;
-        /* tạo khoảng cách đủ lớn trên thiết bị nhỏ */
+    body {
+        padding-top: 100px;
+        overflow-y: auto;
     }
 
-    .login-form h2,
-    .signform h2 {
-        font-size: 26px;
+    .signup-form,
+    .login-form {
+        padding: 20px;
     }
 
-    .login-form input,
-    .login-form button,
-    .signform input,
-    .signform button {
+    /* Đăng ký chuyển 2 cột về 1 cột */
+    .signup-form form {
+        flex-direction: column;
+    }
+
+    .signup-form form div {
+        flex: 1 1 100%;
+    }
+
+    .logo_Login {
+        width: 120px;
+    }
+
+    .signup-form h2,
+    .login-form h2 {
+        font-size: 24px;
+    }
+
+    input,
+    button {
         font-size: 14px;
-        padding: 10px;
     }
 }

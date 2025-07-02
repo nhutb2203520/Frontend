@@ -1,6 +1,6 @@
 <template>
     <div class="form-container">
-      <div class="login-form">
+      <div class="signup-form">
         <img src="@/assets/Logo.jpg" alt="Logo" class="logo_Login" />
   
         <h2>Đăng Ký</h2>

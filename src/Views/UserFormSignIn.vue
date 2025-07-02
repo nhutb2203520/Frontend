@@ -1,6 +1,6 @@
 <template>
     <div class="form-container">
-        <div class="signform">
+        <div class="login-form">
             <img src="@/assets/Logo.jpg" alt="Logo" class="logo_Login" />
 
             <!-- 🔔 Thông báo đăng nhập -->

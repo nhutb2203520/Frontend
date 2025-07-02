@@ -9,9 +9,14 @@
 
         <ul class="navbar-menu">
             <li>
-                <router-link to="/homeadmin" :class="{ active: $route.path === '/homeadmin' }">
-                    Trang Tổng Quan
-                </router-link>
+                <router-link 
+  to="/homeadmin" 
+  :class="{ active: $route.path === '/homeadmin' }" 
+  class="admin-link"
+>
+  Trang Tổng Quan
+</router-link>
+
             </li>
         </ul>
 

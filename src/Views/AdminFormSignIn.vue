@@ -1,6 +1,7 @@
 <template>
+  <NavBarAD />
   <div class="form-container">
-      <div class="signform">
+      <div class="login-form">
           <img src="@/assets/Logo.jpg" alt="Logo" class="logo_Login" />
 
           <!-- 🔔 Thông báo đăng nhập -->
@@ -33,8 +34,11 @@
 
 <script>
 import CryptoJS from "crypto-js";
-
+import NavBarAD from "@/components/Admin/NavBarAD.vue";
 export default {
+  components: {
+      NavBarAD
+    },
   data() {
       return {
           loginData: {
@@ -45,6 +49,7 @@ export default {
           success: false,
       };
   },
+  
   methods: {
       async submitLogin() {
           const username = this.loginData.USERNAME.trim();
@@ -81,7 +86,9 @@ export default {
           }
       }
   }
+  
 };
+
 </script>
 
 <!--

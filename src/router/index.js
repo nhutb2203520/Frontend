@@ -9,6 +9,7 @@ import BookDetails from '@/Views/BookDetails.vue';
 import BorrowingHistory from '@/Views/BorrowingHistory.vue';
 import AccountUser from '@/Views/AccountUser.vue';
 import AccountAdmin from '@/Views/AccountAdmin.vue';
+import ManagementReader from '@/Views/ManagementReader.vue';
 const routes = [
   {
     path: '/signinuser',
@@ -64,6 +65,12 @@ const routes = [
     path: '/account-admin',
     name: 'AccountInforAdmin',
     component: AccountAdmin
+  },
+  {
+    path: '/management-reader',
+    name: 'ManagementReader',
+    component: ManagementReader
+
   }
   
 
