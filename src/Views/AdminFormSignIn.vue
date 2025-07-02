@@ -56,7 +56,7 @@ export default {
         return;
       }
 
-      // 🔒 Mã hóa mật khẩu
+
       const hashedPassword = CryptoJS.SHA256(this.loginData.PASSWORD).toString();
 
       // 🚫 Giả lập xác thực người dùng thay vì gọi API
@@ -72,7 +72,7 @@ export default {
 
         // Đợi để hiển thị thông báo
         setTimeout(() => {
-          this.$router.push("homeadmin").then(() => window.location.reload());
+          this.$router.push("/home").then(() => window.location.reload());
         }, 1000);
       } else {
         this.message = "Tài khoản hoặc mật khẩu không chính xác!";
@@ -84,66 +84,66 @@ export default {
 </script>
 
 <!--
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data() {
-      return {
-        loginData: {
-          USERNAME: "", // Số điện thoại hoặc email
-          PASSWORD: "", // Mật khẩu
-        },
-        message: "",
-        success: false,
-      };
-    },
-    methods: {
-      async submitLogin() {
-        const username = this.loginData.USERNAME.trim();
-        const isPhone = /^[0-9]{10}$/.test(username);
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(username);
-  
-        if (!isPhone && !isEmail) {
-          this.message = "Vui lòng nhập số điện thoại (10 số) hoặc email hợp lệ!";
-          this.success = false;
-          return;
-        }
-  
-        // Chuẩn bị dữ liệu gửi đi
-        const payload = {
-          PASSWORD: this.loginData.PASSWORD,
-        };
-  
-        if (isPhone) {
-          payload.DIENTHOAI = username;
-        } else {
-          payload.EMAIL = username;
-        }
-  
-        try {
-          const response = await axios.post(
-            "http://localhost:3000/api/docgia/login",
-            payload
-          );
-  
-          if (response.status === 200) {
-            localStorage.setItem("tokenuser", JSON.stringify(response.data.token));
-            localStorage.setItem("role", JSON.stringify(response.data.role));
-  
-            this.$router.push("/home").then(() => window.location.reload());
-            this.message = "Đăng nhập thành công!";
-            this.success = true;
-          }
-        } catch (error) {
-          this.message = "Đăng nhập thất bại, vui lòng kiểm tra lại!";
-          this.success = false;
-        }
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      loginData: {
+        USERNAME: "", // Số điện thoại hoặc email
+        PASSWORD: "", // Mật khẩu
       },
+      message: "",
+      success: false,
+    };
+  },
+  methods: {
+    async submitLogin() {
+      const username = this.loginData.USERNAME.trim();
+      const isPhone = /^[0-9]{10}$/.test(username);
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(username);
+
+      if (!isPhone && !isEmail) {
+        this.message = "Vui lòng nhập số điện thoại (10 số) hoặc email hợp lệ!";
+        this.success = false;
+        return;
+      }
+
+      // Chuẩn bị dữ liệu gửi đi
+      const payload = {
+        PASSWORD: this.loginData.PASSWORD,
+      };
+
+      if (isPhone) {
+        payload.DIENTHOAI = username;
+      } else {
+        payload.EMAIL = username;
+      }
+
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/docgia/login",
+          payload
+        );
+
+        if (response.status === 200) {
+          localStorage.setItem("tokenuser", JSON.stringify(response.data.token));
+          localStorage.setItem("role", JSON.stringify(response.data.role));
+
+          this.$router.push("/home").then(() => window.location.reload());
+          this.message = "Đăng nhập thành công!";
+          this.success = true;
+        }
+      } catch (error) {
+        this.message = "Đăng nhập thất bại, vui lòng kiểm tra lại!";
+        this.success = false;
+      }
     },
-  };
-  </script>
-  -->
+  },
+};
+</script>
+-->
 
 <style scoped>
 @import "@/assets/sign.css";

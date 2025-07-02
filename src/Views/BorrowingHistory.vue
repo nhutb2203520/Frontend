@@ -1,7 +1,7 @@
 <template>
     <div class="borrowing-slip container my-5 p-4 border rounded">
         <div class="header text-center border-bottom pb-2 mb-4">
-            <h2 class="fst-italic">Lịch Sử Mượn Sách</h2>
+            <h2 class="fst-italic">LỊCH SỬ MƯỢN SÁCH</h2>
         </div>
 
         <div class="body">
@@ -64,7 +64,8 @@ export default {
     border-color: black;
     border-radius: 10px;
     box-sizing: border-box;
-    background-color: #007bff25;
+    background-color: #7d8287ae;
+    font-size: 30px;
 }
 
 /* Đường viền header */
@@ -87,7 +88,6 @@ table td {
 
 /* Tô nhẹ header */
 .table thead th {
-    background-color: #cacfd3;
+    background-color: #808385;
 }
 </style>
-  
