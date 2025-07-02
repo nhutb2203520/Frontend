@@ -12,4 +12,4 @@ const isLoginPage = computed(() => route?.path === '/login');
     <NavBar v-if="!isLoginPage" />
     <router-view />
   </div>
-</template>
+</template> 

@@ -42,6 +42,17 @@ const routes = [
     component: AdminFormSignIn
   },
   {
+    path: '/account-admin',
+    name: 'AccountInforAdmin',
+    component: AccountAdmin
+  },
+  {
+    path: '/management-reader',
+    name: 'ManagementReader',
+    component: ManagementReader
+
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "notfound",
     component: () => import("@/Views/NotFound.vue"),
@@ -60,18 +71,9 @@ const routes = [
     path: '/account-user',
     name: 'AccountInforUser',
     component: AccountUser
-  },
-  {
-    path: '/account-admin',
-    name: 'AccountInforAdmin',
-    component: AccountAdmin
-  },
-  {
-    path: '/management-reader',
-    name: 'ManagementReader',
-    component: ManagementReader
-
   }
+  
+  
   
 
 ];
