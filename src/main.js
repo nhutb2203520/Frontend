@@ -15,6 +15,19 @@ app.mixin({
     AOS.init();
   },
 });
+router.beforeEach((to, from, next) => {
+  // Nếu là login hoặc register thì thêm class
+  if (
+    to.path === "/signinuser" ||
+    to.path === "/signup" ||
+    to.path === "/borrowinghistory"
+  ) {
+    document.body.classList.add("login-page");
+  } else {
+    document.body.classList.remove("login-page");
+  }
+  next();
+});
 app.use(router);
 app.use(pinia);
 app.mount("#app");
