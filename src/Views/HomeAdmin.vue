@@ -10,15 +10,15 @@
             <div class="button-wrapper">
                 <!-- Hàng 1: 3 nút -->
                 <div class="button-row">
-                    <button class="btn-box" @click="goTo('borrow')">Quản lý thông tin mượn trả sách</button>
-                    <button class="btn-box" @click="goTo('genre')">Quản lý loại sách</button>
-                    <button class="btn-box" @click="goTo('reader')">Quản lý độc giả</button>
+                    <button class="btn-box" @click="goTo('BorrowReturnManagement')">Quản lý thông tin mượn trả sách</button>
+                    <button class="btn-box" @click="goTo('CategoryManagement')">Quản lý loại sách</button>
+                    <button class="btn-box" @click="goTo('ManagementReader')">Quản lý độc giả</button>
                 </div>
 
                 <!-- Hàng 2: 2 nút -->
                 <div class="button-row">
-                    <button class="btn-box" @click="goTo('publisher')">Quản lý nhà xuất bản</button>
-                    <button class="btn-box" @click="goTo('book')">Quản lý sách</button>
+                    <button class="btn-box" @click="goTo('PublisherManager')">Quản lý nhà xuất bản</button>
+                    <button class="btn-box" @click="goTo('BookManagement')">Quản lý sách</button>
                 </div>
             </div>
         </div>
@@ -27,6 +27,9 @@
 
 <script>
 import NavBarAD from '@/components/Admin/NavBarAD.vue';
+import PublisherManager from './PublisherManager.vue';
+import CategoryManagement from './CategoryManagement.vue';
+import ManagementReader from './ManagementReader.vue';
 
 export default {
     name: 'AdminDashboard',
@@ -38,9 +41,13 @@ export default {
             const routes = {
                 borrow: '/admin/borrow',
                 genre: '/admin/genres',
-                reader: '/admin/management-reader',
+                ManagementReader: '/admin/management-reader',
                 publisher: '/admin/publishers',
                 book: '/admin/books',
+                CategoryManagement: '/admin/category-management',
+                PublisherManager: '/admin/management-publisher',
+                BookManagement: '/admin/book-management',
+                BorrowReturnManagement: 'admin/borrow-return-management',
             };
             this.$router.push(routes[page]);
         },

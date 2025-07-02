@@ -17,6 +17,10 @@ import ManagementReader from '@/Views/ManagementReader.vue';
 
 // Not Found
 import NotFound from '@/Views/NotFound.vue';
+import CategoryManagement from '@/Views/CategoryManagement.vue';
+import PublisherManager from '@/Views/PublisherManager.vue';
+import BookManagement from '@/Views/BookManagement.vue';
+import BorrowReturnManagement from '@/Views/BorrowReturnManagement.vue';
 
 const routes = [
   // --------- Client routes ---------
@@ -63,7 +67,7 @@ const routes = [
     component: HomeAdmin,
   },
   {
-    path: '/admin/signin',
+    path: '/admin/signin',  
     name: 'Signin Admin',
     component: AdminFormSignIn,
   },
@@ -76,6 +80,26 @@ const routes = [
     path: '/admin/management-reader',
     name: 'ManagementReader',
     component: ManagementReader,
+  },
+  {
+    path: '/admin/category-management',
+    name: 'CategoryManagement',
+    component: CategoryManagement,
+  },
+  {
+    path: '/admin/management-publisher',
+    name: ' ManagementPublisher',
+    component: PublisherManager,
+  },
+  {
+    path: '/admin/book-management',
+    name:'BookManagement',
+    component: BookManagement,
+  },
+  {
+    path: '/admin/borrow-return-management',
+    name:'BorrowReturnManagement',
+    component: BorrowReturnManagement,
   },
 
   // --------- Not Found ---------
