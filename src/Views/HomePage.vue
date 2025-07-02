@@ -1,5 +1,6 @@
 <template>
     <div class="home-container">
+      <NavBar />
       <!-- Nội dung chính -->
       <div class="page-content">
         <!-- Banner chào mừng -->
