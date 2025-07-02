@@ -1,0 +1,149 @@
+.home-container {
+  min-height: 100vh;
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+.page-content {
+  padding-top: 60px;
+}
+
+.welcome-banner {
+  width: 100%;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.banner-image {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Giới thiệu thư viện */
+.library-intro {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 20px;
+  background-color: #2a2a2a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.intro-image {
+  flex: 0 0 300px;
+  max-width: 100%;
+}
+
+.intro-banner {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.intro-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.intro-content h2 {
+  font-size: 28px;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.intro-content p {
+  font-size: 16px;
+  color: #dddddd;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Chính sách */
+.policy-intro {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 20px;
+  background-color: #2a2a2a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  margin-top: 50px;
+}
+
+.policy-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.policy-content h2,
+.policy-content h3 {
+  color: #ffffff;
+}
+
+.policy-content p {
+  font-size: 16px;
+  color: #dddddd;
+  line-height: 1.6;
+}
+
+.policy-image {
+  flex: 0 0 900px;
+  /* Kích thước ảnh chính sách lớn hơn */
+  max-width: 900px;
+}
+
+.policy-banner {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .banner-image {
+    max-height: 300px;
+  }
+
+  .library-intro {
+    flex-direction: column;
+    padding: 30px 15px;
+  }
+
+  .policy-intro {
+    flex-direction: column-reverse;
+    padding: 30px 15px;
+  }
+
+  .policy-image {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-image {
+    max-height: 200px;
+  }
+
+  .intro-content h2,
+  .policy-content h2 {
+    font-size: 24px;
+  }
+
+  .intro-content p,
+  .policy-content p {
+    font-size: 14px;
+  }
+
+  .policy-content h3 {
+    font-size: 18px;
+  }
+}

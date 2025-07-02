@@ -1,0 +1,141 @@
+
+
+.page-content {
+    padding-top: 60px;
+    /* tương đương chiều cao NavBar */
+}
+
+/* Trang chính */
+.home-container {
+    min-height: 100vh;
+    background-color: #1e1e1e;
+    /* nền tối */
+    color: #ffffff;
+    /* chữ trắng */
+}
+
+/* Banner chào mừng */
+.welcome-banner {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #000;
+    /* fallback khi ảnh chưa tải */
+}
+
+.banner-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Giới thiệu thư viện */
+.library-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #2a2a2a;
+    /* nền tối hơn cho phần giới thiệu */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.intro-image {
+    flex: 0 0 300px;
+    max-width: 100%;
+}
+
+.intro-banner {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.intro-content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.intro-content h2 {
+    font-size: 28px;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.intro-content p {
+    font-size: 16px;
+    color: #dddddd;
+    line-height: 1.6;
+    white-space: pre-line;
+    /* giữ xuống dòng */
+}
+
+/* Chính sách mượn sách */
+.mainpocily-content {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.mainpocily-content h2,
+.mainpocily-content h3 {
+    color: #ffffff;
+}
+
+.mainpocily-content p {
+    color: #dddddd;
+}
+
+/* Responsive tablet */
+@media (max-width: 768px) {
+    .welcome-banner {
+        margin-top: 60px;
+    }
+
+    .banner-image {
+        max-height: 300px;
+    }
+
+    .library-intro {
+        flex-direction: column;
+        padding: 30px 15px;
+    }
+}
+
+/* Responsive mobile */
+@media (max-width: 480px) {
+    .welcome-banner {
+        margin-top: 100px;
+    }
+
+    .banner-image {
+        max-height: 200px;
+    }
+
+    .intro-content h2 {
+        font-size: 24px;
+    }
+
+    .intro-content p {
+        font-size: 14px;
+    }
+
+    .mainpocily-content h2 {
+        font-size: 22px;
+    }
+
+    .mainpocily-content h3 {
+        font-size: 18px;
+    }
+} 
