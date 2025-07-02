@@ -20,6 +20,7 @@
 
 <script>
 import BookCard from '@/components/BookCard.vue';
+import { useBookStore } from '@/Store/Book.store';
 
 export default {
   name: 'BookForYou',
@@ -28,50 +29,19 @@ export default {
   },
   data() {
     return {
-      books: [
-        {
-          title: 'Giáo trình Sinh học ứng dụng đại cương',
-          image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình An toàn, sức khỏe và môi trường',
-          image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Khoa học Trái đất',
-          image: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Ứng dụng công nghệ sinh học',
-          image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Khai thác dữ liệu với Python',
-          image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Vật lý đại cương',
-          image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Hóa học hữu cơ',
-          image: 'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Toán cao cấp',
-          image: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Lập trình Web cơ bản',
-          image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop'
-        },
-        {
-          title: 'Giáo trình Kỹ thuật điện tử cơ bản',
-          image: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=400&h=250&fit=crop'
-        }
-      ]
+      books: []
     };
-  }
+  },
+  async mounted() {
+    try {
+      const bookStore = useBookStore()
+      const result = await bookStore.fetchBooks();
+      this.books = result
+    } catch (error) {
+      console.error('Lỗi khi lấy sách gợi ý:', error);
+      this.books = []; // Đặt mảng sách là rỗng nếu có lỗi
+    }
+  },
 };
 </script>
 

@@ -24,6 +24,19 @@ export const useBookStore = defineStore("book", {
     setError(error) {
       this.error = error;
     },
+    async fetchBooks() {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.get("/books");
+        this.setBooks(response.data.danhsachsach);
+        return response.data.danhsachsach;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
     async fetchBooksHot() {
       this.setLoading(true);
       this.setError(null);
