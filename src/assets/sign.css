@@ -1,0 +1,181 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: url('@/assets/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-form,
+.signform {
+    background-color: rgba(30, 30, 30, 0.9);
+    color: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    margin-top: 0px;
+    /* tránh bị navbar che */
+}
+
+.login-form {
+    padding: 60px;
+    max-width: 900px;
+    width: 90%;
+}
+
+.signform {
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.logo_Login {
+    width: 180px;
+    height: auto;
+    margin-bottom: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.login-form h2,
+.signform h2 {
+    color: #3498db;
+    margin-bottom: 35px;
+}
+
+.login-form h2 {
+    font-size: 36px;
+}
+
+.signform h2 {
+    font-size: 32px;
+}
+
+.login-form form,
+.signform form {
+    text-align: left;
+}
+
+.login-form form div,
+.signform form div {
+    margin-bottom: 25px;
+}
+
+.login-form label,
+.signform label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Style chung cho các input */
+.login-form input[type="text"],
+.login-form input[type="password"],
+.login-form input[type="email"],
+.login-form input[type="tel"],
+.login-form input[type="date"],
+.signform input[type="text"],
+.signform input[type="password"] {
+    width: 100%;
+    padding: 18px 25px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 25px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+/* Chỉnh placeholder nhỏ hơn, chuyên nghiệp hơn */
+.login-form input::placeholder,
+.signform input::placeholder {
+    font-size: 15px;
+    /* nhỏ hơn so với text người dùng nhập */
+    color: #424040;
+}
+
+.login-form input:focus,
+.signform input:focus {
+    border-color: #3498db;
+}
+
+.login-form button,
+.signform button {
+    width: 100%;
+    padding: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-form button:hover,
+.signform button:hover {
+    background-color: #2980b9;
+}
+
+.login-form input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* Thông báo alert và kết quả thành công/thất bại */
+.success,
+.error,
+.alert {
+    padding: 14px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.success,
+.alert-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.error,
+.alert-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+
+    .login-form,
+    .signform {
+        padding: 30px 20px;
+        max-width: 100%;
+        margin-top: 120px;
+        /* tạo khoảng cách đủ lớn trên thiết bị nhỏ */
+    }
+
+    .login-form h2,
+    .signform h2 {
+        font-size: 26px;
+    }
+
+    .login-form input,
+    .login-form button,
+    .signform input,
+    .signform button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
