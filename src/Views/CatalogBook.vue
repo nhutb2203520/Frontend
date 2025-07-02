@@ -1,5 +1,5 @@
 <template>
-    <div class="home-wrapper position-relative min-vh-100 bg-light">
+    <div class="home-wrapper position-relative  bg-light">
         <!-- Sidebar -->
         <SideBar @toggle="handleSidebarToggle" />
 
@@ -50,9 +50,11 @@ export default {
 /* Chỉ giữ lại CSS transition và responsive, phần còn lại dùng Bootstrap */
 .main-content {
     transition: margin-left 0.3s ease;
-    min-height: 100vh;
+    margin-top: 0px !important;
     position: relative;
     z-index: 1;
+    padding-top: 0 !important;
+    padding-left: 50px !important;
 }
 
 .content-shifted {
