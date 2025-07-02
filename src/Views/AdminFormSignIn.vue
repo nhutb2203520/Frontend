@@ -8,7 +8,7 @@
         {{ message }}
       </p>
 
-      <h2>Đăng Nhập Tài KhoảnThư</h2>
+      <h2>Đăng Nhập Tài Khoản Thủ Thư</h2>
       <form @submit.prevent="submitLogin">
         <!-- Username -->
         <div>

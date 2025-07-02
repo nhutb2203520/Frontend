@@ -9,7 +9,7 @@
 
         <ul class="navbar-menu">
             <li>
-                <router-link to="/home" :class="{ active: $route.path === '/home' }">
+                <router-link to="/" :class="{ active: $route.path === '/' }">
                     Trang Chủ
                 </router-link>
             </li>
