@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid bg-dark text-white py-5">
+  <div class="container-fluid bg-dark text-white py-5" data-aos="fade-up" data-aos-duration="1000">
     <div class="text-center mb-5">
       <h2 class="text-info fw-bold display-5">SẢN PHẨM NỔI BẬT</h2>
       <div class="d-flex justify-content-center align-items-center gap-3">
@@ -18,79 +18,99 @@
       </div>
 
       <button class="btn btn-info rounded-circle position-absolute top-50 start-0 translate-middle-y" @click="prevSlide"
-        :disabled="currentIndex === 0">❮</button>
+        :disabled="currentIndex === 0">
+        ❮
+      </button>
       <button class="btn btn-info rounded-circle position-absolute top-50 end-0 translate-middle-y" @click="nextSlide"
-        :disabled="currentIndex >= maxIndex">❯</button>
+        :disabled="currentIndex >= maxIndex">
+        ❯
+      </button>
     </div>
 
     <div class="d-flex justify-content-center gap-3 mt-4">
       <span v-for="(dot, index) in Math.ceil(books.length / itemsPerView)" :key="index" class="rounded-circle" :class="[
         'bg-info',
         { 'opacity-100': Math.floor(currentIndex / itemsPerView) === index, 'opacity-50': Math.floor(currentIndex / itemsPerView) !== index }
-      ]" style="width: 12px; height: 12px; cursor: pointer;" @click="goToSlide(index * itemsPerView)"></span>
+      ]" style="width: 12px; height: 12px; cursor: pointer; transition: all 0.3s;"
+        @click="goToSlide(index * itemsPerView)"></span>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useBookStore } from '@/Store/Book.store';
+<script>
 import BookCard from '@/components/BookCard.vue';
+import { useBookStore } from '@/Store/Book.store';
+export default {
+  name: 'HotBook',
+  components: { BookCard },
+  data() {
+    return {
+      currentIndex: 0,
+      itemsPerView: 5,
+      books: []
+    };
+  },
+  computed: {
+    maxIndex() {
+      return Math.max(0, this.books.length - this.itemsPerView);
+    }
+  },
+  methods: {
+    nextSlide() {
+      if (this.currentIndex < this.maxIndex) {
+        this.currentIndex++;
+      }
+    },
+    prevSlide() {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+      }
+    },
+    goToSlide(index) {
+      this.currentIndex = Math.min(index, this.maxIndex);
+    },
+    updateItemsPerView() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        this.itemsPerView = 1;
+      } else if (width < 1024) {
+        this.itemsPerView = 2;
+      } else if (width < 1200) {
+        this.itemsPerView = 3;
+      } else if (width < 1400) {
+        this.itemsPerView = 4;
+      } else {
+        this.itemsPerView = 5;
+      }
+      if (this.currentIndex > this.maxIndex) {
+        this.currentIndex = this.maxIndex;
+      }
+    }
+  },
+  async mounted() {
+    // Cập nhật số lượng items hiển thị theo chiều rộng
+    this.updateItemsPerView();
+    window.addEventListener('resize', this.updateItemsPerView);
 
-const currentIndex = ref(0);
-const itemsPerView = ref(5);
-const bookStore = useBookStore();
-const books = ref([]);
-
-const maxIndex = computed(() => {
-  const count = Array.isArray(books.value) ? books.value.length : 0;
-  return Math.max(0, count - itemsPerView.value);
-});
-
-function updateItemsPerView() {
-  const width = window.innerWidth;
-  if (width < 768) itemsPerView.value = 1;
-  else if (width < 1024) itemsPerView.value = 2;
-  else if (width < 1200) itemsPerView.value = 3;
-  else if (width < 1400) itemsPerView.value = 4;
-  else itemsPerView.value = 5;
-
-  if (currentIndex.value > maxIndex.value) {
-    currentIndex.value = maxIndex.value;
+    // Gọi API lấy sách
+    try {
+      const bookStore = useBookStore();
+      await bookStore.fetchBooksHot();
+      this.books = bookStore.books;
+    } catch (error) {
+      console.error('Lỗi khi lấy sách mới:', error);
+      this.books = [];
+    }
   }
-}
-
-function nextSlide() {
-  if (currentIndex.value < maxIndex.value) {
-    currentIndex.value++;
+  ,
+  beforeUnmount() {
+    window.removeEventListener('resize', this.updateItemsPerView);
   }
-}
-
-function prevSlide() {
-  if (currentIndex.value > 0) {
-    currentIndex.value--;
-  }
-}
-
-function goToSlide(index) {
-  currentIndex.value = Math.min(index, maxIndex.value);
-}
-
-onMounted(async () => {
-  updateItemsPerView();
-  window.addEventListener('resize', updateItemsPerView);
-
-  try {
-    await bookStore.fetchBooksHot();
-    books.value = bookStore.books;
-    localStorage.setItem('hotBooks', JSON.stringify(books.value));
-  } catch (err) {
-    console.error('Lỗi khi fetch sách:', err);
-    books.value = [];
-  }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateItemsPerView);
-});
+};
 </script>
+
+<style scoped>
+.ratio img {
+  object-fit: cover;
+}
+</style>

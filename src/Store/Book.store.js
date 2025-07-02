@@ -30,6 +30,7 @@ export const useBookStore = defineStore("book", {
       try {
         const response = await axios.get("/books/hot");
         this.setBooks(response.data.danhsachsach);
+        return response.data.danhsachsach;
       } catch (err) {
         this.setError(err.message);
       } finally {
@@ -42,6 +43,19 @@ export const useBookStore = defineStore("book", {
       try {
         const response = await axios.get("/books/new");
         this.setBooks(response.data.danhsachsach);
+        return response.data.danhsachsach;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async fetchBookByMaSach(MaSach) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.get(`/books/${MaSach}`);
+        return response.data.sach;
       } catch (err) {
         this.setError(err.message);
       } finally {

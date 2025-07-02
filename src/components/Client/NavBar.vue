@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar">
+    <nav class="navbar" data-aos="fade-down" data-aos-duration="1000">
         <div class="navbar-left">
             <router-link to="/home" class="navbar-logo">
                 <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
@@ -44,7 +44,7 @@
                 </div>
             </div>
 
-            <div class="navbar-search">
+            <div v-if="$route.path !== '/'" class="navbar-search">
                 <input type="text" placeholder="Tìm kiếm ..." />
                 <button>
                     <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search Icon" />

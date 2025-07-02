@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer">
+  <footer class="footer" data-aos="fade-up" data-aos-duration="1000">
     <p>Mọi thông tin vui lòng liên hệ:</p>
 
     <div class="contact-icons">
@@ -19,12 +19,7 @@
 
     <p>
       Địa chỉ:
-      <a
-        href="https://maps.app.goo.gl/gJwyDTgt7WbQsWDc7"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="footer-link"
-      >
+      <a href="https://maps.app.goo.gl/gJwyDTgt7WbQsWDc7" target="_blank" rel="noopener noreferrer" class="footer-link">
         Khu II Trường Đại học Cần Thơ, Đường 3/2, Q. Ninh Kiều, Tp. Cần Thơ
       </a>
     </p>

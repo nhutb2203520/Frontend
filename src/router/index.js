@@ -44,7 +44,7 @@ const routes = [
     component: () => import("@/Views/NotFound.vue"),
   },
   {
-    path: "/book/:id",
+    path: "/book/:MaSach",
     name: "BookDetails",
     component: BookDetails,
   },
