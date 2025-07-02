@@ -38,7 +38,7 @@ export default {
             const routes = {
                 borrow: '/admin/borrow',
                 genre: '/admin/genres',
-                reader: '/admin/readers',
+                reader: '/admin/management-reader',
                 publisher: '/admin/publishers',
                 book: '/admin/books',
             };
@@ -91,7 +91,7 @@ export default {
     padding: 20px 30px;
     border: 2px solid #000;
     border-radius: 10px;
-    background-color: rgba(253, 253, 253, 0.85);
+    background-color: rgba(114, 150, 203, 0.85);
     font-style: italic;
     font-size: 30px;
     cursor: pointer;

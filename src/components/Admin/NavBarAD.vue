@@ -27,7 +27,7 @@
                         <button @click="logout">Đăng xuất</button>
                     </template> 
                     <template v-else>
-                        <router-link to="/adminformsignin">Đăng nhập</router-link>
+                        <router-link to="/admin/signin">Đăng nhập</router-link>
                     </template>
                 </div>
             </div>

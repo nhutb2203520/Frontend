@@ -1,6 +1,6 @@
 <template>
     <div class="overlay">
-        <NavBarAD />
+      <NavBarAD />
       <div class="reader-management">
         <!-- Tiêu đề -->
         <h1 class="title">Quản lý độc giả</h1>
@@ -33,6 +33,7 @@
   
   <script>
   import NavBarAD from '@/components/Admin/NavBarAD.vue';
+  
   export default {
     components: {
       NavBarAD
@@ -98,9 +99,9 @@
     height: 100%;
     background: rgba(20, 20, 20, 0.85);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 80px 20px 40px;
     overflow-y: auto;
   }
   
