@@ -5,7 +5,7 @@ import HomePage from '@/Views/HomePage.vue';
 import UserFormSignUp from '@/Views/UserFormSignUp.vue';
 import UserFormSignIn from '@/Views/UserFormSignIn.vue';
 import CatalogBook from '@/Views/CatalogBook.vue';
-import BookDetails from '@/Views/BookDetails.vue';
+import BookDetails from '@/components/Client/BookDetails.vue';
 import BorrowingHistory from '@/Views/BorrowingHistory.vue';
 import AccountUser from '@/Views/AccountUser.vue';
 

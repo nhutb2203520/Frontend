@@ -135,14 +135,16 @@
   
   .msg-user span,
   .msg-bot span {
-    display: inline-block;
-    padding: 10px 15px;
-    border-radius: 18px;
-    background-color: #e1f0ff;
-    max-width: 80%;
-    word-wrap: break-word;
-    font-size: 16px;
-  }
+  display: inline-block;
+  padding: 10px 15px;
+  border-radius: 18px;
+  background-color: #a2bad3;
+  color: #000000; /* màu chữ của bot */
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 16px;
+}
+
   
   .msg-user span {
     background-color: #007bff;
