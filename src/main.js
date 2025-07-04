@@ -17,7 +17,7 @@ app.use(ElementPlus);
 router.beforeEach((to, from, next) => {
   // Nếu là login hoặc register thì thêm class
   if (
-    to.path === "/signinuser" ||
+    /^\/(signin(\/[^/]+)?|signinuser|admin\/signin(\/[^/]+)?)$/.test(to.path) ||
     to.path === "/signup" ||
     to.path === "/borrowinghistory" ||
     to.path === "/forgot-password" ||
