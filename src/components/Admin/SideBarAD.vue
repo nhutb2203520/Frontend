@@ -50,11 +50,11 @@
   const isOpen = ref(true);
   
   const menuItems = [
-    { label: 'Quản lý mượn/trả sách', shortLabel: 'Mượn trả', icon: 'bi bi-journal-bookmark-fill', route: 'borrow-return-management' },
-    { label: 'Quản lý loại sách', shortLabel: 'Loại sách', icon: 'bi bi-tags-fill', route: 'category-management' },
-    { label: 'Quản lý độc giả', shortLabel: 'Độc giả', icon: 'bi bi-people-fill', route: 'management-reader' },
-    { label: 'Quản lý sách', shortLabel: 'Sách', icon: 'bi bi-book-half', route: 'book-management' },
-    { label: 'Quản lý NXB', shortLabel: 'NXB', icon: 'bi bi-buildings', route: 'management-publisher' }
+    { label: 'Quản lý mượn/trả sách', shortLabel: 'Mượn trả', icon: 'bi bi-journal-bookmark-fill', route: '/admin/borrow-return-management' },
+    { label: 'Quản lý loại sách', shortLabel: 'Loại sách', icon: 'bi bi-tags-fill', route: '/admin/category-management' },
+    { label: 'Quản lý độc giả', shortLabel: 'Độc giả', icon: 'bi bi-people-fill', route: '/admin/management-reader' },
+    { label: 'Quản lý sách', shortLabel: 'Sách', icon: 'bi bi-book-half', route: '/admin/book-management' },
+    { label: 'Quản lý NXB', shortLabel: 'NXB', icon: 'bi bi-buildings', route: '/admin/management-publisher' }
   ];
   
   function toggleSidebar() {
