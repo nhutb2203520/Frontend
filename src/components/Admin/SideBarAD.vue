@@ -43,7 +43,8 @@
   
   <script setup>
   import { useRouter } from 'vue-router';
-  
+  import { ref } from 'vue';
+
   const emit = defineEmits(['toggle']);
   const router = useRouter();
   const isOpen = ref(true);
