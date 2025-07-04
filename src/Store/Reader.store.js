@@ -1,15 +1,49 @@
 // /d:/Frontend-register-borrow-book/Frontend/src/Store/Reader.store.js
 import { defineStore } from "pinia";
-import axios from "axios";
-
+import axios from "@/utils/axios";
+import { useAuthStore } from "@/Store/auth.store";
 export const useReaderStore = defineStore("reader", {
   state: () => ({
     readers: [],
+    infoReader: localStorage.getItem("infoReader") || " ",
     selectedReader: null,
     loading: false,
     error: null,
   }),
   actions: {
+    login(data) {
+      return axios
+        .post("/readers/login", data)
+        .then((response) => {
+          if (response.data && response.data.reader) {
+            const hoTen = response.data.reader.HoTen;
+            this.infoReader = hoTen; // Gán vào state Pinia
+            localStorage.setItem("infoReader", hoTen);
+            const authStore = useAuthStore();
+            authStore.setTokens(
+              response.data.token,
+              response.data.refreshToken
+            );
+          }
+          return response.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    register(data) {
+      return axios
+        .post("/readers/register", data)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    forgotPassword(email) {
+      return;
+    },
     setReaders(readers) {
       this.readers = readers;
     },

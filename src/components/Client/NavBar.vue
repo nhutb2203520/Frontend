@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar" data-aos="fade-down" data-aos-duration="1000">
+    <nav class="navbar">
         <div class="navbar-left">
             <router-link to="/" class="navbar-logo">
                 <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
