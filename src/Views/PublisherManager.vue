@@ -1,22 +1,22 @@
 <template>
   <div class="overlay">
-    <!-- NavBar trên cùng -->
     <NavBarAD />
-    <!-- Sidebar bên trái -->
     <SideBarAD />
 
-    <!-- Nội dung quản lý -->
-    <div class="reader-management">
+    <div class="publisher-management">
       <h1 class="title">Quản lý nhà xuất bản</h1>
 
-      <!-- Bộ đếm tổng -->
-      <div class="top-buttons">
-        <button>Tổng NXB: {{ totalPublishers }}</button>
-      </div>
+      <!-- Thanh công cụ tổng và tìm kiếm -->
+      <div class="top-bar">
+        <button class="total-btn">Tổng NXB: {{ totalPublishers }}</button>
 
-      <!-- Tìm kiếm và thêm -->
-      <div class="actions">
-        <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên NXB..." />
+        <div class="search">
+          <input
+            v-model="searchKeyword"
+            placeholder="Tìm kiếm theo tên NXB..."
+          />
+        </div>
+
         <button class="add-btn" @click="goToAddPublisher">Thêm NXB</button>
       </div>
 
@@ -28,9 +28,26 @@
             <li
               v-for="pub in filteredPublishers"
               :key="pub.id"
+              @click="togglePublisher(pub)"
               class="reader-item"
             >
               <strong>{{ pub.name }}</strong>
+
+              <div
+                v-if="selectedPublisher?.id === pub.id"
+                class="reader-detail"
+              >
+                <p><strong>ID:</strong> {{ pub.id }}</p>
+                <p><strong>Tên NXB:</strong> {{ pub.name }}</p>
+                <div class="detail-actions">
+                  <button class="btn btn-warning" @click.stop="editPublisher(pub)">
+                    ✏️ Chỉnh sửa
+                  </button>
+                  <button class="btn btn-danger" @click.stop="deletePublisher(pub)">
+                    🗑️ Xóa
+                  </button>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -48,6 +65,7 @@ export default {
   data() {
     return {
       searchKeyword: "",
+      selectedPublisher: null,
       publishers: [
         { id: 1, name: "NXB HÀ NỘI" },
         { id: 2, name: "NXB TRẺ" },
@@ -55,7 +73,7 @@ export default {
         { id: 4, name: "NXB VĨNH LONG" },
         { id: 5, name: "NXB ĐÀ NẴNG" },
         { id: 6, name: "NXB AN GIANG" },
-      ]
+      ],
     };
   },
   computed: {
@@ -63,16 +81,33 @@ export default {
       return this.publishers.length;
     },
     filteredPublishers() {
-      return this.publishers.filter(p =>
+      return this.publishers.filter((p) =>
         p.name.toLowerCase().includes(this.searchKeyword.toLowerCase())
       );
-    }
+    },
   },
   methods: {
+    togglePublisher(pub) {
+      this.selectedPublisher =
+        this.selectedPublisher?.id === pub.id ? null : pub;
+    },
     goToAddPublisher() {
       this.$router.push('/admin/add-publisher');
-    }
-  }
+    },
+    editPublisher(pub) {
+      this.$router.push(`/admin/edit-publisher/${pub.id}`);
+    },
+    deletePublisher(pub) {
+      if (
+        confirm(
+          `Bạn có chắc chắn muốn xóa nhà xuất bản "${pub.name}" không?`
+        )
+      ) {
+        this.publishers = this.publishers.filter((p) => p.id !== pub.id);
+        this.selectedPublisher = null;
+      }
+    },
+  },
 };
 </script>
 
@@ -92,7 +127,7 @@ export default {
   z-index: 1;
 }
 
-.reader-management {
+.publisher-management {
   max-width: 900px;
   width: 100%;
   background: #fff;
@@ -111,46 +146,29 @@ export default {
   color: #2c3e50;
 }
 
-.top-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.top-buttons button {
-  padding: 12px 20px;
-  border: 2px solid #2980b9;
-  background-color: white;
-  color: #2980b9;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.top-buttons button:hover {
-  background-color: #2980b9;
-  color: white;
-}
-
-.actions {
+.top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-.actions input {
-  flex: 1;
-  min-width: 250px;
+.total-btn {
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.search input {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 15px;
+  min-width: 250px;
 }
 
 .add-btn {
@@ -160,8 +178,8 @@ export default {
   border: none;
   border-radius: 8px;
   font-weight: bold;
-  transition: 0.3s;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .add-btn:hover {
@@ -186,5 +204,20 @@ export default {
 .reader-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.reader-detail {
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.detail-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
 }
 </style>

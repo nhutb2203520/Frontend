@@ -1,20 +1,17 @@
 <template>
-  <div class="home-wrapper position-relative min-vh-100 bg-light">
-    <!-- Sidebar Admin -->
+  
+  <div class="overlay">
+    <!-- NavBar trên cùng -->
+    <NavBarAD />
+    <!-- Sidebar bên trái -->
     <SideBarAD @toggle="handleSidebarToggle" />
-
-    <!-- Nội dung chính -->
-    <div
-      class="main-content p-3 p-md-4"
-      :class="{
-        'content-shifted': sidebarOpen,
-        'content-expanded': !sidebarOpen,
-      }"
-    >
-      <NavBarAD />
-      <!-- Tiêu đề -->
-      <h1 class="title">Quản lý sách</h1>
-
+  
+    <router-view></router-view>
+    <!-- Nội dung quản lý -->
+    <div v-if ="route.name ==='BookManagement'" class="book-management">
+    
+      <h1 class="title" >Quản lý sách</h1>
+     
       <!-- Thanh công cụ đầu -->
       <div class="top-bar">
         <button class="total-btn">Tổng số sách: {{ totalBooks }}</button>
@@ -41,11 +38,31 @@
       <!-- Danh sách sách -->
       <div class="book-list">
         <h3>Danh sách sách</h3>
-        <ul>
-          <li v-for="book in filteredBooks" :key="book.id">
-            {{ book.name }}
-          </li>
-        </ul>
+        <div class="scrollable-list">
+          <ul>
+            <li
+              v-for="book in filteredBooks"
+              :key="book.id"
+              @click="toggleBook(book)"
+              class="book-item"
+            >
+              <strong>{{ book.name }}</strong>
+
+              <div v-if="selectedBook?.id === book.id" class="book-detail">
+                <p><strong>ID:</strong> {{ book.id }}</p>
+                <p><strong>Tên sách:</strong> {{ book.name }}</p>
+                <div class="detail-actions">
+                  <button class="btn btn-warning" @click.stop="editBook(book)">
+                    ✏️ Chỉnh sửa
+                  </button>
+                  <button class="btn btn-danger" @click.stop="deleteBook(book)">
+                    🗑️ Xóa
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -54,21 +71,30 @@
 <script>
 import NavBarAD from "@/components/Admin/NavBarAD.vue";
 import SideBarAD from "@/components/Admin/SideBarAD.vue";
-
+import AddBook from "@/components/Admin/AddBook.vue";
+import EditBook from "@/components/Admin/EditBook.vue";
+import LocationManagement from "@/components/Admin/LocationManagement.vue";
 export default {
   name: "BookManagement",
   components: {
     NavBarAD,
     SideBarAD,
+    AddBook,
+    EditBook,
+    LocationManagement,
   },
   data() {
     return {
       sidebarOpen: true,
       searchKeyword: "",
+      selectedBook: null,
       books: [
         { id: 1, name: "Lập trình Python cơ bản" },
         { id: 2, name: "Tâm lý học hiện đại" },
         { id: 3, name: "Dữ liệu lớn và AI" },
+        { id: 4, name: "Thiết kế phần mềm hướng đối tượng" },
+        { id: 5, name: "Trí tuệ nhân tạo ứng dụng" },
+        
       ],
     };
   },
@@ -81,50 +107,76 @@ export default {
         book.name.toLowerCase().includes(this.searchKeyword.toLowerCase())
       );
     },
+    route() {
+      return this.$route;
+    },
   },
   methods: {
     handleSidebarToggle(isOpen) {
       this.sidebarOpen = isOpen;
     },
     goToAddBook() {
-      this.$router.push("/admin/add-book");
+      this.$router.push({
+        name: "AddBook",
+      });
     },
     goToManageLocation() {
-      this.$router.push("/admin/manage-location");
+      this.$router.push({
+      name: "LocationManagement",  
+    });
     },
     goToManageAuthor() {
-      this.$router.push("/admin/manage-author");
+      this.$router.push({
+        name: "AuthorManagement",
+      });
+    },
+    toggleBook(book) {
+      this.selectedBook = this.selectedBook?.id === book.id ? null : book;
+    },
+    editBook(book) {
+      this.$router.push({
+    name: "EditBook",
+    params: { id: book.id }
+      });
+    },
+    deleteBook(book) {
+      if (confirm(`Bạn có chắc chắn muốn xóa sách "${book.name}" không?`)) {
+        this.books = this.books.filter((b) => b.id !== book.id);
+        this.selectedBook = null;
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-/* Hiệu ứng dịch chuyển nội dung */
-.main-content {
-  transition: margin-left 0.3s ease;
-  min-height: 100vh;
-  position: relative;
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 20, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 120px 20px 20px;
+  overflow-y: auto;
   z-index: 1;
 }
 
-.content-shifted {
-  margin-left: 250px; /* khi sidebar mở */
+.book-management {
+  max-width: 900px;
+  width: 100%;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 2;
+  position: relative;
 }
 
-.content-expanded {
-  margin-left: 80px; /* khi sidebar thu gọn */
-}
-
-/* Responsive xử lý khi màn nhỏ */
-@media (max-width: 768px) {
-  .content-shifted,
-  .content-expanded {
-    margin-left: 0 !important;
-  }
-}
-
-/* Các thành phần giao diện */
 .title {
   text-align: center;
   font-size: 28px;
@@ -207,9 +259,11 @@ export default {
 
 .book-list {
   background: #f8f8f8;
-  padding: 25px;
+  padding: 20px;
   border-radius: 10px;
   border: 1px solid #ccc;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .book-list h3 {
@@ -220,10 +274,44 @@ export default {
 .book-list ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.book-list li {
+.book-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.book-detail {
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.detail-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-warning {
+  background-color: #f1c40f;
+  color: #000;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: #fff;
 }
 </style>

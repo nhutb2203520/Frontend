@@ -21,6 +21,10 @@ import CategoryManagement from "@/Views/CategoryManagement.vue";
 import PublisherManager from "@/Views/PublisherManager.vue";
 import BookManagement from "@/Views/BookManagement.vue";
 import BorrowReturnManagement from "@/Views/BorrowReturnManagement.vue";
+import ChangePass from "@/components/Client/ChangePass.vue";
+import AddBook from "@/components/Admin/AddBook.vue";
+import EditBook from "@/components/Admin/EditBook.vue";
+import LocationManagement from "@/components/Admin/LocationManagement.vue";
 
 const routes = [
   // --------- Client routes ---------
@@ -59,6 +63,11 @@ const routes = [
     name: "AccountInforUser",
     component: AccountUser,
   },
+  {
+    path: "/change-password",
+    name: "Change Password",
+    component: ChangePass,
+  },
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
   {
@@ -95,6 +104,25 @@ const routes = [
     path: "/admin/book-management",
     name: "BookManagement",
     component: BookManagement,
+    children: [
+      {
+        path: "add-book",
+        name: "AddBook",
+        component: AddBook,
+      },
+      {
+        path: "edit-book/:id",
+        name: "EditBook",
+        component: EditBook,
+        props: true,
+      },
+      {
+        path: "location-management",
+        name: "LocationManagement",
+        component: LocationManagement,
+      },
+     
+    ]
   },
   {
     path: "/admin/borrow-return-management",
@@ -108,6 +136,10 @@ const routes = [
     name: "NotFound",
     component: NotFound,
   },
+  
+  
+  //
+  
 ];
 
 const router = createRouter({
