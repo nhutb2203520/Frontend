@@ -1,7 +1,8 @@
 // /d:/Frontend-register-borrow-book/Frontend/src/Store/Reader.store.js
 import { defineStore } from "pinia";
 import axios from "@/utils/axios";
-import { useAuthStore } from "@/Store/auth.store";
+import { useAuthStore } from "./auth.store";
+import ResetPassword from "@/Views/Reset-Password.vue";
 export const useReaderStore = defineStore("reader", {
   state: () => ({
     readers: [],
@@ -18,8 +19,8 @@ export const useReaderStore = defineStore("reader", {
           if (response.data && response.data.reader) {
             const hoTen = response.data.reader.HoTen;
             this.infoReader = hoTen; // Gán vào state Pinia
-            localStorage.setItem("infoReader", hoTen);
             const authStore = useAuthStore();
+            localStorage.setItem("infoReader", hoTen);
             authStore.setTokens(
               response.data.token,
               response.data.refreshToken
@@ -41,8 +42,33 @@ export const useReaderStore = defineStore("reader", {
           throw new Error(error.response?.data?.message || error.message);
         });
     },
-    forgotPassword(email) {
-      return;
+    forgotPassword(identifier) {
+      return axios
+        .post("/auth/forgot-password", identifier)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Không thể gửi yêu cầu khôi phục mật khẩu.";
+          throw new Error(errorMessage);
+        });
+    },
+    resetPassword({ token, Password }) {
+      return axios
+        .post(`/auth/reset-password/${token}`, { Password })
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Không thể đặt lại mật khẩu.";
+          throw new Error(errorMessage);
+        });
     },
     setReaders(readers) {
       this.readers = readers;

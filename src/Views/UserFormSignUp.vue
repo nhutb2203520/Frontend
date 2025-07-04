@@ -93,8 +93,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
+import { useReaderStore } from '@/Store/Reader.store';
+import { ElMessage } from 'element-plus';
 export default {
   data() {
     const today = new Date().toISOString().split("T")[0];
@@ -109,30 +109,49 @@ export default {
         EMAIL: "",
         PASSWORD: "",
         CONFIRM_PASSWORD: "",
-      },
-      message: "",
-      success: false,
+      }
     };
   },
   methods: {
     async submitRegister() {
       if (this.registerData.PASSWORD !== this.registerData.CONFIRM_PASSWORD) {
-        this.message = "Mật khẩu nhập lại không khớp!";
-        this.success = false;
+        ElMessage.warning("Mật khẩu và xác nhận mật khẩu không khớp.");
         return;
       }
-
+      // Kiểm tra email hợp lệ
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(this.registerData.EMAIL)) {
+        ElMessage.warning("Email không hợp lệ.");
+        return;
+      }
+      // Kiểm tra số điện thoại hợp lệ (10 chữ số)
+      const phonePattern = /^[0-9]{10}$/;
+      if (!phonePattern.test(this.registerData.DIENTHOAI)) {
+        ElMessage.warning("Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số.");
+        return;
+      }
       try {
-        const response = await axios.post("http://localhost:3000/api/docgia/register", this.registerData);
-        if (response.status === 200 || response.status === 201) {
-          this.message = "Đăng ký thành công!";
-          this.success = true;
-          this.$router.push("/login");
+        const readerStore = useReaderStore();
+        const data = {
+          HoTen: this.registerData.HOTEN,
+          DiaChi: this.registerData.DIACHI,
+          NgaySinh: this.registerData.NGAYSINH,
+          Phai: this.registerData.GIOITINH,
+          SoDienThoai: this.registerData.DIENTHOAI,
+          Email: this.registerData.EMAIL,
+          Password: this.registerData.PASSWORD,
+        }
+        const result = await readerStore.register(data);
+        if (result.message === "Đăng ký tài khoản thành công.") {
+          ElMessage.success(result.message);
+          this.$router.push("/signinuser");
+        } else {
+          ElMessage.error(result.message || "Đăng ký thất bại.");
         }
       } catch (error) {
-        this.message = "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin!";
-        this.success = false;
+        ElMessage.error(error.message || "Lỗi không xác định.");
       }
+
     },
   },
 };

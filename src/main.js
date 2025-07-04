@@ -19,7 +19,9 @@ router.beforeEach((to, from, next) => {
   if (
     to.path === "/signinuser" ||
     to.path === "/signup" ||
-    to.path === "/borrowinghistory"
+    to.path === "/borrowinghistory" ||
+    to.path === "/forgot-password" ||
+    /^\/reset-password\/[^/]+$/.test(to.path)
   ) {
     document.body.classList.add("login-page");
   } else {

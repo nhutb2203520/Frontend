@@ -22,7 +22,11 @@
         <!-- Nút đăng nhập -->
         <button type="submit" class="btn btn-primary w-100">Đăng Nhập</button>
       </form>
-
+      <div>
+        <p class="mt-3 text-center">
+          <router-link to="/forgot-password">Quên mật khẩu?</router-link>
+        </p>
+      </div>
       <div>
         <p class="mt-3 text-center">
           Chưa có tài khoản? <router-link to="/signup">Đăng ký ngay</router-link>

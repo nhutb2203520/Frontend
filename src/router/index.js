@@ -68,6 +68,16 @@ const routes = [
     name: "Change Password",
     component: ChangePass,
   },
+  {
+    path: "/forgot-password",
+    name: "Forgot Password",
+    component: () => import("@/Views/Forgot-Password.vue"),
+  },
+  {
+    path: "/reset-password/:token",
+    name: "Reset Password",
+    component: () => import("@/Views/Reset-Password.vue"),
+  },
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
   {
@@ -121,8 +131,7 @@ const routes = [
         name: "LocationManagement",
         component: LocationManagement,
       },
-     
-    ]
+    ],
   },
   {
     path: "/admin/borrow-return-management",
@@ -136,10 +145,8 @@ const routes = [
     name: "NotFound",
     component: NotFound,
   },
-  
-  
+
   //
-  
 ];
 
 const router = createRouter({

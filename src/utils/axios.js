@@ -1,8 +1,8 @@
 import axios from "axios";
-
+import { useAuthStore } from "@/Store/auth.store";
 const instance = axios.create({
   baseURL: "http://localhost:3000",
-  timeout: 10000, // 10 giây
+  timeout: 10000,
 });
 instance.interceptors.request.use((config) => {
   const auth = useAuthStore();
