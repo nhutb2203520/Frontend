@@ -1,6 +1,7 @@
 <template>
     <div class="overlay">
       <NavBarAD />
+      <SideBarAD />
   
       <div class="category-management">
         <!-- Tiêu đề -->
@@ -38,10 +39,12 @@
   
   <script>
   import NavBarAD from "@/components/Admin/NavBarAD.vue";
+  import SideBarAD from "@/components/Admin/SideBarAD.vue";
   
   export default {
     components: {
       NavBarAD,
+      SideBarAD,
     },
     data() {
       return {
@@ -83,7 +86,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 0px 20px;
     overflow-y: auto;
   }
   

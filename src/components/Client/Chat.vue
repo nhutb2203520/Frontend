@@ -66,13 +66,6 @@ export default {
 </script>
 
 <style scoped>
-.chat-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
-}
-
 .chat-image {
   max-width: 100px;
   margin: 10px auto;
@@ -140,11 +133,14 @@ export default {
   display: inline-block;
   padding: 10px 15px;
   border-radius: 18px;
-  background-color: #e1f0ff;
+  background-color: #a2bad3;
+  color: #000000;
+  /* màu chữ của bot */
   max-width: 80%;
   word-wrap: break-word;
   font-size: 16px;
 }
+
 
 .msg-user span {
   background-color: #007bff;

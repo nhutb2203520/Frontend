@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar">
         <div class="navbar-left">
-            <router-link to="/home" class="navbar-logo">
+            <router-link to="/homeadmin" class="navbar-logo">
                 <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
                 <span class="title">QUẢN LÝ THƯ VIỆN NLN</span>
             </router-link>
