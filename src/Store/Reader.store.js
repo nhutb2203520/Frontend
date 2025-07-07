@@ -1,15 +1,75 @@
 // /d:/Frontend-register-borrow-book/Frontend/src/Store/Reader.store.js
 import { defineStore } from "pinia";
-import axios from "axios";
-
+import axios from "@/utils/axios";
+import { useAuthStore } from "./auth.store";
+import ResetPassword from "@/Views/Reset-Password.vue";
 export const useReaderStore = defineStore("reader", {
   state: () => ({
     readers: [],
+    infoReader: localStorage.getItem("infoReader") || " ",
     selectedReader: null,
     loading: false,
     error: null,
   }),
   actions: {
+    login(data) {
+      return axios
+        .post("/readers/login", data)
+        .then((response) => {
+          if (response.data && response.data.reader) {
+            const hoTen = response.data.reader.HoTen;
+            this.infoReader = hoTen; // Gán vào state Pinia
+            const authStore = useAuthStore();
+            localStorage.setItem("infoReader", hoTen);
+            authStore.setTokens(
+              response.data.token,
+              response.data.refreshToken
+            );
+          }
+          return response.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    register(data) {
+      return axios
+        .post("/readers/register", data)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    forgotPassword(identifier) {
+      return axios
+        .post("/auth/forgot-password", identifier)
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Không thể gửi yêu cầu khôi phục mật khẩu.";
+          throw new Error(errorMessage);
+        });
+    },
+    resetPassword({ token, Password }) {
+      return axios
+        .post(`/auth/reset-password/${token}`, { Password })
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "Không thể đặt lại mật khẩu.";
+          throw new Error(errorMessage);
+        });
+    },
     setReaders(readers) {
       this.readers = readers;
     },

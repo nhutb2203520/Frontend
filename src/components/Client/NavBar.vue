@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar" data-aos="fade-down" data-aos-duration="1000">
+    <nav class="navbar">
         <div class="navbar-left">
             <router-link to="/" class="navbar-logo">
                 <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
@@ -55,14 +55,17 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/Store/auth.store';
+import { useReaderStore } from '@/Store/Reader.store';
+import { ElMessage } from 'element-plus';
 export default {
     name: 'NavBar',
     data() {
         return {
             showAccountMenu: false,
-            isLoggedIn: false, // ⚠️ sau này dùng localStorage hoặc Vuex
+            isLoggedIn: useAuthStore().accessToken, // ⚠️ sau này dùng localStorage hoặc Vuex
             userInfo: {
-                name: 'Nguyễn Văn A'
+                name: useReaderStore().infoReader || 'Người dùng',
             }
         };
     },
@@ -72,9 +75,11 @@ export default {
         },
         logout() {
             this.isLoggedIn = false;
-            this.showAccountMenu = false;
-            alert("Đã đăng xuất!");
-            // Nếu có token/localStorage → xóa tại đây
+            this.showAccountMenu = false
+            useAuthStore().logout(); // Gọi action logout từ auth store
+            ElMessage.success('Đăng xuất thành công!');
+            this.$router.push('/'); // Quay về trang chủ sau khi đăng xuất
+
         }
     }
 };

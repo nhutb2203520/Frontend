@@ -6,22 +6,22 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import ElementPlus from "element-plus";
+import "element-plus/dist/index.css";
 import App from "./App.vue";
 import router from "./router"; // 🟢 Import router
 const pinia = createPinia();
 
 const app = createApp(App);
-app.mixin({
-  mounted() {
-    AOS.init();
-  },
-});
+app.use(ElementPlus);
 router.beforeEach((to, from, next) => {
   // Nếu là login hoặc register thì thêm class
   if (
-    to.path === "/signinuser" ||
+    /^\/(signin(\/[^/]+)?|signinuser|admin\/signin(\/[^/]+)?)$/.test(to.path) ||
     to.path === "/signup" ||
-    to.path === "/borrowinghistory"
+    to.path === "/borrowinghistory" ||
+    to.path === "/forgot-password" ||
+    /^\/reset-password\/[^/]+$/.test(to.path)
   ) {
     document.body.classList.add("login-page");
   } else {
@@ -32,3 +32,4 @@ router.beforeEach((to, from, next) => {
 app.use(router);
 app.use(pinia);
 app.mount("#app");
+AOS.init();
