@@ -3,10 +3,12 @@
     <!-- NavBar trên cùng -->
     <NavBarAD />
     <!-- Sidebar bên trái -->
-    <SideBarAD />
+    <SideBarAD @toggle="handleSidebarToggle" />
 
-    <!-- Nội dung quản lý -->
-    <div class="reader-management">
+    <router-view />
+
+    <!-- Nội dung quản lý độc giả -->
+    <div v-if="route.name === 'ManagementReader'" class="reader-management">
       <h1 class="title">Quản lý độc giả</h1>
 
       <!-- Bộ lọc -->
@@ -74,23 +76,18 @@ export default {
       searchKeyword: "",
       filterType: "all",
       selectedReader: null,
+      sidebarOpen: true,
       readers: [
         { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", status: "active" },
         { id: 2, name: "Lê Thị B", email: "b@gmail.com", status: "blocked" },
         { id: 3, name: "Trần Văn C", email: "c@gmail.com", status: "active" },
-        { id: 4, name: "Đặng Thị D", email: "d@gmail.com", status: "active" },
-        { id: 5, name: "Phạm Văn E", email: "e@gmail.com", status: "active" },
-        { id: 6, name: "Ngô Thị F", email: "f@gmail.com", status: "blocked" },
-        { id: 7, name: "Nguyễn Văn A", email: "a@gmail.com", status: "active" },
-        { id: 8, name: "Lê Thị B", email: "b@gmail.com", status: "blocked" },
-        { id: 9, name: "Trần Văn C", email: "c@gmail.com", status: "active" },
-        { id: 10, name: "Đặng Thị D", email: "d@gmail.com", status: "active" },
-        { id: 11, name: "Phạm Văn E", email: "e@gmail.com", status: "active" },
-        { id: 12, name: "Ngô Thị F", email: "f@gmail.com", status: "blocked" },
       ]
     };
   },
   computed: {
+    route() {
+      return this.$route;
+    },
     totalReaders() {
       return this.readers.length;
     },
@@ -114,6 +111,9 @@ export default {
     }
   },
   methods: {
+    handleSidebarToggle(isOpen) {
+      this.sidebarOpen = isOpen;
+    },
     filterAll() {
       this.filterType = 'all';
       this.selectedReader = null;
@@ -130,7 +130,7 @@ export default {
       this.selectedReader = this.selectedReader?.id === reader.id ? null : reader;
     },
     goToAddReader() {
-      this.$router.push('/admin/add-reader');
+      this.$router.push({ name: "AddReader" });
     },
     toggleStatus(reader) {
       reader.status = reader.status === 'active' ? 'blocked' : 'active';
@@ -154,7 +154,6 @@ export default {
   overflow-y: auto;
   z-index: 1;
 }
-
 .reader-management {
   max-width: 900px;
   width: 100%;
@@ -166,14 +165,12 @@ export default {
   z-index: 2;
   position: relative;
 }
-
 .title {
   text-align: center;
   font-size: 28px;
   margin-bottom: 25px;
   color: #2c3e50;
 }
-
 .top-buttons {
   display: flex;
   justify-content: center;
@@ -181,7 +178,6 @@ export default {
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
-
 .top-buttons button {
   padding: 12px 20px;
   border: 2px solid #2980b9;
@@ -192,12 +188,10 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
-
 .top-buttons button:hover {
   background-color: #2980b9;
   color: white;
 }
-
 .actions {
   display: flex;
   justify-content: space-between;
@@ -206,7 +200,6 @@ export default {
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .actions input {
   flex: 1;
   min-width: 250px;
@@ -215,7 +208,6 @@ export default {
   border: 1px solid #ccc;
   font-size: 15px;
 }
-
 .add-btn {
   padding: 12px 20px;
   background-color: #3498db;
@@ -226,11 +218,9 @@ export default {
   transition: 0.3s;
   cursor: pointer;
 }
-
 .add-btn:hover {
   background-color: #2980b9;
 }
-
 .reader-list {
   background: #f8f8f8;
   padding: 20px;
@@ -239,19 +229,16 @@ export default {
   max-height: 400px;
   overflow-y: auto;
 }
-
 .scrollable-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
 .reader-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
-
 .reader-detail {
   background-color: #fff;
   padding: 10px;
@@ -259,11 +246,9 @@ export default {
   border-radius: 8px;
   margin-top: 10px;
 }
-
 .text-success {
   color: #28a745;
 }
-
 .text-danger {
   color: #dc3545;
 }

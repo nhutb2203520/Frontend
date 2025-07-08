@@ -17,7 +17,20 @@
           />
         </div>
 
-        <button class="add-btn" @click="goToAddPublisher">Thêm NXB</button>
+        <button class="add-btn" @click="toggleAddForm">
+          {{ showAddForm ? '❌ Hủy thêm' : '➕ Thêm NXB' }}
+        </button>
+      </div>
+
+      <!-- Form thêm nhà xuất bản -->
+      <div v-if="showAddForm" class="add-form">
+        <input v-model="newPublisher.name" placeholder="Nhập tên nhà xuất bản" />
+        <textarea v-model="newPublisher.address" placeholder="Nhập địa chỉ" rows="2" />
+        <div class="detail-actions">
+          <button class="btn btn-success" @click="addPublisher">💾 Lưu</button>
+          <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
+        </div>
+        <hr />
       </div>
 
       <!-- Danh sách NXB -->
@@ -36,16 +49,29 @@
               <div
                 v-if="selectedPublisher?.id === pub.id"
                 class="reader-detail"
+                @click.stop
               >
-                <p><strong>ID:</strong> {{ pub.id }}</p>
-                <p><strong>Tên NXB:</strong> {{ pub.name }}</p>
-                <div class="detail-actions">
-                  <button class="btn btn-warning" @click.stop="editPublisher(pub)">
-                    ✏️ Chỉnh sửa
-                  </button>
-                  <button class="btn btn-danger" @click.stop="deletePublisher(pub)">
-                    🗑️ Xóa
-                  </button>
+                <!-- Nếu đang chỉnh sửa -->
+                <div v-if="editingPublisherId === pub.id">
+                  <p><strong>Tên NXB:</strong></p>
+                  <input v-model="editedPublisher.name" />
+                  <p><strong>Địa chỉ:</strong></p>
+                  <textarea v-model="editedPublisher.address" rows="2" />
+                  <div class="detail-actions">
+                    <button class="btn btn-success" @click="saveEdit(pub.id)">💾 Lưu</button>
+                    <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
+                  </div>
+                </div>
+
+                <!-- Nếu không chỉnh sửa -->
+                <div v-else>
+                  <p><strong>ID:</strong> {{ pub.id }}</p>
+                  <p><strong>Tên NXB:</strong> {{ pub.name }}</p>
+                  <p><strong>Địa chỉ:</strong> {{ pub.address }}</p>
+                  <div class="detail-actions">
+                    <button class="btn btn-warning" @click.stop="editPublisher(pub)">✏️ Chỉnh sửa</button>
+                    <button class="btn btn-danger" @click.stop="deletePublisher(pub)">🗑️ Xóa</button>
+                  </div>
                 </div>
               </div>
             </li>
@@ -66,13 +92,18 @@ export default {
     return {
       searchKeyword: "",
       selectedPublisher: null,
+      editingPublisherId: null,
+      showAddForm: false,
+      newPublisher: { name: "", address: "" },
+      editedPublisher: { name: "", address: "" },
+      nextId: 7,
       publishers: [
-        { id: 1, name: "NXB HÀ NỘI" },
-        { id: 2, name: "NXB TRẺ" },
-        { id: 3, name: "NXB CẦN THƠ" },
-        { id: 4, name: "NXB VĨNH LONG" },
-        { id: 5, name: "NXB ĐÀ NẴNG" },
-        { id: 6, name: "NXB AN GIANG" },
+        { id: 1, name: "NXB HÀ NỘI", address: "Hà Nội" },
+        { id: 2, name: "NXB TRẺ", address: "TP.HCM" },
+        { id: 3, name: "NXB CẦN THƠ", address: "Cần Thơ" },
+        { id: 4, name: "NXB VĨNH LONG", address: "Vĩnh Long" },
+        { id: 5, name: "NXB ĐÀ NẴNG", address: "Đà Nẵng" },
+        { id: 6, name: "NXB AN GIANG", address: "An Giang" },
       ],
     };
   },
@@ -88,21 +119,59 @@ export default {
   },
   methods: {
     togglePublisher(pub) {
-      this.selectedPublisher =
-        this.selectedPublisher?.id === pub.id ? null : pub;
+      if (this.editingPublisherId !== null) return;
+      this.selectedPublisher = this.selectedPublisher?.id === pub.id ? null : pub;
     },
-    goToAddPublisher() {
-      this.$router.push('/admin/add-publisher');
+    toggleAddForm() {
+      this.showAddForm = !this.showAddForm;
+      this.newPublisher = { name: "", address: "" };
+    },
+    addPublisher() {
+      if (!this.newPublisher.name.trim()) {
+        alert("⚠️ Vui lòng nhập tên nhà xuất bản.");
+      return;
+      }
+
+      try {
+        this.publishers.push({
+          id: this.nextId++,
+          name: this.newPublisher.name.trim(),
+          address: this.newPublisher.address.trim(),
+        });
+        this.toggleAddForm();
+        alert("✅ Thêm nhà xuất bản thành công!");
+      } catch (e) {
+        alert("❌ Có lỗi xảy ra khi thêm nhà xuất bản.");
+      }
+    },
+
+    cancelAdd() {
+      this.toggleAddForm();
     },
     editPublisher(pub) {
-      this.$router.push(`/admin/edit-publisher/${pub.id}`);
+      this.editingPublisherId = pub.id;
+      this.editedPublisher = { name: pub.name, address: pub.address };
     },
+    cancelEdit() {
+      this.editingPublisherId = null;
+      this.editedPublisher = { name: "", address: "" };
+    },
+    saveEdit(id) {
+      const index = this.publishers.findIndex((p) => p.id === id);
+      if (index !== -1) {
+       try {
+        this.publishers[index].name = this.editedPublisher.name.trim();
+        this.publishers[index].address = this.editedPublisher.address.trim();
+        this.cancelEdit();
+      alert("✅ Cập nhật thành công!");
+    } catch (e) {
+      alert("❌ Có lỗi xảy ra khi cập nhật.");
+    }
+  }
+},
+
     deletePublisher(pub) {
-      if (
-        confirm(
-          `Bạn có chắc chắn muốn xóa nhà xuất bản "${pub.name}" không?`
-        )
-      ) {
+      if (confirm(`Bạn có chắc chắn muốn xóa nhà xuất bản "${pub.name}" không?`)) {
         this.publishers = this.publishers.filter((p) => p.id !== pub.id);
         this.selectedPublisher = null;
       }
@@ -219,5 +288,43 @@ export default {
   margin-top: 10px;
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.add-form input,
+.add-form textarea,
+.reader-detail input,
+.reader-detail textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+.btn-warning {
+  background-color: #f1c40f;
+  color: #000;
+}
+.btn-danger {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.btn-success {
+  background-color: #27ae60;
+  color: white;
+}
+.btn-secondary {
+  background-color: #7f8c8d;
+  color: white;
 }
 </style>

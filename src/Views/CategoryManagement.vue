@@ -6,23 +6,29 @@
     <div class="publisher-management">
       <h1 class="title">Quản lý loại sách</h1>
 
-      <!-- Thanh công cụ tổng và tìm kiếm -->
       <div class="top-bar">
         <button class="total-btn">Tổng loại sách: {{ totalCategories }}</button>
-
         <div class="search">
-          <input
-            v-model="searchKeyword"
-            placeholder="Tìm kiếm theo tên loại sách..."
-          />
+          <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên loại sách..." />
         </div>
-
-        <button class="add-btn" @click="goToAddCategory">Thêm loại sách</button>
+        <button class="add-btn" @click="toggleAddForm">
+          {{ showAddForm ? '❌ Hủy thêm' : '➕ Thêm loại sách' }}
+        </button>
       </div>
 
-      <!-- Danh sách loại sách -->
       <div class="reader-list">
         <h3>Danh sách loại sách</h3>
+
+        <div v-if="showAddForm" class="add-form">
+          <input v-model="newCategory.name" placeholder="Nhập tên loại sách" />
+          <textarea v-model="newCategory.description" placeholder="Nhập mô tả loại sách" rows="2" />
+          <div class="detail-actions">
+            <button class="btn btn-success" @click="addCategory">💾 Lưu</button>
+            <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
+          </div>
+          <hr />
+        </div>
+
         <div class="scrollable-list">
           <ul>
             <li
@@ -33,19 +39,25 @@
             >
               <strong>{{ cat.name }}</strong>
 
-              <div
-                v-if="selectedCategory?.id === cat.id"
-                class="reader-detail"
-              >
-                <p><strong>ID:</strong> {{ cat.id }}</p>
-                <p><strong>Tên loại sách:</strong> {{ cat.name }}</p>
-                <div class="detail-actions">
-                  <button class="btn btn-warning" @click.stop="editCategory(cat)">
-                    ✏️ Chỉnh sửa
-                  </button>
-                  <button class="btn btn-danger" @click.stop="deleteCategory(cat)">
-                    🗑️ Xóa
-                  </button>
+              <div v-if="selectedCategory?.id === cat.id" class="reader-detail" @click.stop>
+                <div v-if="editingCategoryId === cat.id">
+                  <p><strong>Tên loại sách:</strong></p>
+                  <input v-model="editedCategory.name" />
+                  <p><strong>Mô tả:</strong></p>
+                  <textarea v-model="editedCategory.description" rows="2" />
+                  <div class="detail-actions">
+                    <button class="btn btn-success" @click="saveEdit(cat.id)">💾 Lưu</button>
+                    <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
+                  </div>
+                </div>
+                <div v-else>
+                  <p><strong>ID:</strong> {{ cat.id }}</p>
+                  <p><strong>Tên loại sách:</strong> {{ cat.name }}</p>
+                  <p><strong>Mô tả:</strong> {{ cat.description }}</p>
+                  <div class="detail-actions">
+                    <button class="btn btn-warning" @click.stop="editCategory(cat)">✏️ Chỉnh sửa</button>
+                    <button class="btn btn-danger" @click.stop="deleteCategory(cat)">🗑️ Xóa</button>
+                  </div>
                 </div>
               </div>
             </li>
@@ -57,8 +69,8 @@
 </template>
 
 <script>
-import NavBarAD from '@/components/Admin/NavBarAD.vue';
-import SideBarAD from '@/components/Admin/SideBarAD.vue';
+import NavBarAD from "@/components/Admin/NavBarAD.vue";
+import SideBarAD from "@/components/Admin/SideBarAD.vue";
 
 export default {
   components: { NavBarAD, SideBarAD },
@@ -66,12 +78,17 @@ export default {
     return {
       searchKeyword: "",
       selectedCategory: null,
+      editingCategoryId: null,
+      showAddForm: false,
+      newCategory: { name: "", description: "" },
+      editedCategory: { name: "", description: "" },
       categories: [
-        { id: 1, name: "Khoa học" },
-        { id: 2, name: "Tiểu thuyết" },
-        { id: 3, name: "Tâm lý học" },
-        { id: 4, name: "Kinh doanh" },
+        { id: 1, name: "Khoa học", description: "Sách về khoa học tự nhiên, công nghệ" },
+        { id: 2, name: "Tiểu thuyết", description: "Truyện dài, hư cấu, lãng mạn" },
+        { id: 3, name: "Tâm lý học", description: "Tài liệu về hành vi con người, phát triển cá nhân" },
+        { id: 4, name: "Kinh doanh", description: "Sách về kinh tế, tài chính, quản trị" },
       ],
+      nextId: 5,
     };
   },
   computed: {
@@ -85,22 +102,57 @@ export default {
     },
   },
   methods: {
-    toggleCategory(cat) {
-      this.selectedCategory =
-        this.selectedCategory?.id === cat.id ? null : cat;
+    toggleAddForm() {
+      this.showAddForm = !this.showAddForm;
+      this.newCategory = { name: "", description: "" };
     },
-    goToAddCategory() {
-      this.$router.push('/admin/add-category');
+    addCategory() {
+      if (!this.newCategory.name.trim()) {
+        alert("⚠️ Vui lòng nhập tên loại sách.");
+        return;
+      }
+      try {
+        this.categories.push({
+          id: this.nextId++,
+          name: this.newCategory.name.trim(),
+          description: this.newCategory.description.trim(),
+        });
+        this.toggleAddForm();
+        alert("✅ Thêm loại sách thành công!");
+      } catch (error) {
+        alert("❌ Có lỗi xảy ra khi thêm loại sách.");
+      }
+    },
+    cancelAdd() {
+      this.toggleAddForm();
+    },
+    toggleCategory(cat) {
+      if (this.editingCategoryId !== null) return;
+      this.selectedCategory = this.selectedCategory?.id === cat.id ? null : cat;
     },
     editCategory(cat) {
-      this.$router.push(`/admin/edit-category/${cat.id}`);
+      this.editingCategoryId = cat.id;
+      this.editedCategory = { name: cat.name, description: cat.description };
+    },
+    cancelEdit() {
+      this.editingCategoryId = null;
+      this.editedCategory = { name: "", description: "" };
+    },
+    saveEdit(id) {
+      const index = this.categories.findIndex((c) => c.id === id);
+      if (index !== -1) {
+        try {
+          this.categories[index].name = this.editedCategory.name.trim();
+          this.categories[index].description = this.editedCategory.description.trim();
+          this.cancelEdit();
+          alert("✅ Cập nhật loại sách thành công!");
+        } catch (error) {
+          alert("❌ Có lỗi xảy ra khi cập nhật.");
+        }
+      }
     },
     deleteCategory(cat) {
-      if (
-        confirm(
-          `Bạn có chắc chắn muốn xóa loại sách "${cat.name}" không?`
-        )
-      ) {
+      if (confirm(`Bạn có chắc chắn muốn xóa loại sách "${cat.name}" không?`)) {
         this.categories = this.categories.filter((c) => c.id !== cat.id);
         this.selectedCategory = null;
       }
@@ -110,6 +162,7 @@ export default {
 </script>
 
 <style scoped>
+/* Dùng lại CSS như trước đây - đã tối ưu */
 .overlay {
   position: fixed;
   top: 0;
@@ -179,7 +232,6 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
-
 .add-btn:hover {
   background-color: #2980b9;
 }
@@ -217,5 +269,43 @@ export default {
   margin-top: 10px;
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.add-form input,
+.add-form textarea,
+.reader-detail input,
+.reader-detail textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+.btn-warning {
+  background-color: #f1c40f;
+  color: #000;
+}
+.btn-danger {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.btn-success {
+  background-color: #27ae60;
+  color: white;
+}
+.btn-secondary {
+  background-color: #7f8c8d;
+  color: white;
 }
 </style>

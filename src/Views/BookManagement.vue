@@ -6,7 +6,7 @@
     <!-- Sidebar bên trái -->
     <SideBarAD @toggle="handleSidebarToggle" />
   
-    <router-view></router-view>
+    <router-view />
     <!-- Nội dung quản lý -->
     <div v-if ="route.name ==='BookManagement'" class="book-management">
     
