@@ -1,23 +1,42 @@
 <template>
   <div class="chat-container">
-    <img src="@/assets/ChatGPT.png" alt="ChatGPT Logo" class="chat-image" @click="toggleChat" />
+    <!-- Nút mở chat -->
+    <img
+      v-if="!isChatOpen"
+      src="@/assets/ChatGPT.png"
+      alt="ChatGPT Logo"
+      class="chat-image"
+      @click="openChat"
+    />
 
-    <div v-if="isChatOpen" class="chat-box">
-      <div class="chat-header">
-        <strong>ChatBot NLN</strong>
-        <button class="close-btn" @click="toggleChat">×</button>
-      </div>
-
-      <div class="chat-messages">
-        <div v-for="(msg, index) in messages" :key="index" :class="msg.sender === 'user' ? 'msg-user' : 'msg-bot'">
-          <span>{{ msg.text }}</span>
+    <!-- Khung chat + overlay -->
+    <div v-if="isChatOpen" class="chat-overlay" @click.self="closeChat">
+      <div class="chat-box">
+        <div class="chat-header">
+          <strong>ChatBot NLN</strong>
+          <button class="close-btn" @click="closeChat">×</button>
         </div>
-      </div>
 
-      <div class="chat-input-area">
-        <input type="text" v-model="userInput" class="chat-input" placeholder="Nhập câu hỏi..."
-          @keyup.enter="sendMessage" />
-        <button @click="sendMessage" class="chat-send">Gửi</button>
+        <div class="chat-messages">
+          <div
+            v-for="(msg, index) in messages"
+            :key="index"
+            :class="msg.sender === 'user' ? 'msg-user' : 'msg-bot'"
+          >
+            <span>{{ msg.text }}</span>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <input
+            type="text"
+            v-model="userInput"
+            class="chat-input"
+            placeholder="Nhập câu hỏi..."
+            @keyup.enter="sendMessage"
+          />
+          <button @click="sendMessage" class="chat-send">Gửi</button>
+        </div>
       </div>
     </div>
   </div>
@@ -30,13 +49,23 @@ export default {
     return {
       isChatOpen: false,
       userInput: "",
-      messages: []
+      messages: [],
     };
   },
   methods: {
-    toggleChat() {
-      this.isChatOpen = !this.isChatOpen;
+    openChat() {
+      this.isChatOpen = true;
+      // Hiển thị tin nhắn chào nếu chưa có tin nhắn nào
+      if (this.messages.length === 0) {
+        this.messages.push({
+          sender: "bot",
+          text: "Xin chào bạn đến với Thư viện! Hãy đặt cho tôi câu hỏi bất kỳ về sách, thư viện,... Tôi sẽ trả lời cho bạn!!!",
+        });
+      }
       this.$nextTick(() => this.scrollToBottom());
+    },
+    closeChat() {
+      this.isChatOpen = false;
     },
     sendMessage() {
       const text = this.userInput.trim();
@@ -47,10 +76,11 @@ export default {
 
       this.$nextTick(() => this.scrollToBottom());
 
+      // Phản hồi mẫu sau 500ms
       setTimeout(() => {
         this.messages.push({
           sender: "bot",
-          text: "Cảm ơn bạn đã hỏi! (Đây là phản hồi mẫu)"
+          text: "Cảm ơn bạn đã hỏi! (Đây là phản hồi mẫu)",
         });
         this.$nextTick(() => this.scrollToBottom());
       }, 500);
@@ -60,34 +90,53 @@ export default {
       if (container) {
         container.scrollTop = container.scrollHeight;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
+.chat-container {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  z-index: 9999;
+}
+
 .chat-image {
-  max-width: 100px;
-  margin: 10px auto;
-  display: block;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s;
 }
 
 .chat-image:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+}
+
+.chat-overlay {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 20px;
 }
 
 .chat-box {
-  width: 400px;
-  /* lớn hơn */
-  height: 550px;
-  /* cao hơn */
+  width: 360px;
+  height: 500px;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
@@ -112,7 +161,6 @@ export default {
 
 .chat-messages {
   flex: 1;
-  /* chiếm toàn bộ chiều cao còn lại */
   overflow-y: auto;
   padding: 10px;
   background: #f8f8f8;
@@ -135,12 +183,10 @@ export default {
   border-radius: 18px;
   background-color: #a2bad3;
   color: #000000;
-  /* màu chữ của bot */
   max-width: 80%;
   word-wrap: break-word;
   font-size: 16px;
 }
-
 
 .msg-user span {
   background-color: #007bff;
@@ -151,6 +197,7 @@ export default {
   display: flex;
   border-top: 1px solid #ddd;
   padding: 8px;
+  background-color: white;
 }
 
 .chat-input {
@@ -169,6 +216,7 @@ export default {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
+  border-radius: 6px;
 }
 
 .chat-send:hover {

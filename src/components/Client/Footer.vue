@@ -5,25 +5,43 @@
     </div>
 
     <div class="footer-icons">
+      <!-- Map -->
       <div class="footer-icon-item">
-        <a href="https://maps.app.goo.gl/38x4YKtZq9NjNzoW9" target="_blank" rel="noopener"><img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Map" /></a>
-
+        <a href="https://maps.app.goo.gl/38x4YKtZq9NjNzoW9" target="_blank" rel="noopener">
+          <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Map" />
+        </a>
         <p>Map</p>
       </div>
+
+      <!-- Phone -->
       <div class="footer-icon-item">
-        <img src="https://cdn-icons-png.flaticon.com/512/597/597177.png" alt="Phone" />
+        <a href="tel:+0776560730">
+          <img src="https://cdn-icons-png.flaticon.com/512/597/597177.png" alt="Phone" />
+        </a>
         <p>Phone</p>
       </div>
+
+      <!-- Email -->
       <div class="footer-icon-item">
-        <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="Email" />
+        <a href="mailto:nhutb2203520@student.ctu.edu.vn">
+          <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="Email" />
+        </a>
         <p>Email</p>
       </div>
+
+      <!-- Facebook -->
       <div class="footer-icon-item">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+        <a href="https://facebook.com" target="_blank" rel="noopener">
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+        </a>
         <p>Facebook</p>
       </div>
+
+      <!-- YouTube -->
       <div class="footer-icon-item">
-        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+        <a href="https://youtube.com" target="_blank" rel="noopener">
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+        </a>
         <p>YouTube</p>
       </div>
     </div>
@@ -45,7 +63,7 @@ export default {
 
 <style scoped>
 .footer-wrapper {
-  background-color: #62a1e0;
+  background-color: #448cd4;
   text-align: center;
   padding: 40px 20px;
   font-family: 'Segoe UI', sans-serif;
@@ -66,10 +84,12 @@ export default {
 }
 
 .footer-icon-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   max-width: 100px;
+  text-align: center;
+}
+
+.footer-icon-item a {
+  display: inline-block;
 }
 
 .footer-icon-item img {
@@ -79,18 +99,25 @@ export default {
   border-radius: 50%;
   padding: 12px;
   margin-bottom: 8px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.footer-icon-item img:hover {
+  transform: scale(1.1);
 }
 
 .footer-icon-item p {
   margin: 0;
   font-size: 14px;
   font-weight: 500;
+  color: #ffffff;
 }
 
 .divider {
   border: none;
   height: 1px;
-  background-color: #888;
+  background-color: #ffffff;
   width: 80%;
   margin: 20px auto;
 }
@@ -98,6 +125,6 @@ export default {
 .footer-contact p {
   margin: 5px 0;
   font-size: 14px;
-  color: #444;
+  color: #ffffff;
 }
 </style>
