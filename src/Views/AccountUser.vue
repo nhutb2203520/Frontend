@@ -11,6 +11,12 @@
         <p v-if="userInfo"><el-icon>
             <UserFilled />
           </el-icon> <strong>Họ tên:</strong> {{ capitalizeWords(userInfo.HoTen) }}</p>
+        <p v-if="userInfo && userInfo.NgaySinh">
+          <el-icon>
+            <Calendar />
+          </el-icon>
+          <strong>Ngày sinh:</strong> {{ formatDate(userInfo.NgaySinh) }}
+        </p>
 
         <p v-if="userInfo"><el-icon>
             <Message />

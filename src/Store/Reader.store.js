@@ -112,12 +112,15 @@ export const useReaderStore = defineStore("reader", {
     },
     updateAccount(data) {
       return axios
-        .put("/readers/update-account", data)
+        .patch("/readers/me", data)
         .then((response) => {
-          const updatedReader = response.data.reader;
-          this.infoReader = updatedReader.HoTen; // Cập nhật thông tin người đọc
-          sessionStorage.setItem("infoReader", updatedReader.HoTen);
-          return updatedReader;
+          if (response.data.reader) {
+            const updatedReader = response.data.reader;
+            this.infoReader = updatedReader.HoTen;
+            sessionStorage.setItem("infoReader", updatedReader.HoTen);
+          }
+
+          return response.data;
         })
         .catch((error) => {
           throw new Error(error.response?.data?.message || error.message);

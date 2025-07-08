@@ -100,16 +100,22 @@ const submitForm = async () => {
   }
 
   try {
-    await readerStore.updateAccount({
+    const res = await readerStore.updateAccount({
       HoTen: form.value.fullName,
       NgaySinh: form.value.birthDate,
-      GioiTinh: form.value.gender,
-      SDT: form.value.phone,
+      Phai: form.value.gender,
+      SoDienThoai: form.value.phone,
       Email: form.value.email,
       DiaChi: form.value.address
     });
-    ElMessage.success('✅ Cập nhật thông tin thành công!');
-    router.push('/account-user');
+    console.log(res.message)
+    if (res.message === 'Cập nhật tài khoản thành công.') {
+      ElMessage.success('Cập nhật thông tin thành công!');
+      router.push('/account-user');
+    } else {
+      ElMessage.warning(res.message);
+      return;
+    }
   } catch (err) {
     ElMessage.error(err.response?.data?.message || '❌ Cập nhật thất bại!');
   }
