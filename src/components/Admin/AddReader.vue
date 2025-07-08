@@ -40,12 +40,12 @@
           </div>
   
           <div class="form-group">
-            <label>Mật khẩu:</label>
+            <label>Mật khẩu cho tài khoản độc giả:</label>
             <input type="password" v-model="reader.password" required minlength="6" />
           </div>
   
           <div class="form-group">
-            <label>Nhập lại mật khẩu:</label>
+            <label>Nhập lại mật khẩu cho tài khoản độc giả:</label>
             <input type="password" v-model="confirmPassword" required minlength="6" />
           </div>
   

@@ -27,6 +27,9 @@ import EditBook from "@/components/Admin/EditBook.vue";
 import LocationManagement from "@/components/Admin/LocationManagement.vue";
 import AuthorManagement from "@/components/Admin/AuthorManagement.vue";
 import AddReader from "@/components/Admin/AddReader.vue";
+import UpdateAccount from "@/components/Client/UpdateAccount.vue";
+import ChangePassAD from "@/components/Admin/ChangePassAD.vue";
+import UpdateAccountAD from "@/components/Admin/UpdateAccountAD.vue";
 
 const routes = [
   // --------- Client routes ---------
@@ -79,7 +82,12 @@ const routes = [
     component: AccountUser,
   },
   {
-    path: "/change-password",
+    path: "/account-user/update-account",
+    name: "UpdateAccount",
+    component: UpdateAccount,
+  },
+  {
+    path: "/account-user/change-password",
     name: "Change Password",
     component: ChangePass,
   },
@@ -109,6 +117,16 @@ const routes = [
     path: "/admin/account",
     name: "AccountInforAdmin",
     component: AccountAdmin,
+  },
+  {
+    path: "/admin/account/change-pass-ad",
+    name: "ChangePassAD",
+    component: ChangePassAD,
+  },
+  {
+    path: "/admin/account/update-account-ad",
+    name: "UpdateAccountAD",
+    component: UpdateAccountAD,
   },
   {
     path: "/admin/management-reader",

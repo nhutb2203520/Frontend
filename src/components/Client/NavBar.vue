@@ -33,7 +33,7 @@
                 <div v-if="showAccountMenu" class="account-dropdown">
                     <template v-if="isLoggedIn">
                         <p>Xin chào, {{ userInfo.name }}</p>
-                        <router-link to="/profile">Thông tin cá nhân</router-link>
+                        <router-link to="/account-user">Thông tin cá nhân</router-link>
                         <button @click="logout">Đăng xuất</button>
                     </template>
                     <template v-else>
