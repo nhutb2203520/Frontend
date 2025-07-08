@@ -16,15 +16,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(book, index) in borrowDetails" :key="index">
+                    <tr v-for="(borrow, index) in borrowDetails" :key="index">
                         <td>{{ index + 1 }}</td>
                         <td>
-                            <strong>{{ book.title }}</strong><br />
-                            <em>Tác giả: {{ book.author }}</em>
+                            <strong>{{ capitalizeWords(borrow.MaSach?.TenSach) }}</strong><br />
+                            <em>Tác giả: {{capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))
+                                }}</em>
                         </td>
-                        <td>{{ book.borrowDate }}</td>
-                        <td>{{ book.returnDate }}</td>
-                        <td>{{ book.status }}</td> <!-- Cột bị thiếu đã thêm vào -->
+                        <td>{{ formatDate(borrow.NgayMuon) }}</td>
+                        <td>{{ formatDate(borrow.NgayTra) }}</td>
+                        <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
+                        <!-- Cột bị thiếu đã thêm vào -->
                     </tr>
                 </tbody>
             </table>
@@ -32,30 +34,29 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'BookBorrowingSlip',
-    data() {
-        return {
-            borrowDetails: [
-                {
-                    title: 'Giáo trình Vue.js cơ bản',
-                    author: 'Nguyễn Văn A',
-                    borrowDate: '2025-07-01',
-                    returnDate: '2025-07-06',
-                    status: 'Đang mượn'
-                },
-                {
-                    title: 'Node.js nâng cao',
-                    author: 'Trần Thị B',
-                    borrowDate: '2025-07-01',
-                    returnDate: '2025-07-06',
-                    status: 'Đã trả'
-                }
-            ]
-        };
-    }
-};
+<script setup>
+import { onMounted, ref } from 'vue';
+import { useBorrowBookStore } from '@/Store/BorrowBook.store';
+const borrowDetails = ref([]);
+onMounted(async () => {
+    const borrowBookStore = useBorrowBookStore();
+    borrowDetails.value = await borrowBookStore.fetchBorrowBooks();
+    console.log(borrowDetails.value);
+});
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString('vi-VN', options);
+}
+function capitalizeWords(str) {
+    return str
+        .toLowerCase()
+        .split(' ')
+        .filter(word => word.trim() !== "")
+        .map(word => word[0].toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+
 </script>
 
 <style scoped>

@@ -2,11 +2,10 @@
 import { defineStore } from "pinia";
 import axios from "@/utils/axios";
 import { useAuthStore } from "./auth.store";
-import ResetPassword from "@/Views/Reset-Password.vue";
 export const useReaderStore = defineStore("reader", {
   state: () => ({
     readers: [],
-    infoReader: localStorage.getItem("infoReader") || " ",
+    infoReader: sessionStorage.getItem("infoReader") || " ",
     selectedReader: null,
     loading: false,
     error: null,
@@ -20,11 +19,12 @@ export const useReaderStore = defineStore("reader", {
             const hoTen = response.data.reader.HoTen;
             this.infoReader = hoTen; // Gán vào state Pinia
             const authStore = useAuthStore();
-            localStorage.setItem("infoReader", hoTen);
+            sessionStorage.setItem("infoReader", hoTen);
             authStore.setTokens(
               response.data.token,
               response.data.refreshToken
             );
+            authStore.startRefreshLoop();
           }
           return response.data;
         })

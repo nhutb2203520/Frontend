@@ -31,5 +31,10 @@ router.beforeEach((to, from, next) => {
 });
 app.use(router);
 app.use(pinia);
+import { useAuthStore } from "@/Store/auth.store";
+const authStore = useAuthStore();
+if (authStore.accessToken && authStore.refreshToken) {
+  authStore.startRefreshLoop();
+}
 app.mount("#app");
 AOS.init();

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import { ElMessage } from "element-plus";
 // Client Views
 import HomePage from "@/Views/HomePage.vue";
 import UserFormSignUp from "@/Views/UserFormSignUp.vue";
@@ -59,6 +59,19 @@ const routes = [
     path: "/borrowinghistory",
     name: "BorrowingHistory",
     component: BorrowingHistory,
+    beforeEnter: (to, from, next) => {
+      const accessToken = sessionStorage.getItem("accessToken");
+      if (!accessToken) {
+        ElMessage({
+          message: "Bạn cần đăng nhập để xem lịch sử mượn sách.",
+          type: "warning",
+        });
+        // Chuyển hướng đến trang đăng nhập nếu không có accessToken
+        next({ name: "Signin User" });
+      } else {
+        next();
+      }
+    },
   },
   {
     path: "/account-user",
@@ -107,7 +120,7 @@ const routes = [
         name: "AddReader",
         component: AddReader,
       },
-    ]
+    ],
   },
   {
     path: "/admin/category-management",
@@ -123,12 +136,12 @@ const routes = [
     path: "/admin/book-management",
     name: "BookManagement",
     component: BookManagement,
-      children: [
-        {
-          path: "add-book",
-          name: "AddBook",
-          component: AddBook,
-        },
+    children: [
+      {
+        path: "add-book",
+        name: "AddBook",
+        component: AddBook,
+      },
       {
         path: "edit-book/:id",
         name: "EditBook",
@@ -144,7 +157,7 @@ const routes = [
         path: "author-management",
         name: "AuthorManagement",
         component: AuthorManagement,
-      }
+      },
     ],
   },
   {

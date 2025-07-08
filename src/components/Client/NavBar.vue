@@ -54,35 +54,34 @@
     </nav>
 </template>
 
-<script>
+<script setup>
 import { useAuthStore } from '@/Store/auth.store';
 import { useReaderStore } from '@/Store/Reader.store';
 import { ElMessage } from 'element-plus';
-export default {
-    name: 'NavBar',
-    data() {
-        return {
-            showAccountMenu: false,
-            isLoggedIn: useAuthStore().accessToken, // ⚠️ sau này dùng localStorage hoặc Vuex
-            userInfo: {
-                name: useReaderStore().infoReader || 'Người dùng',
-            }
-        };
-    },
-    methods: {
-        toggleAccountMenu() {
-            this.showAccountMenu = !this.showAccountMenu;
-        },
-        logout() {
-            this.isLoggedIn = false;
-            this.showAccountMenu = false
-            useAuthStore().logout(); // Gọi action logout từ auth store
-            ElMessage.success('Đăng xuất thành công!');
-            this.$router.push('/'); // Quay về trang chủ sau khi đăng xuất
+import { ref, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-        }
-    }
-};
+const auth = useAuthStore();
+const reader = useReaderStore();
+
+const showAccountMenu = ref(false);
+const router = useRouter();
+
+const isLoggedIn = computed(() => !!auth.accessToken);
+const userInfo = computed(() => ({
+    name: reader.infoReader || 'Người dùng'
+}));
+
+function toggleAccountMenu() {
+    showAccountMenu.value = !showAccountMenu.value;
+}
+
+function logout() {
+    auth.logout();
+    ElMessage.success('Đăng xuất thành công!');
+    router.push('/');
+}
 </script>
+
 
 <style src="src/assets/navbar.css"></style>
