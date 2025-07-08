@@ -11,6 +11,18 @@ export const useReaderStore = defineStore("reader", {
     error: null,
   }),
   actions: {
+    setReaders(readers) {
+      this.readers = readers;
+    },
+    setSelectedReader(reader) {
+      this.selectedReader = reader;
+    },
+    setLoading(loading) {
+      this.loading = loading;
+    },
+    setError(error) {
+      this.error = error;
+    },
     login(data) {
       return axios
         .post("/readers/login", data)
@@ -80,17 +92,36 @@ export const useReaderStore = defineStore("reader", {
           throw new Error(error.response?.data?.message || error.message);
         });
     },
-    setReaders(readers) {
-      this.readers = readers;
+    async changePassword(currentPassword, newPassword) {
+      this.setLoading(true);
+      this.setError(null);
+      console.log("Changing password for reader...");
+      try {
+        const response = await axios.patch("/readers/change-password", {
+          currentPassword,
+          newPassword,
+        });
+        console.log("Password changed successfully:", response.data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.response?.data?.message || err.message);
+        throw err;
+      } finally {
+        this.setLoading(false);
+      }
     },
-    setSelectedReader(reader) {
-      this.selectedReader = reader;
-    },
-    setLoading(loading) {
-      this.loading = loading;
-    },
-    setError(error) {
-      this.error = error;
+    updateAccount(data) {
+      return axios
+        .put("/readers/update-account", data)
+        .then((response) => {
+          const updatedReader = response.data.reader;
+          this.infoReader = updatedReader.HoTen; // Cập nhật thông tin người đọc
+          sessionStorage.setItem("infoReader", updatedReader.HoTen);
+          return updatedReader;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
     },
     async fetchReaders() {
       this.setLoading(true);

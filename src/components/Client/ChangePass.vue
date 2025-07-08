@@ -2,30 +2,27 @@
   <div class="container d-flex justify-content-center mt-5 mb-5">
     <div class="signform">
       <img src="@/assets/Logo.jpg" alt="Logo" class="logo_Login" />
-
-      <!-- 🔔 Thông báo -->
-      <p v-if="message" :class="['alert', success ? 'alert-success' : 'alert-danger']" role="alert">
-        {{ message }}
-      </p>
-
       <h2>Đổi Mật Khẩu</h2>
+
       <form @submit.prevent="submitResetPassword">
-        <!-- SĐT hoặc Email -->
+        <!-- Mật khẩu cũ -->
         <div class="mb-3">
           <label class="form-label">Mật khẩu cũ</label>
-          <input type="password" v-model="form.password" required class="form-control" placeholder="Nhập mật khẩu cũ" />
+          <input type="password" v-model="form.currentPassword" required class="form-control"
+            placeholder="Nhập mật khẩu cũ" />
         </div>
+
         <!-- Mật khẩu mới -->
         <div class="mb-3">
           <label class="form-label">Mật khẩu mới</label>
-          <input type="password" v-model="form.password" required class="form-control"
+          <input type="password" v-model="form.newPassword" required class="form-control"
             placeholder="Nhập mật khẩu mới" />
         </div>
 
         <!-- Nhập lại mật khẩu -->
         <div class="mb-3">
           <label class="form-label">Nhập lại mật khẩu</label>
-          <input type="password" v-model="form.rePassword" required class="form-control"
+          <input type="password" v-model="form.validateNewPassword" required class="form-control"
             placeholder="Nhập lại mật khẩu" />
         </div>
 
@@ -33,54 +30,60 @@
           Đổi Mật Khẩu
         </button>
       </form>
-
     </div>
   </div>
 </template>
 
-<script>
-import CryptoJS from "crypto-js";
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+import { useReaderStore } from '../../Store/Reader.store';
+import { ElMessage } from 'element-plus';
 
-export default {
-  data() {
-    return {
-      form: {
-        username: "",
-        password: "",
-        rePassword: "",
-      },
-      message: "",
-      success: false,
-    };
-  },
-  mounted() {
-    document.body.classList.add("login-page");
-  },
-  beforeUnmount() {
-    document.body.classList.remove("login-page");
-  },
-  methods: {
-    submitResetPassword() {
-      if (password !== rePassword) {
-        this.message = "Mật khẩu nhập lại không khớp!";
-        this.success = false;
-        return;
-      }
+const router = useRouter();
+const readerStore = useReaderStore();
 
-      // 🔒 Giả lập hash mật khẩu và xử lý
-      const hashedPassword = CryptoJS.SHA256(password).toString();
-      console.log("Mật khẩu mã hóa:", hashedPassword);
+const form = ref({
+  currentPassword: '',
+  newPassword: '',
+  validateNewPassword: '',
+});
 
-      this.message = "Đổi mật khẩu thành công!";
-      this.success = true;
+const submitResetPassword = async () => {
+  const { currentPassword, newPassword, validateNewPassword } = form.value;
+  if (newPassword.length < 6) {
+    ElMessage.error('❌ Mật khẩu mới phải có ít nhất 6 ký tự!');
+    return;
+  }
+  if (newPassword !== validateNewPassword) {
+    ElMessage.error('❌ Mật khẩu nhập lại không khớp!');
+    return;
+  }
 
-      setTimeout(() => {
-        this.$router.push("/signinuser");
-      }, 2000);
-    },
-  },
+  try {
+    const res = await readerStore.changePassword(currentPassword, newPassword);
+    if (res.message === 'Đổi mật khẩu thành công.') {
+      ElMessage.success('✅ Đổi mật khẩu thành công!');
+      router.push('/account-user');
+    } else {
+      ElMessage.error(res.message || '❌ Đổi mật khẩu thất bại!');
+      return;
+    }
+  } catch (error) {
+    const msg = error?.response?.data?.message || '❌ Đổi mật khẩu thất bại!';
+    ElMessage.error(msg);
+  }
 };
+
+onMounted(() => {
+  document.body.classList.add('login-page');
+});
+
+onBeforeUnmount(() => {
+  document.body.classList.remove('login-page');
+});
 </script>
+
 
 <style scoped>
 @import "@/assets/sign.css";
