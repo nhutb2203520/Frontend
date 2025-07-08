@@ -25,13 +25,15 @@ import ChangePass from "@/components/Client/ChangePass.vue";
 import AddBook from "@/components/Admin/AddBook.vue";
 import EditBook from "@/components/Admin/EditBook.vue";
 import LocationManagement from "@/components/Admin/LocationManagement.vue";
+import AuthorManagement from "@/components/Admin/AuthorManagement.vue";
+import AddReader from "@/components/Admin/AddReader.vue";
 
 const routes = [
   // --------- Client routes ---------
   {
     path: "/",
     name: "Home Page",
-    component: HomePage,x
+    component: HomePage,
   },
   {
     path: "/signup",
@@ -99,6 +101,13 @@ const routes = [
     path: "/admin/management-reader",
     name: "ManagementReader",
     component: ManagementReader,
+    children: [
+      {
+        path: "add-reader",
+        name: "AddReader",
+        component: AddReader,
+      },
+    ]
   },
   {
     path: "/admin/category-management",
@@ -114,12 +123,12 @@ const routes = [
     path: "/admin/book-management",
     name: "BookManagement",
     component: BookManagement,
-    children: [
-      {
-        path: "add-book",
-        name: "AddBook",
-        component: AddBook,
-      },
+      children: [
+        {
+          path: "add-book",
+          name: "AddBook",
+          component: AddBook,
+        },
       {
         path: "edit-book/:id",
         name: "EditBook",
@@ -131,6 +140,11 @@ const routes = [
         name: "LocationManagement",
         component: LocationManagement,
       },
+      {
+        path: "author-management",
+        name: "AuthorManagement",
+        component: AuthorManagement,
+      }
     ],
   },
   {

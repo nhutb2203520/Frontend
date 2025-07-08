@@ -16,6 +16,7 @@
       <div class="location-list">
         <h3>Danh sách vị trí sách</h3>
 
+        <!-- Form thêm -->
         <div v-if="showAddForm" class="add-form">
           <input v-model="newLocation.name" placeholder="Nhập tên vị trí mới" />
           <textarea v-model="newLocation.description" placeholder="Nhập mô tả vị trí mới" rows="2" />
@@ -26,6 +27,7 @@
           <hr />
         </div>
 
+        <!-- Danh sách -->
         <div class="scrollable-list">
           <ul>
             <li
@@ -36,16 +38,22 @@
             >
               <strong>{{ loc.name }}</strong>
               <div v-if="selectedLocation?.id === loc.id" class="location-detail" @click.stop>
+
+                <!-- Chỉnh sửa -->
                 <div v-if="editingLocationId === loc.id">
                   <p><strong>Tên vị trí:</strong></p>
-                  <input v-model="editedLocation.name" />
+                  <input v-model="editedLocation.name" placeholder="Tên vị trí" />
+
                   <p><strong>Mô tả:</strong></p>
-                  <textarea v-model="editedLocation.description" rows="2" />
+                  <textarea v-model="editedLocation.description" placeholder="Mô tả vị trí" rows="2" />
+
                   <div class="detail-actions">
                     <button class="btn btn-success" @click="saveEdit(loc.id)">💾 Lưu</button>
                     <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
                   </div>
                 </div>
+
+                <!-- Hiển thị -->
                 <div v-else>
                   <p><strong>ID:</strong> {{ loc.id }}</p>
                   <p><strong>Tên vị trí:</strong> {{ loc.name }}</p>
@@ -103,12 +111,17 @@ export default {
         alert("⚠️ Vui lòng nhập tên vị trí.");
         return;
       }
-      this.locations.push({
-        id: this.nextId++,
-        name: this.newLocation.name.trim(),
-        description: this.newLocation.description.trim(),
-      });
-      this.toggleAddForm();
+      try {
+        this.locations.push({
+          id: this.nextId++,
+          name: this.newLocation.name.trim(),
+          description: this.newLocation.description.trim(),
+        });
+        this.toggleAddForm();
+        alert("✅ Thêm vị trí thành công!");
+      } catch {
+        alert("❌ Đã xảy ra lỗi khi thêm.");
+      }
     },
     cancelAdd() {
       this.toggleAddForm();
@@ -128,10 +141,15 @@ export default {
     saveEdit(id) {
       const index = this.locations.findIndex((l) => l.id === id);
       if (index !== -1) {
-        this.locations[index].name = this.editedLocation.name.trim();
-        this.locations[index].description = this.editedLocation.description.trim();
+        try {
+          this.locations[index].name = this.editedLocation.name.trim();
+          this.locations[index].description = this.editedLocation.description.trim();
+          this.cancelEdit();
+          alert("✅ Cập nhật vị trí thành công!");
+        } catch {
+          alert("❌ Lỗi khi cập nhật.");
+        }
       }
-      this.cancelEdit();
     },
     deleteLocation(loc) {
       if (confirm(`Bạn có chắc chắn muốn xóa vị trí "${loc.name}" không?`)) {
@@ -144,7 +162,6 @@ export default {
 </script>
 
 <style scoped>
-/* CSS giữ nguyên như cũ, đã kiểm tra đầy đủ */
 .overlay {
   position: fixed;
   top: 0;
@@ -159,7 +176,6 @@ export default {
   overflow-y: auto;
   z-index: 1;
 }
-
 .location-management {
   max-width: 900px;
   width: 100%;
@@ -171,14 +187,12 @@ export default {
   z-index: 2;
   position: relative;
 }
-
 .title {
   text-align: center;
   font-size: 28px;
   margin-bottom: 25px;
   color: #2c3e50;
 }
-
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -187,7 +201,6 @@ export default {
   gap: 15px;
   margin-bottom: 20px;
 }
-
 .total-btn {
   background-color: #f1f1f1;
   color: #333;
@@ -196,14 +209,12 @@ export default {
   border-radius: 8px;
   font-weight: bold;
 }
-
 .search input {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
   min-width: 250px;
 }
-
 .add-btn {
   padding: 12px 20px;
   background-color: #3498db;
@@ -217,7 +228,6 @@ export default {
 .add-btn:hover {
   background-color: #2980b9;
 }
-
 .location-list {
   background: #f8f8f8;
   padding: 20px;
@@ -243,23 +253,24 @@ export default {
   border-radius: 8px;
   margin-top: 10px;
 }
-
 .add-form input,
-.add-form textarea {
+.add-form textarea,
+.location-detail input,
+.location-detail textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
 }
-
 .detail-actions {
   margin-top: 10px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
-
 .btn {
   padding: 8px 14px;
   border-radius: 6px;
