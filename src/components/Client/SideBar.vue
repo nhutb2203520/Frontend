@@ -1,6 +1,8 @@
 <template>
-  <div
-    :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', { 'sidebar-collapsed': !isOpen }]">
+  <div style="margin-top: 5px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
+    'sidebar-collapsed':
+      !isOpen
+  }]">
     <!-- Header -->
     <div class="bg-primary text-white p-3 d-flex align-items-center justify-content-between cursor-pointer"
       @click="toggleSidebar">

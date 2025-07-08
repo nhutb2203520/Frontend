@@ -12,14 +12,8 @@
       <form @submit.prevent="submitResetPassword">
         <!-- SĐT hoặc Email -->
         <div class="mb-3">
-          <label class="form-label">Số điện thoại / Email</label>
-          <input type="text" v-model="form.username" required class="form-control"
-            placeholder="Nhập số điện thoại hoặc email" />
-        </div>
-        <div class="mb-3">
           <label class="form-label">Mật khẩu cũ</label>
-          <input type="password" v-model="form.password" required class="form-control"
-            placeholder="Nhập mật khẩu cũ" />
+          <input type="password" v-model="form.password" required class="form-control" placeholder="Nhập mật khẩu cũ" />
         </div>
         <!-- Mật khẩu mới -->
         <div class="mb-3">
@@ -39,7 +33,7 @@
           Đổi Mật Khẩu
         </button>
       </form>
-     
+
     </div>
   </div>
 </template>
@@ -67,17 +61,6 @@ export default {
   },
   methods: {
     submitResetPassword() {
-      const { username, password, rePassword } = this.form;
-      const isPhone = /^[0-9]{10}$/.test(username);
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(username);
-
-      if (!isPhone && !isEmail) {
-        this.message =
-          "Vui lòng nhập đúng số điện thoại hoặc địa chỉ email hợp lệ!";
-        this.success = false;
-        return;
-      }
-
       if (password !== rePassword) {
         this.message = "Mật khẩu nhập lại không khớp!";
         this.success = false;

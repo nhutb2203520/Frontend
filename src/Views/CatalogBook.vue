@@ -54,7 +54,7 @@ export default {
     position: relative;
     z-index: 1;
     padding-top: 0 !important;
-    padding-left: 50px !important;
+    padding-left: 30px !important;
 }
 
 .content-shifted {

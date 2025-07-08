@@ -2,27 +2,40 @@
   <div class="background-wrapper">
     <div class="account-info-container">
       <div class="avatar">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png"
-          alt="User Avatar"
-        />
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User Avatar" />
       </div>
       <h2>Tài Khoản Độc Giả</h2>
       <div class="info-box">
-        <p class="info-text">Thông tin chi tiết tài khoản</p>
+        <p class="info-text">Thông tin tài khoản</p>
+        <div class="account-details"></div>
+        <p v-if="userInfo"><el-icon>
+            <UserFilled />
+          </el-icon> <strong>Họ tên:</strong> {{ capitalizeWords(userInfo.HoTen) }}</p>
+
+        <p v-if="userInfo"><el-icon>
+            <Message />
+          </el-icon> <strong>Email:</strong> {{ userInfo.Email }}</p>
+        <p v-if="userInfo"><el-icon>
+            <PhoneFilled />
+          </el-icon> <strong>Số điện thoại:</strong> {{ userInfo.SoDienThoai }}</p>
+        <p v-if="userInfo"><el-icon>
+            <LocationFilled />
+          </el-icon> <strong>Địa chỉ:</strong> {{ userInfo.DiaChi }}</p>
+        <p v-if="userInfo"><el-icon>
+            <Calendar />
+          </el-icon> <strong>Ngày tạo:</strong> {{ formatDate(userInfo.createdAt) }}</p>
+        <p v-if="userInfo"><el-icon>
+            <CircleCheckFilled />
+          </el-icon> <strong>Trạng thái:</strong> {{ capitalizeWords(userInfo.MaTT?.TenTT) }}</p>
+
+
       </div>
 
       <div class="action-buttons">
-        <button
-          class="action-btn update"
-          @click="$router.push('/account-user/update-account')"
-        >
+        <button class="action-btn update" @click="$router.push('/account-user/update-account')">
           Cập nhật
         </button>
-        <button
-          class="action-btn password"
-          @click="$router.push('/account-user/change-password')"
-        >
+        <button class="action-btn password" @click="$router.push('/account-user/change-password')">
           Đổi mật khẩu
         </button>
         <button class="action-btn delete" @click="handleDeleteAccount">
@@ -33,33 +46,44 @@
   </div>
 </template>
 
-<script>
-import { ElMessageBox, ElMessage } from "element-plus";
-export default {
-  name: "AccountInfor",
-  methods: {
-    handleDeleteAccount() {
-      ElMessageBox.confirm(
-        "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động không thể hoàn tác.",
-        "Xác nhận xóa tài khoản",
-        {
-          confirmButtonText: "Xác nhận",
-          cancelButtonText: "Hủy",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          // TODO: Gọi API xóa tài khoản tại đây
-          ElMessage.success("✅ Tài khoản đã được xóa.");
-          this.$router.push("/");
-        })
-        .catch(() => {
-          ElMessage.info("❌ Hủy xóa tài khoản.");
-        });
-    },
-  },
+<script setup>
+import { ref, onMounted } from 'vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import { useReaderStore } from '@/Store/Reader.store';
+import { formatDate } from '../utils/formatDate'
+import { capitalizeWords } from '../utils/stringUtils'
+const userInfo = ref(null);
+const readerStore = useReaderStore();
+onMounted(async () => {
+  try {
+    const res = await readerStore.getMyAccount();
+    userInfo.value = res;
+  } catch (err) {
+    console.error(err);
+    ElMessage.error('Không thể tải thông tin người dùng!');
+  }
+});
+
+const handleDeleteAccount = () => {
+  ElMessageBox.confirm(
+    "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động không thể hoàn tác.",
+    "Xác nhận xóa tài khoản",
+    {
+      confirmButtonText: "Xác nhận",
+      cancelButtonText: "Hủy",
+      type: "warning",
+    }
+  )
+    .then(() => {
+      // TODO: Gọi API xóa tài khoản tại đây
+      ElMessage.success("✅ Tài khoản đã được xóa.");
+    })
+    .catch(() => {
+      ElMessage.info("❌ Hủy xóa tài khoản.");
+    });
 };
 </script>
+
 
 <style scoped>
 .background-wrapper {
@@ -107,7 +131,7 @@ export default {
 
 .info-box {
   border: 2px solid #070606;
-  padding: 60px 30px;
+  padding: 30px 30px;
   margin-top: 60px;
   min-height: 250px;
   background-color: rgba(255, 252, 252, 0.805);
@@ -116,10 +140,17 @@ export default {
 }
 
 .info-text {
-  font-style: italic;
   font-size: 22px;
-  color: #000;
+  font-weight: 700;
+  color: #0b2b64;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #0b2b64;
+  padding-bottom: 4px;
+  display: inline-block;
 }
+
 
 .action-buttons {
   display: flex;

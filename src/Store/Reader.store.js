@@ -70,6 +70,16 @@ export const useReaderStore = defineStore("reader", {
           throw new Error(errorMessage);
         });
     },
+    getMyAccount() {
+      return axios
+        .get("/readers/me")
+        .then((response) => {
+          return response.data.reader;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
     setReaders(readers) {
       this.readers = readers;
     },

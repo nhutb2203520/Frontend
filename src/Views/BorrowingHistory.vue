@@ -21,7 +21,7 @@
                         <td>
                             <strong>{{ capitalizeWords(borrow.MaSach?.TenSach) }}</strong><br />
                             <em>Tác giả: {{capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))
-                                }}</em>
+                            }}</em>
                         </td>
                         <td>{{ formatDate(borrow.NgayMuon) }}</td>
                         <td>{{ formatDate(borrow.NgayTra) }}</td>
@@ -37,24 +37,16 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useBorrowBookStore } from '@/Store/BorrowBook.store';
+import { capitalizeWords } from '@/utils/stringUtils';
+import { formatDate } from '@/utils/formatDate';
 const borrowDetails = ref([]);
 onMounted(async () => {
     const borrowBookStore = useBorrowBookStore();
     borrowDetails.value = await borrowBookStore.fetchBorrowBooks();
     console.log(borrowDetails.value);
 });
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    return new Date(dateString).toLocaleDateString('vi-VN', options);
-}
-function capitalizeWords(str) {
-    return str
-        .toLowerCase()
-        .split(' ')
-        .filter(word => word.trim() !== "")
-        .map(word => word[0].toUpperCase() + word.slice(1))
-        .join(' ');
-}
+
+
 
 
 </script>
