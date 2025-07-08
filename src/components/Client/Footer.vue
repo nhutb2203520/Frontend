@@ -1,76 +1,103 @@
 <template>
-  <footer class="footer" data-aos="fade-up" data-aos-duration="1000">
-    <p>Mọi thông tin vui lòng liên hệ:</p>
-
-    <div class="contact-icons">
-      <a href="mailto:thuviensinhvien@ctu.edu.vn" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Gmail" />
-      </a>
-      <a href="tel:+840123456789">
-        <img src="https://cdn-icons-png.flaticon.com/512/597/597177.png" alt="Phone" />
-      </a>
-      <a href="https://facebook.com" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
-      </a>
-      <a href="https://zalo.me" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" />
-      </a>
+  <footer class="footer-wrapper">
+    <div class="footer-header">
+      <h2>QUẢN LÝ THƯ VIỆN NLN</h2>
     </div>
 
-    <p>
-      Địa chỉ:
-      <a href="https://maps.app.goo.gl/gJwyDTgt7WbQsWDc7" target="_blank" rel="noopener noreferrer" class="footer-link">
-        Khu II Trường Đại học Cần Thơ, Đường 3/2, Q. Ninh Kiều, Tp. Cần Thơ
-      </a>
-    </p>
+    <div class="footer-icons">
+      <div class="footer-icon-item">
+        <a href="https://maps.app.goo.gl/38x4YKtZq9NjNzoW9" target="_blank" rel="noopener"><img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" alt="Map" /></a>
 
-    <p>&copy; Bản quyền thuộc về NLN Quản Lý Thư Viện.</p>
+        <p>Map</p>
+      </div>
+      <div class="footer-icon-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/597/597177.png" alt="Phone" />
+        <p>Phone</p>
+      </div>
+      <div class="footer-icon-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="Email" />
+        <p>Email</p>
+      </div>
+      <div class="footer-icon-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+        <p>Facebook</p>
+      </div>
+      <div class="footer-icon-item">
+        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />
+        <p>YouTube</p>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="footer-contact">
+      <p>📞 0776 560 730 &nbsp;&nbsp;&nbsp;&nbsp; 📞 0349 414 282</p>
+      <p>🌐 www.quanlythuviennln.com</p>
+    </div>
   </footer>
 </template>
 
 <script>
 export default {
-  name: 'Footer'
-}
+  name: "Footer",
+};
 </script>
 
 <style scoped>
-.footer {
-  background-color: #007bff;
-  padding: 30px 20px;
+.footer-wrapper {
+  background-color: #62a1e0;
   text-align: center;
-  color: #ffffff;
+  padding: 40px 20px;
   font-family: 'Segoe UI', sans-serif;
-  font-size: 15px;
-  border-top: 2px solid #007bff;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.contact-icons {
-  margin: 15px 0;
-}
-
-.contact-icons a {
-  margin: 0 10px;
-  display: inline-block;
-  transition: transform 0.2s;
-}
-
-.contact-icons a:hover {
-  transform: scale(1.1);
-}
-
-.contact-icons img {
-  width: 32px;
-  height: 32px;
-}
-
-.footer-link {
   color: #ffffff;
-  text-decoration: underline;
 }
 
-.footer-link:hover {
-  color: #fcfcfc;
+.footer-header h2 {
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.footer-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100px;
+}
+
+.footer-icon-item img {
+  width: 70px;
+  height: 70px;
+  background-color: #e2e6ea;
+  border-radius: 50%;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.footer-icon-item p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #888;
+  width: 80%;
+  margin: 20px auto;
+}
+
+.footer-contact p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #444;
 }
 </style>
