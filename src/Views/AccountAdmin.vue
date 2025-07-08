@@ -10,55 +10,47 @@
       </div>
 
       <div class="action-buttons">
-        <button class="action-btn update" @click="$router.push('/admin/account/update-account-ad')">Cập nhật</button>
-        <button class="action-btn password" @click="$router.push('/admin/account/change-pass-ad')">Đổi mật khẩu</button>
-        <button class="action-btn delete" @click="showDeletePopup = true">Xóa tài khoản</button>
-      </div>
-    </div>
-
-    <!-- POPUP xác nhận xóa -->
-    <div v-if="showDeletePopup" class="popup-overlay">
-      <div class="popup">
-        <h3>Xóa tài khoản</h3>
-        <p>Nhập Email/Số điện thoại và Mật khẩu để xác nhận:</p>
-        <input v-model="deleteInfo.email" type="text" placeholder="Email hoặc số điện thoại" />
-        <input v-model="deleteInfo.password" type="password" placeholder="Mật khẩu" />
-        <div class="popup-buttons">
-          <button class="btn cancel" @click="showDeletePopup = false">❌ Hủy</button>
-          <button class="btn delete" @click="confirmDelete">🗑️ Xóa tài khoản</button>
-        </div>
+        <button class="action-btn update" @click="$router.push('/admin/account/update-account-ad')">
+          Cập nhật
+        </button>
+        <button class="action-btn password" @click="$router.push('/admin/account/change-pass-ad')">
+          Đổi mật khẩu
+        </button>
+        <button class="action-btn delete" @click="handleDeleteAccount">
+          Xóa tài khoản
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ElMessageBox, ElMessage } from "element-plus";
+
 export default {
   name: "AccountInfor",
-  data() {
-    return {
-      showDeletePopup: false,
-      deleteInfo: {
-        email: "",
-        password: ""
-      }
-    };
-  },
   methods: {
-    confirmDelete() {
-      if (!this.deleteInfo.email || !this.deleteInfo.password) {
-        alert("⚠️ Vui lòng nhập đầy đủ Email/SĐT và Mật khẩu.");
-        return;
-      }
-
-      const confirmed = confirm("❗ Bạn có chắc chắn muốn xóa tài khoản này không?");
-      if (confirmed) {
-        // Gọi API xoá tài khoản nếu có ở đây
-        alert("✅ Tài khoản đã được xóa thành công.");
-        this.$router.push("/");
-      }
-    }
-  }
+    handleDeleteAccount() {
+      ElMessageBox.confirm(
+        "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này sẽ không thể hoàn tác.",
+        "Xác nhận xóa tài khoản",
+        {
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          // TODO: Gọi API xóa tài khoản tại đây
+          // Ví dụ: await axios.delete(`/api/account/delete/${id}`)
+          ElMessage.success("Tài khoản đã được xóa.");
+          this.$router.push("/");
+        })
+        .catch(() => {
+          ElMessage.info("Hủy xóa tài khoản.");
+        });
+    },
+  },
 };
 </script>
 
@@ -156,62 +148,5 @@ export default {
 .action-btn.delete:hover {
   background-color: #7b0000;
   color: #fff;
-}
-
-/* POPUP overlay */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(20, 20, 20, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* POPUP nội dung */
-.popup {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
-
-.popup input {
-  width: 100%;
-  padding: 12px;
-  margin: 12px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.popup-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
-}
-
-.popup .btn {
-  padding: 10px 20px;
-  font-weight: bold;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-}
-
-.popup .btn.cancel {
-  background-color: #7f8c8d;
-  color: white;
-}
-
-.popup .btn.delete {
-  background-color: #e74c3c;
-  color: white;
 }
 </style>

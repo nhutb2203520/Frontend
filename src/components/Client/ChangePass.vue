@@ -39,14 +39,7 @@
           Đổi Mật Khẩu
         </button>
       </form>
-      <div>
-        <p class="mt-3 text-center">
-          <router-link to="/forgot-password">Quên mật khẩu?</router-link>
-        </p>
-      </div>
-      <div class="mt-3 text-center">
-        <router-link to="/signinuser">Quay lại đăng nhập</router-link>
-      </div>
+     
     </div>
   </div>
 </template>
