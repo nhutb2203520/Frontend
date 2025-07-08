@@ -16,7 +16,11 @@
           <input type="text" v-model="form.username" required class="form-control"
             placeholder="Nhập số điện thoại hoặc email" />
         </div>
-
+        <div class="mb-3">
+          <label class="form-label">Mật khẩu cũ</label>
+          <input type="password" v-model="form.password" required class="form-control"
+            placeholder="Nhập mật khẩu cũ" />
+        </div>
         <!-- Mật khẩu mới -->
         <div class="mb-3">
           <label class="form-label">Mật khẩu mới</label>
@@ -35,7 +39,11 @@
           Đổi Mật Khẩu
         </button>
       </form>
-
+      <div>
+        <p class="mt-3 text-center">
+          <router-link to="/forgot-password">Quên mật khẩu?</router-link>
+        </p>
+      </div>
       <div class="mt-3 text-center">
         <router-link to="/signinuser">Quay lại đăng nhập</router-link>
       </div>
