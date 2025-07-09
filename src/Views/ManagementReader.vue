@@ -1,64 +1,62 @@
 <template>
-  <div class="overlay">
-    <!-- NavBar trên cùng -->
-    <NavBarAD />
-    <!-- Sidebar bên trái -->
-    <SideBarAD @toggle="handleSidebarToggle" />
+  <div class="overlay d-flex">
+    <SideBarAD />
+    <div class="flex-grow-1">
+      <NavBarAD />
+      <div class="container-fluid px-3">
+        <!-- Router View sẽ hiển thị form thêm độc giả nếu được định tuyến -->
+        <router-view />
 
-    <router-view />
+        <!-- Danh sách độc giả chỉ hiển thị khi route là ManagementReader -->
+        <div v-if="$route.name === 'ManagementReader'" class="reader-management mx-auto mt-4">
+          <h1 class="title">Quản lý độc giả</h1>
 
-    <!-- Nội dung quản lý độc giả -->
-    <div v-if="route.name === 'ManagementReader'" class="reader-management">
-      <h1 class="title">Quản lý độc giả</h1>
+          <div class="top-buttons d-flex flex-wrap justify-content-center gap-3 mb-4">
+            <button @click="filterAll">Tổng độc giả: {{ totalReaders }}</button>
+            <button @click="filterActive">Hoạt động: {{ activeReaders }}</button>
+            <button @click="filterBlocked">Bị khóa: {{ blockedReaders }}</button>
+          </div>
 
-      <!-- Bộ lọc -->
-      <div class="top-buttons">
-        <button @click="filterAll">Tổng độc giả: {{ totalReaders }}</button>
-        <button @click="filterActive">Hoạt động: {{ activeReaders }}</button>
-        <button @click="filterBlocked">Bị khóa: {{ blockedReaders }}</button>
-      </div>
+          <div class="actions d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên hoặc email..." />
+            <button class="add-btn" @click="goToAddReader">Thêm độc giả</button>
+          </div>
 
-      <!-- Tìm kiếm và thêm -->
-      <div class="actions">
-        <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên hoặc email..." />
-        <button class="add-btn" @click="goToAddReader">Thêm độc giả</button>
-      </div>
-
-      <!-- Danh sách độc giả -->
-      <div class="reader-list">
-        <h3>Danh sách độc giả</h3>
-        <div class="scrollable-list">
-          <ul>
-            <li
-              v-for="reader in filteredReaders"
-              :key="reader.id"
-              @click="toggleReader(reader)"
-              class="reader-item"
-            >
-              <strong>{{ reader.name }}</strong> - {{ reader.email }} -
-              <span :class="reader.status === 'active' ? 'text-success' : 'text-danger'">
-                {{ reader.status === 'active' ? 'Hoạt động' : 'Bị khóa' }}
-              </span>
-
-              <!-- Thông tin chi tiết hiện dưới tên -->
-              <div v-if="selectedReader?.id === reader.id" class="reader-detail">
-                <p><strong>📧 Email:</strong> {{ reader.email }}</p>
-                <p>
-                  <strong>Trạng thái:</strong>
+          <div class="reader-list">
+            <h3>Danh sách độc giả</h3>
+            <div class="scrollable-list">
+              <ul>
+                <li
+                  v-for="reader in filteredReaders"
+                  :key="reader.id"
+                  @click="toggleReader(reader)"
+                  class="reader-item"
+                >
+                  <strong>{{ reader.name }}</strong> - {{ reader.email }} -
                   <span :class="reader.status === 'active' ? 'text-success' : 'text-danger'">
                     {{ reader.status === 'active' ? 'Hoạt động' : 'Bị khóa' }}
                   </span>
-                </p>
-                <button
-                  class="btn"
-                  :class="reader.status === 'active' ? 'btn-danger' : 'btn-success'"
-                  @click.stop="toggleStatus(reader)"
-                >
-                  {{ reader.status === 'active' ? '🔒 Khóa' : '🔓 Mở khóa' }}
-                </button>
-              </div>
-            </li>
-          </ul>
+
+                  <div v-if="selectedReader?.id === reader.id" class="reader-detail">
+                    <p><strong>📧 Email:</strong> {{ reader.email }}</p>
+                    <p>
+                      <strong>Trạng thái:</strong>
+                      <span :class="reader.status === 'active' ? 'text-success' : 'text-danger'">
+                        {{ reader.status === 'active' ? 'Hoạt động' : 'Bị khóa' }}
+                      </span>
+                    </p>
+                    <button
+                      class="btn"
+                      :class="reader.status === 'active' ? 'btn-danger' : 'btn-success'"
+                      @click.stop="toggleStatus(reader)"
+                    >
+                      {{ reader.status === 'active' ? '🔒 Khóa' : '🔓 Mở khóa' }}
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +74,6 @@ export default {
       searchKeyword: "",
       filterType: "all",
       selectedReader: null,
-      sidebarOpen: true,
       readers: [
         { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", status: "active" },
         { id: 2, name: "Lê Thị B", email: "b@gmail.com", status: "blocked" },
@@ -85,9 +82,6 @@ export default {
     };
   },
   computed: {
-    route() {
-      return this.$route;
-    },
     totalReaders() {
       return this.readers.length;
     },
@@ -111,9 +105,6 @@ export default {
     }
   },
   methods: {
-    handleSidebarToggle(isOpen) {
-      this.sidebarOpen = isOpen;
-    },
     filterAll() {
       this.filterType = 'all';
       this.selectedReader = null;
@@ -140,23 +131,22 @@ export default {
 </script>
 
 <style scoped>
+
 .overlay {
   position: fixed;
-  top: 0;
+  padding: 15px;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(20, 20, 20, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 120px 20px 20px;
   overflow-y: auto;
   z-index: 1;
 }
+
 .reader-management {
-  max-width: 900px;
-  width: 100%;
+  margin-top: 105px !important;
+  width: 65%;
+  max-width: 65%;
   background: #fff;
   padding: 30px;
   border-radius: 16px;
@@ -164,20 +154,16 @@ export default {
   font-family: 'Segoe UI', sans-serif;
   z-index: 2;
   position: relative;
+  box-sizing: border-box;
 }
+
 .title {
   text-align: center;
   font-size: 28px;
   margin-bottom: 25px;
   color: #2c3e50;
 }
-.top-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
+
 .top-buttons button {
   padding: 12px 20px;
   border: 2px solid #2980b9;
@@ -192,14 +178,7 @@ export default {
   background-color: #2980b9;
   color: white;
 }
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+
 .actions input {
   flex: 1;
   min-width: 250px;
@@ -208,6 +187,7 @@ export default {
   border: 1px solid #ccc;
   font-size: 15px;
 }
+
 .add-btn {
   padding: 12px 20px;
   background-color: #3498db;
@@ -221,6 +201,7 @@ export default {
 .add-btn:hover {
   background-color: #2980b9;
 }
+
 .reader-list {
   background: #f8f8f8;
   padding: 20px;
@@ -229,16 +210,19 @@ export default {
   max-height: 400px;
   overflow-y: auto;
 }
+
 .scrollable-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .reader-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
+
 .reader-detail {
   background-color: #fff;
   padding: 10px;
@@ -246,10 +230,36 @@ export default {
   border-radius: 8px;
   margin-top: 10px;
 }
+
 .text-success {
   color: #28a745;
 }
+
 .text-danger {
   color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  .reader-management {
+    width: 95% !important;
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .top-buttons,
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .top-buttons button,
+  .actions input,
+  .add-btn {
+    width: 100% !important;
+  }
 }
 </style>

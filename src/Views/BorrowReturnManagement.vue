@@ -1,62 +1,61 @@
 <template>
-  <div class="overlay">
-    <NavBarAD />
+  <div class="overlay d-flex">
     <SideBarAD />
+    <div class="flex-grow-1">
+      <NavBarAD />
 
-    <div class="borrow-management">
-      <h1 class="title">Quản lý mượn – trả sách</h1>
+      <div class="container-fluid px-3">
+        <div class="borrow-management mx-auto mt-4">
+          <h1 class="title">Quản lý mượn – trả sách</h1>
 
-      <!-- Bộ lọc -->
-      <div class="top-buttons">
-        <button @click="filterByStatus('all')">Tất cả: {{ borrowList.length }}</button>
-        <button @click="filterByStatus('borrowing')">Đang mượn: {{ countByStatus('borrowing') }}</button>
-        <button @click="filterByStatus('pending')">Chờ duyệt: {{ countByStatus('pending') }}</button>
-        <button @click="filterByStatus('overdue')">Quá hạn: {{ countByStatus('overdue') }}</button>
-      </div>
+          <!-- Bộ lọc -->
+          <div class="top-buttons d-flex flex-wrap justify-content-center gap-3 mb-4">
+            <button @click="filterByStatus('all')">Tất cả: {{ borrowList.length }}</button>
+            <button @click="filterByStatus('borrowing')">Đang mượn: {{ countByStatus('borrowing') }}</button>
+            <button @click="filterByStatus('pending')">Chờ duyệt: {{ countByStatus('pending') }}</button>
+            <button @click="filterByStatus('overdue')">Quá hạn: {{ countByStatus('overdue') }}</button>
+          </div>
 
-      <!-- Tìm kiếm và nhắc -->
-      <div class="actions">
-        <input v-model="searchKeyword" placeholder="Tìm kiếm người mượn, sách..." />
-        <button v-if="activeFilter === 'overdue' && overdueCount" class="btn btn-warning" @click="remindAll">
-          📢 Nhắc tất cả ({{ overdueCount }})
-        </button>
-      </div>
+          <!-- Tìm kiếm và nhắc -->
+          <div class="actions d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <input v-model="searchKeyword" placeholder="Tìm kiếm người mượn, sách..." />
+            <button v-if="activeFilter === 'overdue' && overdueCount" class="btn btn-warning" @click="remindAll">
+              📢 Nhắc tất cả ({{ overdueCount }})
+            </button>
+          </div>
 
-      <!-- Danh sách phiếu mượn -->
-      <div class="reader-list">
-        <h3>Danh sách phiếu mượn</h3>
-        <div class="scrollable-list">
-          <ul>
-            <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)" class="reader-item">
-              <strong>{{ entry.reader }}</strong> - "{{ entry.book }}" -
-              <span :class="'text-' + statusLabels[entry.status].color">
-                {{ statusLabels[entry.status].text }}
-              </span>
+          <!-- Danh sách phiếu mượn -->
+          <div class="reader-list">
+            <h3>Danh sách phiếu mượn</h3>
+            <div class="scrollable-list">
+              <ul>
+                <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)" class="reader-item">
+                  <strong>{{ entry.reader }}</strong> - "{{ entry.book }}" -
+                  <span :class="'text-' + statusLabels[entry.status].color">
+                    {{ statusLabels[entry.status].text }}
+                  </span>
 
-              <!-- Hiển thị chi tiết nếu được chọn -->
-              <div v-if="selectedBorrower && selectedBorrower.id === entry.id" class="reader-detail">
-                <p><strong>Họ tên:</strong> {{ entry.reader }}</p>
-                <p><strong>Sách:</strong> {{ entry.book }}</p>
-                <p><strong>Trạng thái:</strong> {{ statusLabels[entry.status].text }}</p>
-                <p><strong>Mượn:</strong> {{ formatDate(entry.borrowDate) }}</p>
-                <p v-if="entry.dueDate"><strong>Hạn trả:</strong> {{ formatDate(entry.dueDate) }}</p>
-                <p v-if="entry.status === 'overdue'" class="text-danger fw-bold">
-                  ⚠️ Quá hạn {{ getOverdueDays(entry.dueDate) }} ngày
-                </p>
-                <div class="detail-actions">
-                  <button v-if="entry.status === 'pending'" class="btn btn-success btn-sm" @click.stop="approve(entry)">
-                    Duyệt
-                  </button>
-                  <button v-else-if="entry.status === 'overdue'" class="btn btn-warning btn-sm" @click.stop="remind(entry)">
-                    Nhắc
-                  </button>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div v-if="filteredBorrowList.length === 0" class="text-center text-muted mt-3 fst-italic">
-          Không có kết quả phù hợp
+                  <div v-if="selectedBorrower && selectedBorrower.id === entry.id" class="reader-detail">
+                    <p><strong>Họ tên:</strong> {{ entry.reader }}</p>
+                    <p><strong>Sách:</strong> {{ entry.book }}</p>
+                    <p><strong>Trạng thái:</strong> {{ statusLabels[entry.status].text }}</p>
+                    <p><strong>Mượn:</strong> {{ formatDate(entry.borrowDate) }}</p>
+                    <p v-if="entry.dueDate"><strong>Hạn trả:</strong> {{ formatDate(entry.dueDate) }}</p>
+                    <p v-if="entry.status === 'overdue'" class="text-danger fw-bold">
+                      ⚠️ Quá hạn {{ getOverdueDays(entry.dueDate) }} ngày
+                    </p>
+                    <div class="detail-actions">
+                      <button v-if="entry.status === 'pending'" class="btn btn-success btn-sm" @click.stop="approve(entry)">Duyệt</button>
+                      <button v-else-if="entry.status === 'overdue'" class="btn btn-warning btn-sm" @click.stop="remind(entry)">Nhắc</button>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div v-if="filteredBorrowList.length === 0" class="text-center text-muted mt-3 fst-italic">
+              Không có kết quả phù hợp
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -152,29 +151,29 @@ export default {
 <style scoped>
 .overlay {
   position: fixed;
-  top: 0;
+  padding: 15px;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(20, 20, 20, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 120px 20px 20px;
   overflow-y: auto;
   z-index: 1;
 }
 
 .borrow-management {
-  max-width: 900px;
-  width: 100%;
+  margin-top: 105px !important;
+  width: 65%;
+  height: 65%;
+  max-width: 100%;
   background: #fff;
   padding: 30px;
+  margin: 0 auto;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   font-family: 'Segoe UI', sans-serif;
   z-index: 2;
   position: relative;
+  box-sizing: border-box;
 }
 
 .title {
@@ -182,14 +181,6 @@ export default {
   font-size: 28px;
   margin-bottom: 25px;
   color: #2c3e50;
-}
-
-.top-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
 }
 
 .top-buttons button {
@@ -202,19 +193,9 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
-
 .top-buttons button:hover {
   background-color: #2980b9;
   color: white;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .actions input {
@@ -255,25 +236,37 @@ export default {
   margin-top: 10px;
 }
 
-.text-primary {
-  color: #007bff;
-}
-
-.text-warning {
-  color: #ffc107;
-}
-
-.text-danger {
-  color: #dc3545;
-}
-
-.text-success {
-  color: #28a745;
-}
-
 .detail-actions {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .borrow-management {
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .top-buttons,
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .top-buttons button,
+  .actions input,
+  .btn {
+    width: 100% !important;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 </style>

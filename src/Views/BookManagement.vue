@@ -153,7 +153,7 @@ export default {
 .overlay {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 10px;
   width: 100vw;
   height: 100vh;
   background: rgba(20, 20, 20, 0.85);
@@ -166,14 +166,15 @@ export default {
 }
 
 .book-management {
-  max-width: 900px;
-  width: 100%;
+  margin-top: 12  px !important;
+  width: 65%;
+  max-width: 65%;
   background: #fff;
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   font-family: 'Segoe UI', sans-serif;
-  z-index: 2;
+  z-index: 1;
   position: relative;
 }
 
