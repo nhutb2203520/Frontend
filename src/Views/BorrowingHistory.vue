@@ -87,76 +87,78 @@
   }
   </script>
   
-  <style scoped>
+<style scoped>
   .borrowing-slip {
-    border-width: 2px;
-    border-color: black;
-    border-radius: 10px;
-    box-sizing: border-box;
-    background-color: #7d8287ae;
-    font-size: 30px;
+  border-width: 2px;
+  border-color: black;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background-color: #7d8287ae;
+  font-size: 20px; /* Giảm cỡ chữ toàn bộ */
+}
+
+.header {
+  border-bottom: 2px solid black;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  vertical-align: middle;
+  border: 1px solid black !important;
+  white-space: normal; /* Cho phép xuống dòng */
+  font-size: 30px; 
+  word-break: break-word;
+}
+
+.table thead th {
+  background-color: #808385 !important;
+}
+
+/* Responsive font scaling */
+@media (max-width: 992px) {
+  .borrowing-slip {
+    font-size: 18 px;
+    padding: 20px;
   }
-  
-  .header {
-    border-bottom: 2px solid black;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
+
   table th,
   table td {
-    vertical-align: middle;
-    border: 1px solid black !important;
-    white-space: nowrap;
-    font-size: 28px;
+    font-size: 16px;
   }
-  
-  .table thead th {
-    background-color: #808385 !important;
+}
+
+@media (max-width: 768px) {
+  .borrowing-slip {
+    font-size: 16px;
+    padding: 15px;
   }
-  
-  /* Responsive font scaling */
-  @media (max-width: 992px) {
-    .borrowing-slip {
-      font-size: 24px;
-      padding: 20px;
-    }
-  
-    table th,
-    table td {
-      font-size: 22px;
-    }
+
+  table th,
+  table td {
+    font-size: 14px;
   }
-  
-  @media (max-width: 768px) {
-    .borrowing-slip {
-      font-size: 20px;
-      padding: 15px;
-    }
-  
-    table th,
-    table td {
-      font-size: 18px;
-    }
+}
+
+@media (max-width: 576px) {
+  .borrowing-slip {
+    font-size: 14px;
+    padding: 10px;
   }
-  
-  @media (max-width: 576px) {
-    .borrowing-slip {
-      font-size: 16px;
-      padding: 10px;
-    }
-  
-    table th,
-    table td {
-      font-size: 16px;
-    }
-  
-    h2 {
-      font-size: 22px;
-    }
+
+  table th,
+  table td {
+    font-size: 13px;
   }
+
+  h2 {
+    font-size: 20px;
+  }
+}
+
   </style>
   
