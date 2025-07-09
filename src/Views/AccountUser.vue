@@ -1,5 +1,5 @@
 <template>
-  <div class="background-wrapper mt-5">
+  <div class="background-wrapper">
     <div class="account-info-container">
       <div class="avatar">
         <img src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User Avatar" />

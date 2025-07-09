@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 5px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
+  <div style="margin-top: 25px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
     'sidebar-collapsed': !isOpen
   }]">
     <!-- Header -->
