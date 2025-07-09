@@ -9,14 +9,16 @@
       @click="openChat"
     />
 
-    <!-- Khung chat + overlay -->
+    <!-- Overlay và khung chat -->
     <div v-if="isChatOpen" class="chat-overlay" @click.self="closeChat">
-      <div class="chat-box">
-        <div class="chat-header">
+      <div class="chat-box shadow">
+        <!-- Header -->
+        <div class="chat-header d-flex justify-content-between align-items-center">
           <strong>ChatBot NLN</strong>
           <button class="close-btn" @click="closeChat">×</button>
         </div>
 
+        <!-- Tin nhắn -->
         <div class="chat-messages">
           <div
             v-for="(msg, index) in messages"
@@ -27,15 +29,16 @@
           </div>
         </div>
 
+        <!-- Input -->
         <div class="chat-input-area">
           <input
             type="text"
             v-model="userInput"
-            class="chat-input"
+            class="chat-input form-control"
             placeholder="Nhập câu hỏi..."
             @keyup.enter="sendMessage"
           />
-          <button @click="sendMessage" class="chat-send">Gửi</button>
+          <button @click="sendMessage" class="chat-send btn btn-primary">Gửi</button>
         </div>
       </div>
     </div>
@@ -55,7 +58,6 @@ export default {
   methods: {
     openChat() {
       this.isChatOpen = true;
-      // Hiển thị tin nhắn chào nếu chưa có tin nhắn nào
       if (this.messages.length === 0) {
         this.messages.push({
           sender: "bot",
@@ -70,13 +72,11 @@ export default {
     sendMessage() {
       const text = this.userInput.trim();
       if (!text) return;
-
       this.messages.push({ sender: "user", text });
       this.userInput = "";
 
       this.$nextTick(() => this.scrollToBottom());
 
-      // Phản hồi mẫu sau 500ms
       setTimeout(() => {
         this.messages.push({
           sender: "bot",
@@ -87,9 +87,7 @@ export default {
     },
     scrollToBottom() {
       const container = this.$el.querySelector(".chat-messages");
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      if (container) container.scrollTop = container.scrollHeight;
     },
   },
 };
@@ -98,8 +96,8 @@ export default {
 <style scoped>
 .chat-container {
   position: fixed;
-  bottom: 50px;
-  right: 50px;
+  bottom: 30px;
+  right: 30px;
   z-index: 9999;
 }
 
@@ -118,37 +116,31 @@ export default {
 
 .chat-overlay {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: transparent;
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  padding: 20px;
+  padding: 16px;
 }
 
 .chat-box {
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
   height: 500px;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
+  background: white;
   border: 1px solid #ccc;
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .chat-header {
   background-color: #007bff;
   color: white;
-  padding: 12px;
+  padding: 12px 16px;
   font-size: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .close-btn {
@@ -166,14 +158,17 @@ export default {
   background: #f8f8f8;
 }
 
+.msg-user,
+.msg-bot {
+  margin-bottom: 10px;
+}
+
 .msg-user {
   text-align: right;
-  margin-bottom: 10px;
 }
 
 .msg-bot {
   text-align: left;
-  margin-bottom: 10px;
 }
 
 .msg-user span,
@@ -182,7 +177,7 @@ export default {
   padding: 10px 15px;
   border-radius: 18px;
   background-color: #a2bad3;
-  color: #000000;
+  color: #000;
   max-width: 80%;
   word-wrap: break-word;
   font-size: 16px;
@@ -195,31 +190,21 @@ export default {
 
 .chat-input-area {
   display: flex;
+  gap: 6px;
   border-top: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
   background-color: white;
 }
 
 .chat-input {
   flex: 1;
-  border: none;
-  padding: 12px;
+  padding: 10px;
   font-size: 16px;
-  outline: none;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 .chat-send {
-  border: none;
-  background-color: #007bff;
-  color: white;
-  padding: 12px 18px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  border-radius: 6px;
-}
-
-.chat-send:hover {
-  background-color: #0056b3;
+  white-space: nowrap;
 }
 </style>

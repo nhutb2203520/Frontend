@@ -54,7 +54,7 @@ export default {
     position: relative;
     z-index: 1;
     padding-top: 0 !important;
-    padding-left: 30px !important;
+    padding-left: 50px !important;
 }
 
 .content-shifted {
@@ -74,7 +74,7 @@ export default {
     .content-expanded {
         margin-left: 0;
     }
-
+ 
     .sidebar {
         transform: translateX(-100%);
     }
