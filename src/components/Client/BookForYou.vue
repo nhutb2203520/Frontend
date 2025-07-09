@@ -16,7 +16,7 @@
         </div>
       </template>
 
-      <p v-else class="text-center text-warning w-100">Thư viện không có sách phù hợp.</p>
+      <p v-else class="text-center text-warning w-100 fw-bold fs-5 mt-3">Thư viện không có sách phù hợp.</p>
     </div>
 
   </div>
@@ -43,6 +43,10 @@ export default {
     selectedPublisher: {
       type: String,
       default: null
+    },
+    selectedYear: {
+      type: String,
+      default: null
     }
   },
   data() {
@@ -52,51 +56,30 @@ export default {
     };
   },
   watch: {
-    selectedAuthor: {
-      handler(newAuthor) {
-        this.filterBooksByAuthor(newAuthor);
-      },
-      immediate: true
-    },
-    selectedGenre: {
-      handler(newGenre) {
-        this.filterBooksByGenre(newGenre);
-      },
-      immediate: true
-    },
-    selectedPublisher: {
-      handler(newPublisher) {
-        this.books = this.allBooks.filter(book => book.MaNXB.TenNXB.toLowerCase().includes(newPublisher.toLowerCase()));
-      },
-      immediate: true
-    }
+    selectedAuthor: 'filterBooks',
+    selectedGenre: 'filterBooks',
+    selectedPublisher: 'filterBooks',
+    selectedYear: 'filterBooks'
   },
   methods: {
-    filterBooksByAuthor(author) {
-      if (!author) {
-        this.books = this.allBooks;
-        return;
-      }
-
-      const searchTerm = author.toLowerCase();
+    filterBooks() {
+      const author = this.selectedAuthor?.toLowerCase();
+      const genre = this.selectedGenre?.toLowerCase();
+      const publisher = this.selectedPublisher?.toLowerCase();
+      const year = this.selectedYear;
 
       this.books = this.allBooks.filter(book => {
-        if (!Array.isArray(book.TacGia)) return false;
+        const matchAuthor = !author || (Array.isArray(book.TacGia) &&
+          book.TacGia.some(tg => tg.TenTG?.toLowerCase().includes(author)));
+        const matchGenre = !genre || book.MaLoai?.TenLoai?.toLowerCase().includes(genre);
+        const matchPublisher = !publisher || book.MaNXB?.TenNXB?.toLowerCase().includes(publisher);
+        const matchYear = !year || String(book.NamXuatBan) === year;
 
-        return book.TacGia.some(tg =>
-          typeof tg.TenTG === 'string' && tg.TenTG.toLowerCase().includes(searchTerm)
-        );
+        return matchAuthor && matchGenre && matchPublisher && matchYear;
       });
-    },
-    filterBooksByGenre(genre) {
-      if (!genre) {
-        this.books = this.allBooks;
-        return;
-      }
 
-      const searchTerm = genre.toLowerCase();
-
-      this.books = this.allBooks.filter(book => book.MaLoai.TenLoai.toLowerCase().includes(searchTerm));
+      // Reset slide nếu cần
+      this.currentIndex = 0;
     }
   },
   async mounted() {
@@ -104,7 +87,7 @@ export default {
       const bookStore = useBookStore();
       const result = await bookStore.fetchBooks();
       this.allBooks = result;
-      this.filterBooksByAuthor(this.selectedAuthor); // Lọc lần đầu nếu có sẵn
+      this.books = result; // Khởi tạo sách hiển thị là toàn bộ sách
     } catch (error) {
       console.error('Lỗi khi lấy sách gợi ý:', error);
       this.books = [];

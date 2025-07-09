@@ -17,8 +17,10 @@ export default {
             required: true
         }
     },
+    emits: ['year-selected'],
     methods: {
         handleClick(item) {
+            this.$emit('year-selected', item);
             console.log('Năm xuất bản được chọn:', item);
         }
     }

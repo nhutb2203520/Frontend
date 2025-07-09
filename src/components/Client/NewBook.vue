@@ -10,13 +10,13 @@
     </div>
 
     <div class="position-relative bg-secondary bg-opacity-25 rounded shadow p-4 overflow-hidden">
-      <div class="row g-4 flex-nowrap overflow-hidden" style="transition: transform 0.6s;"
+      <div v-if="books.length > 0" class="row g-4 flex-nowrap overflow-hidden" style="transition: transform 0.6s;"
         :style="{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }">
-        <div v-for="(book, index) in books" :key="index" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-          <!-- 🔁 Tái sử dụng BookCard.vue -->
-          <BookCard :book="book" />
+        <div v-for="(book, index) in books" :key="index" class="col-12 col-sm-6 col-md-4 col-lg-custom">
+          <BookCard :book="book" :hoverEffect="true" />
         </div>
       </div>
+      <p v-else class="text-warning text-center fw-bold fs-5 mt-3">Thư viện không có sách phù hợp.</p>
 
       <button class="btn btn-info rounded-circle position-absolute top-50 start-0 translate-middle-y" @click="prevSlide"
         :disabled="currentIndex === 0">❮</button>
@@ -47,8 +47,32 @@ export default {
     return {
       currentIndex: 0,
       itemsPerView: 5,
+      allBooks: [],   // chứa toàn bộ sách
       books: []
     };
+  }, props: {
+    selectedAuthor: {
+      type: String,
+      default: null
+    },
+    selectedGenre: {
+      type: String,
+      default: null
+    },
+    selectedPublisher: {
+      type: String,
+      default: null
+    },
+    selectedYear: {
+      type: String,
+      default: null
+    }
+  },
+  watch: {
+    selectedAuthor: 'filterBooks',
+    selectedGenre: 'filterBooks',
+    selectedPublisher: 'filterBooks',
+    selectedYear: 'filterBooks'
   },
   computed: {
     maxIndex() {
@@ -56,6 +80,25 @@ export default {
     }
   },
   methods: {
+    filterBooks() {
+      const author = this.selectedAuthor?.toLowerCase();
+      const genre = this.selectedGenre?.toLowerCase();
+      const publisher = this.selectedPublisher?.toLowerCase();
+      const year = this.selectedYear;
+
+      this.books = this.allBooks.filter(book => {
+        const matchAuthor = !author || (Array.isArray(book.TacGia) &&
+          book.TacGia.some(tg => tg.TenTG?.toLowerCase().includes(author)));
+        const matchGenre = !genre || book.MaLoai?.TenLoai?.toLowerCase().includes(genre);
+        const matchPublisher = !publisher || book.MaNXB?.TenNXB?.toLowerCase().includes(publisher);
+        const matchYear = !year || String(book.NamXuatBan) === year;
+
+        return matchAuthor && matchGenre && matchPublisher && matchYear;
+      });
+
+      // Reset slide nếu cần
+      this.currentIndex = 0;
+    },
     nextSlide() {
       if (this.currentIndex < this.maxIndex) this.currentIndex++;
     },
@@ -84,8 +127,8 @@ export default {
     try {
       const bookStore = useBookStore();
       const result = await bookStore.fetchBooksNew(); // Giả sử có phương thức fetchNewBooks trong Book.store;
+      this.allBooks = result;
       this.books = result;
-      console.log('Sách mới:', this.books);
     } catch (error) {
       console.error('Lỗi khi lấy sách mới:', error);
       this.books = []; // Đặt mảng sách là rỗng nếu có lỗi
@@ -100,5 +143,13 @@ export default {
 <style scoped>
 .ratio img {
   object-fit: cover;
+}
+
+@media (min-width: 992px) {
+  .col-lg-custom {
+    flex: 0 0 auto;
+    width: 20%;
+    /* 100% / 5 = 20% mỗi quyển */
+  }
 }
 </style>

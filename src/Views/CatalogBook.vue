@@ -2,15 +2,17 @@
     <div class="home-wrapper position-relative  bg-light">
         <!-- Sidebar -->
         <SideBar @toggle="handleSidebarToggle" @authorSelected="handleAuthor" @genreSelected="handleGenre"
-            @publisherSelected="handlePublisher" />
+            @publisherSelected="handlePublisher" @yearSelected="handleYear" @allBooks="handleAllBooks" />
 
         <!-- Nội dung chính -->
         <div class="main-content p-3 p-md-4"
             :class="{ 'content-shifted': sidebarOpen, 'content-expanded': !sidebarOpen }">
-            <HotBook />
-            <NewBook />
+            <HotBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
+                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
+            <NewBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
+                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
             <BookForYou :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                :selectedPublisher="selectedPublisher" />
+                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
             <Footer />
             <Chat />
         </div>
@@ -40,7 +42,8 @@ export default {
             sidebarOpen: true,
             selectedAuthor: null,
             selectedGenre: null,
-            selectedPublisher: null
+            selectedPublisher: null,
+            selectedYear: null
         };
     },
     methods: {
@@ -58,6 +61,17 @@ export default {
         handlePublisher(publisher) {
             this.selectedPublisher = publisher;
             console.log("Nhà xuất bản được chọn ở Catalog:", publisher);
+        },
+        handleYear(year) {
+            this.selectedYear = year;
+            console.log("Năm xuất bản được chọn ở Catalog:", year);
+        },
+        handleAllBooks() {
+            this.selectedAuthor = null;
+            this.selectedGenre = null;
+            this.selectedPublisher = null;
+            this.selectedYear = null;
+            console.log("Đã reset tất cả bộ lọc về mặc định.");
         }
     }
 };
@@ -91,7 +105,7 @@ export default {
     .content-expanded {
         margin-left: 0;
     }
- 
+
     .sidebar {
         transform: translateX(-100%);
     }

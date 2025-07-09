@@ -1,7 +1,6 @@
 <template>
   <div style="margin-top: 5px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
-    'sidebar-collapsed':
-      !isOpen
+    'sidebar-collapsed': !isOpen
   }]">
     <!-- Header -->
     <div class="bg-primary text-white p-3 d-flex align-items-center justify-content-between cursor-pointer"
@@ -19,17 +18,26 @@
     <!-- Sidebar mở rộng -->
     <div v-if="isOpen" class="p-3">
       <div v-for="(section, index) in sections" :key="index" class="mb-2">
-        <div class="d-flex justify-content-between align-items-center p-2 rounded cursor-pointer border hover-shadow"
-          @click="toggleSection(index)">
-          <div class="d-flex align-items-center">
-            <i :class="[section.icon, 'me-2', 'text-primary']"></i>
-            <span>{{ section.label }}</span>
-          </div>
-          <i :class="['bi', section.open ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
+        <!-- Nếu là mục "Tất cả sách" -->
+        <div v-if="section.isAll" class="d-flex align-items-center p-2 rounded cursor-pointer border hover-shadow mb-3"
+          @click="handleAllBooks">
+          <i :class="[section.icon, 'me-2', 'text-primary']"></i>
+          <span class="fw-bold">Tất cả sách</span>
         </div>
-        <div v-show="section.open" class="mt-2 ms-4">
-          <component :is="getComponent(section.label)" :items="section.items" @author-selected="handleAuthor"
-            @genre-selected="handleGenre" @publisher-selected="handlePublisher" />
+        <!-- Các mục còn lại -->
+        <div v-else>
+          <div class="d-flex justify-content-between align-items-center p-2 rounded cursor-pointer border hover-shadow"
+            @click="toggleSection(index)">
+            <div class="d-flex align-items-center">
+              <i :class="[section.icon, 'me-2', 'text-primary']"></i>
+              <span>{{ section.label }}</span>
+            </div>
+            <i :class="['bi', section.open ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
+          </div>
+          <div v-show="section.open" class="mt-2 ms-4">
+            <component :is="getComponent(section.label)" :items="section.items" @author-selected="handleAuthor"
+              @genre-selected="handleGenre" @publisher-selected="handlePublisher" @year-selected="handleYear" />
+          </div>
         </div>
       </div>
     </div>
@@ -37,7 +45,7 @@
     <!-- Sidebar rút gọn -->
     <div v-else class="p-2 text-center">
       <div v-for="(section, index) in sections" :key="index" class="collapsed-item p-3 mb-2 rounded cursor-pointer"
-        :title="`${section.label} (${section.items.length})`" @click="expandAndOpenSection(index)">
+        :title="`${section.label} (${section.items?.length || ''})`" @click="expandAndOpenSection(index)">
         <i :class="[section.icon, 'text-primary', 'fs-4', 'mb-1']"></i>
         <small class="text-muted fw-medium" style="font-size: 0.7rem;">{{ section.shortLabel }}</small>
       </div>
@@ -46,41 +54,47 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import Genre from '@/components/Client/Genre.vue';
 import Publisher from '@/components/Client/Publisher.vue';
 import YearOfPublication from '@/components/Client/YearOfPublication.vue';
 import AuthorDetails from '@/components/Client/AuthorDetails.vue';
 import { useCategoryBookStore } from '@/Store/category.store';
 import { usePublisherStore } from '@/Store/publisher.store';
-import { useAuthorStore } from '@/Store/author.store'
+import { useAuthorStore } from '@/Store/author.store';
 import { useBookStore } from '@/Store/Book.store';
-import { capitalizeWords } from '../../utils/stringUtils'
-const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected']);
+import { capitalizeWords } from '../../utils/stringUtils';
 
+const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected', 'yearSelected', 'allBooks']);
 const isOpen = ref(true);
 
 const sections = ref([
+  {
+    label: 'Tất cả sách',
+    shortLabel: 'Tất cả',
+    icon: 'bi bi-book',
+    isAll: true
+  },
   {
     label: 'Thể loại',
     shortLabel: 'Thể loại',
     icon: 'bi bi-tags-fill',
     open: false,
-    items: [] // sẽ được gán khi mounted
+    items: []
   },
   {
     label: 'Nhà xuất bản',
     shortLabel: 'NXB',
     icon: 'bi bi-building',
     open: false,
-    items: [] // sẽ được gán khi mounted
+    items: []
   },
   {
     label: 'Năm xuất bản',
     shortLabel: 'Năm XB',
     icon: 'bi bi-calendar3',
     open: false,
-    items: [] // sẽ được gán khi mounted
+    items: []
   },
   {
     label: 'Tác giả',
@@ -91,21 +105,18 @@ const sections = ref([
   }
 ]);
 
-const toggleSection = (index) => {
-  sections.value[index].open = !sections.value[index].open;
+const handleAllBooks = () => {
+  emit('allBooks'); // Gửi về Catalog.vue để reset filter
 };
-const handleAuthor = (author) => {
-  emit('authorSelected', author); //truyền tiếp lên Catalog.vue
-};
-const handleGenre = (genre) => {
-  emit('genreSelected', genre); //truyền tiếp lên Catalog.vue
-};
-const handlePublisher = (publisher) => {
-  emit('publisherSelected', publisher); //truyền tiếp lên Catalog.vue
-};
+
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
   emit('toggle', isOpen.value);
+};
+
+const toggleSection = (index) => {
+  // index sẽ luôn đúng vì đã xử lý phần tử "Tất cả sách" riêng
+  sections.value[index].open = !sections.value[index].open;
 };
 
 const expandAndOpenSection = (index) => {
@@ -126,35 +137,35 @@ const getComponent = (label) => {
   }
 };
 
+const handleAuthor = (author) => emit('authorSelected', author);
+const handleGenre = (genre) => emit('genreSelected', genre);
+const handlePublisher = (publisher) => emit('publisherSelected', publisher);
+const handleYear = (year) => emit('yearSelected', year);
+
 onMounted(async () => {
   const categoryStore = useCategoryBookStore();
-  const categories = await categoryStore.fetchCategoryBooks();
-  const categoryNames = categories.map(cat => cat.TenLoai);
-  sections.value[0].items = categoryNames.map(name => capitalizeWords(name)) || [];
-
   const publisherStore = usePublisherStore();
-  const publishers = await publisherStore.fetchPublishers();
-  const publisherNames = publishers.map(pub => pub.TenNXB);
-  sections.value[1].items = publisherNames.map(name => capitalizeWords(name)) || [];
-
+  const authorStore = useAuthorStore();
   const bookStore = useBookStore();
-  const books = await bookStore.fetchBooks(); // Gọi API lấy sách
-  const years = books
-    .map(book => parseInt(book.NamXuatBan, 10))
-    .filter(year => !isNaN(year));
+
+  const categories = await categoryStore.fetchCategoryBooks();
+  sections.value[1].items = categories.map(cat => capitalizeWords(cat.TenLoai));
+
+  const publishers = await publisherStore.fetchPublishers();
+  sections.value[2].items = publishers.map(pub => capitalizeWords(pub.TenNXB));
+
+  const books = await bookStore.fetchBooks();
+  const years = books.map(book => parseInt(book.NamXuatBan)).filter(year => !isNaN(year));
   const minYear = Math.min(...years);
   const currentYear = new Date().getFullYear();
-  // Tạo danh sách từ năm nhỏ nhất đến hiện tại
   const yearList = [];
   for (let y = currentYear; y >= minYear; y--) {
-    yearList.push(String(y)); // ép sang string để giống dữ liệu cũ
+    yearList.push(String(y));
   }
-  sections.value[2].items = yearList;
+  sections.value[3].items = yearList;
 
-  const authorStore = useAuthorStore();
   const authors = await authorStore.fetchAuthors();
-  const authorNames = authors.map(author => author.TenTG);
-  sections.value[3].items = authorNames.map(name => capitalizeWords(name)) || [];
+  sections.value[4].items = authors.map(author => capitalizeWords(author.TenTG));
 });
 </script>
 
