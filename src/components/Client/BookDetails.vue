@@ -1,5 +1,6 @@
 <template>
   <div class="layout-wrapper py-4">
+    <!-- Lỗi chỗ slidebar khi nhấn vào option con -->
     <SideBar @toggle="sidebarOpen = $event" />
     <div :class="['main-content', { 'collapsed': !sidebarOpen }]">
       <div class="">
@@ -15,11 +16,11 @@
             <!-- Thông tin chi tiết -->
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
-                <p><strong>Tên sách:</strong> {{ book.TenSach }}</p>
-                <p><strong>Loại sách:</strong> {{ book.MaLoai?.TenLoai }}</p>
+                <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
+                <p><strong>Loại sách:</strong> {{ capitalizeWords(book.MaLoai?.TenLoai) }}</p>
                 <p><strong>Số quyển trong kho:</strong> {{ book.SoQuyen - book.SoLuongDaMuon }}</p>
-                <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => tg.TenTG).join(', ')}}</p>
-                <p><strong>Nhà xuất bản:</strong> {{ book.MaNXB?.TenNXB }}</p>
+                <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
+                <p><strong>Nhà xuất bản:</strong> {{ capitalizeWords(book.MaNXB?.TenNXB) }}</p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
 
                 <!-- Nút hành động -->
@@ -61,7 +62,7 @@
 import SideBar from '@/components/Client/SideBar.vue';
 import Footer from '@/components/Client/Footer.vue';
 import { useBookStore } from '@/Store/Book.store';
-
+import { capitalizeWords } from '@/utils/stringUtils'
 export default {
   name: 'BookDetails',
   components: { SideBar, Footer },
@@ -84,6 +85,7 @@ export default {
     }
   },
   methods: {
+    capitalizeWords,
     borrowBook() {
       alert('Bạn đã chọn mượn sách: ' + this.book?.TenSach);
     }

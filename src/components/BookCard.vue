@@ -6,7 +6,7 @@
         <img :src="book.image" :alt="book.TenSach" class="img-fluid rounded" />
       </div>
       <h5 class="text-white fw-semibold mb-3" style="min-height: 48px">
-        {{ book.TenSach }}
+        {{ capitalizeWords(book.TenSach) }}
       </h5>
       <div class="mt-auto">
         <!-- 🔗 Điều hướng tới trang chi tiết sách -->
@@ -20,6 +20,7 @@
 
 <script>
 import { RouterLink } from 'vue-router';
+import { capitalizeWords } from '@/utils/stringUtils'
 export default {
   name: 'BookCard',
   props: {
@@ -31,6 +32,9 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  methods: {
+    capitalizeWords
   }
 };
 </script>
