@@ -7,15 +7,15 @@
           <span class="title">QUẢN LÝ THƯ VIỆN NLN</span>
         </router-link>
   
-        <!-- Tài khoản (di chuyển ra bên trái của menu toggle) -->
+        <!-- Tài khoản (phía bên phải) -->
         <div class="d-flex align-items-center gap-3 order-lg-3">
-          <div class="account-link" @click="toggleAccountMenu">
+          <div class="account-link position-relative" @click="toggleAccountMenu">
             <img src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User Icon" />
             <span>Tài Khoản</span>
   
             <div v-if="showAccountMenu" class="account-dropdown">
               <template v-if="isLoggedIn">
-                <p>Xin chào, {{ userInfo.name }}</p>
+                <p class="account-name">Xin chào, {{ userInfo.name }}</p>
                 <router-link to="/account-user">Thông tin cá nhân</router-link>
                 <button @click="logout">Đăng xuất</button>
               </template>
@@ -27,7 +27,7 @@
           </div>
         </div>
   
-        <!-- Nút toggle menu (nằm bên phải) -->
+        <!-- Nút toggle menu -->
         <button
           class="navbar-toggler order-lg-2"
           type="button"
@@ -40,7 +40,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
   
-        <!-- Menu -->
+        <!-- Menu điều hướng -->
         <div class="collapse navbar-collapse justify-content-center order-lg-1" id="navbarNav" ref="collapseRef">
           <ul class="navbar-nav mb-2 mb-lg-0 gap-lg-4">
             <li class="nav-item">
