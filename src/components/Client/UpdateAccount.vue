@@ -95,7 +95,7 @@ const validateForm = () => {
 
 const submitForm = async () => {
   if (!validateForm()) {
-    ElMessage.warning('❗ Vui lòng nhập đầy đủ và đúng thông tin!');
+    ElMessage.warning('Vui lòng nhập đầy đủ và đúng thông tin!');
     return;
   }
 
@@ -117,7 +117,7 @@ const submitForm = async () => {
       return;
     }
   } catch (err) {
-    ElMessage.error(err.response?.data?.message || '❌ Cập nhật thất bại!');
+    ElMessage.error(err.response?.data?.message || 'Cập nhật thất bại!');
   }
 };
 

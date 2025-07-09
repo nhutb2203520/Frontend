@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 25px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
+  <div style="margin-top: 24px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
     'sidebar-collapsed': !isOpen
   }]">
     <!-- Header -->
@@ -65,10 +65,10 @@ import { usePublisherStore } from '@/Store/publisher.store';
 import { useAuthorStore } from '@/Store/author.store';
 import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '../../utils/stringUtils';
-
+import { useRouter } from 'vue-router';
 const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected', 'yearSelected', 'allBooks']);
 const isOpen = ref(true);
-
+const router = useRouter();
 const sections = ref([
   {
     label: 'Tất cả sách',
@@ -153,29 +153,35 @@ const getComponent = (label) => {
 const handleGenre = (genre) => {
   selected.value = { genre, publisher: null, year: null, author: null };
   emit('genreSelected', genre);
+  router.push('/catalogbook');
+
 };
 
 
 const handleAuthor = (author) => {
   selected.value = { genre: null, publisher: null, year: null, author };
   emit('authorSelected', author);
+  router.push('/catalogbook');
 };
 
 const handlePublisher = (publisher) => {
   selected.value = { genre: null, publisher, year: null, author: null };
   emit('publisherSelected', publisher);
+  router.push('/catalogbook');
 };
 
 const handleYear = (year) => {
   selected.value = { genre: null, publisher: null, year, author: null };
   emit('yearSelected', year);
+  router.push('/catalogbook');
 };
 const handleAllBooks = () => {
-  selected.value.genre = null;
-  selected.value.author = null;
-  selected.value.publisher = null;
-  selected.value.year = null;
+  selected.value = { genre: null, publisher: null, year: null, author: null };
+  sections.value.forEach(section => {
+    if (!section.isAll) section.open = false;
+  });
   emit('allBooks'); // Gửi về Catalog.vue để reset filter
+  router.push('/catalogbook'); // Chuyển hướng đến trang danh mục sách
 };
 
 onMounted(async () => {
@@ -203,6 +209,21 @@ onMounted(async () => {
   const authors = await authorStore.fetchAuthors();
   sections.value[4].items = authors.map(author => capitalizeWords(author.TenTG));
 });
+function resetSidebarSelections() {
+  selected.value = {
+    genre: null,
+    author: null,
+    publisher: null,
+    year: null,
+  };
+  sections.value.forEach(section => {
+    if (!section.isAll) section.open = false;
+  });
+}
+defineExpose({
+  resetSidebarSelections
+});
+
 </script>
 
 <style scoped>

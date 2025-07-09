@@ -1,21 +1,22 @@
 <template>
     <div class="home-wrapper position-relative  bg-light">
         <!-- Sidebar -->
-        <SideBar @toggle="handleSidebarToggle" @authorSelected="handleAuthor" @genreSelected="handleGenre"
-            @publisherSelected="handlePublisher" @yearSelected="handleYear" @allBooks="handleAllBooks" />
+        <NavBar @resetSidebar="handleSidebarReset" />
+        <SideBar ref="sidebarRef" @toggle="handleSidebarToggle" @authorSelected="handleAuthor"
+            @genreSelected="handleGenre" @publisherSelected="handlePublisher" @yearSelected="handleYear"
+            @allBooks="handleAllBooks" />
 
         <!-- Nội dung chính -->
         <div class="main-content p-3 p-md-4"
             :class="{ 'content-shifted': sidebarOpen, 'content-expanded': !sidebarOpen }">
-            <SearchBook v-if="searchStore.keyword" :searchKeyword="searchStore.keyword" :selectedAuthor="selectedAuthor"
+            <SearchBook v-if="shouldShowSearch" :searchKeyword="searchKeyword" :selectedAuthor="selectedAuthor"
                 :selectedGenre="selectedGenre" :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
+
+
             <template v-else>
-                <HotBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                    :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
-                <NewBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                    :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
-                <BookForYou :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                    :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
+                <HotBook />
+                <NewBook />
+                <BookForYou />
             </template>
 
             <Footer />
@@ -24,7 +25,7 @@
     </div>
 </template>
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import SideBar from '@/components/Client/SideBar.vue';
 import HotBook from '@/components/Client/HotBook.vue';
@@ -32,11 +33,16 @@ import NewBook from '@/components/Client/NewBook.vue';
 import BookForYou from '@/components/Client/BookForYou.vue';
 import Footer from '@/components/Client/Footer.vue';
 import Chat from '@/components/Client/Chat.vue';
+import NavBar from '@/components/Client/NavBar.vue';
 import SearchBook from '@/components/Client/SearchBook.vue';
-import { useSearchStore } from '@/Store/search.store';
 
+const sidebarRef = ref(null);
+
+function handleSidebarReset() {
+    sidebarRef.value?.resetSidebarSelections();
+}
 const route = useRoute();
-const searchStore = useSearchStore();
+
 const sidebarOpen = ref(true);
 const selectedAuthor = ref(null);
 const selectedGenre = ref(null);
@@ -49,7 +55,13 @@ watch(() => route.query.search, (newSearch) => {
     searchKeyword.value = newSearch || '';
 }, { immediate: true });
 
-
+const shouldShowSearch = computed(() =>
+    !!searchKeyword.value ||
+    !!selectedAuthor.value ||
+    !!selectedGenre.value ||
+    !!selectedPublisher.value ||
+    !!selectedYear.value
+);
 function handleSidebarToggle(isOpen) {
     sidebarOpen.value = isOpen;
 }

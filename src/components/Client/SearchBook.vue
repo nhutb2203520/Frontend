@@ -1,7 +1,12 @@
 <template>
-    <div class="container my-4">
-        <h3 class="text-info fw-bold mb-3">
-            Kết quả tìm kiếm cho "{{ searchKeyword }}"
+    <div class="search-wrapper my-4 text-white">
+        <h3 class="fw-bold mb-4">
+            Kết quả tìm kiếm
+            <span v-if="searchKeyword">cho từ khóa: "<strong>{{ searchKeyword }}</strong>"</span>
+            <span v-else-if="selectedAuthor">từ tác giả: "<strong>{{ selectedAuthor }}</strong>"</span>
+            <span v-else-if="selectedGenre">thuộc thể loại: "<strong>{{ selectedGenre }}</strong>"</span>
+            <span v-else-if="selectedPublisher">từ nhà xuất bản: "<strong>{{ selectedPublisher }}</strong>"</span>
+            <span v-else-if="selectedYear">năm xuất bản: "<strong>{{ selectedYear }}</strong>"</span>
         </h3>
 
         <div v-if="filteredBooks.length > 0" class="row g-4">
@@ -11,7 +16,7 @@
         </div>
 
         <p v-else class="text-warning text-center mt-4 fw-bold fs-5">
-            Không tìm thấy sách phù hợp với từ khóa "{{ searchKeyword }}"
+            Không tìm thấy sách phù hợp.
         </p>
     </div>
 </template>
@@ -21,19 +26,6 @@ import { ref, watch, onMounted } from 'vue';
 import BookCard from '@/components/BookCard.vue';
 import { useBookStore } from '@/Store/Book.store';
 
-const bookStore = useBookStore();
-
-// ✅ Hàm chuẩn hóa tiếng Việt (bỏ dấu, viết thường)
-function normalizeText(str) {
-    return str
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'd');
-}
-
-// ✅ Nhận props từ component cha (CatalogBook.vue)
 const props = defineProps({
     searchKeyword: String,
     selectedAuthor: String,
@@ -42,76 +34,95 @@ const props = defineProps({
     selectedYear: String
 });
 
+const emit = defineEmits(['clearSearch']);
+
 const allBooks = ref([]);
 const filteredBooks = ref([]);
 
-// ✅ Lấy toàn bộ sách từ store
+// Hàm chuẩn hóa tiếng Việt không dấu
+function normalizeText(str) {
+    return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd');
+}
+function filterBooks() {
+    const keyword = normalizeText(props.searchKeyword?.trim() || '');
+    const authorFilter = normalizeText(props.selectedAuthor || '');
+    const genreFilter = normalizeText(props.selectedGenre || '');
+    const publisherFilter = normalizeText(props.selectedPublisher || '');
+    const yearFilter = props.selectedYear || '';
+
+    filteredBooks.value = allBooks.value.filter((book) => {
+        const tenSach = normalizeText(book.TenSach || '');
+        const tacGiaList = book.TacGia?.map((tg) => normalizeText(tg.TenTG || '')) || [];
+        const theLoai = normalizeText(book.MaLoai?.TenLoai || '');
+        const nhaXuatBan = normalizeText(book.MaNXB?.TenNXB || '');
+        const namXuatBan = String(book.NamXuatBan || '');
+
+        // Nếu có keyword -> tìm trong toàn bộ sách, bỏ qua các bộ lọc khác
+        if (keyword) {
+            return (
+                tenSach.includes(keyword) ||
+                tacGiaList.some((name) => name.includes(keyword)) ||
+                theLoai.includes(keyword) ||
+                nhaXuatBan.includes(keyword) ||
+                namXuatBan.includes(keyword)
+            );
+        }
+
+        // Nếu không có keyword -> dùng các bộ lọc riêng
+        return (
+            (!authorFilter || tacGiaList.some((name) => name.includes(authorFilter))) &&
+            (!genreFilter || theLoai.includes(genreFilter)) &&
+            (!publisherFilter || nhaXuatBan.includes(publisherFilter)) &&
+            (!yearFilter || namXuatBan === yearFilter)
+        );
+    });
+}
+
+const bookStore = useBookStore();
 async function fetchBooks() {
     try {
         const books = await bookStore.fetchBooks();
         allBooks.value = books;
-        filterBooks(); // Lọc ngay sau khi load
+        filterBooks();
     } catch (error) {
         console.error('Lỗi khi lấy sách:', error);
     }
 }
 
-// ✅ Hàm lọc sách theo tất cả điều kiện
-function filterBooks() {
-    const keyword = normalizeText(props.searchKeyword?.trim() || '');
-
-    filteredBooks.value = allBooks.value.filter((book) => {
-        const tenSach = normalizeText(book.TenSach || '');
-        const tacGiaList = book.TacGia?.map((tg) => normalizeText(tg.TenTG || '')) || [];
-
-        const matchKeyword =
-            !keyword ||
-            tenSach.includes(keyword) ||
-            tacGiaList.some((name) => name.includes(keyword));
-
-        const matchAuthor =
-            !props.selectedAuthor ||
-            (book.TacGia &&
-                book.TacGia.some(
-                    (tg) => normalizeText(tg.TenTG) === normalizeText(props.selectedAuthor)
-                ));
-
-        const matchGenre =
-            !props.selectedGenre ||
-            (book.MaLoai &&
-                normalizeText(book.MaLoai.TenLoai) === normalizeText(props.selectedGenre));
-
-        const matchPublisher =
-            !props.selectedPublisher ||
-            (book.MaNXB &&
-                normalizeText(book.MaNXB.TenNXB) === normalizeText(props.selectedPublisher));
-
-        const matchYear =
-            !props.selectedYear || String(book.NamXuatBan) === props.selectedYear;
-
-        return (
-            matchKeyword &&
-            matchAuthor &&
-            matchGenre &&
-            matchPublisher &&
-            matchYear
-        );
-    });
-}
-
-// ✅ Theo dõi props để lọc lại khi có thay đổi
 watch(
-    () => [
-        props.searchKeyword,
-        props.selectedAuthor,
-        props.selectedGenre,
-        props.selectedPublisher,
-        props.selectedYear
-    ],
-    filterBooks,
+    () => [props.searchKeyword, props.selectedAuthor, props.selectedGenre, props.selectedPublisher, props.selectedYear],
+    () => {
+        filterBooks();
+        // Không gọi emit clearSearch nếu đang lọc theo author/genre...
+        if (props.searchKeyword) {
+            emit('clearSearch');
+        }
+    },
     { immediate: true }
 );
 
-// ✅ Gọi API khi component mounted
+
 onMounted(fetchBooks);
 </script>
+
+<style scoped>
+.search-wrapper {
+    background-color: #1e1e2f;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+h3 {
+    color: #00d4ff;
+}
+
+strong {
+    color: #ffcc00;
+}
+</style>

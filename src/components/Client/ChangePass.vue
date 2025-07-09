@@ -52,25 +52,25 @@ const form = ref({
 const submitResetPassword = async () => {
   const { currentPassword, newPassword, validateNewPassword } = form.value;
   if (newPassword.length < 6) {
-    ElMessage.error('❌ Mật khẩu mới phải có ít nhất 6 ký tự!');
+    ElMessage.error('Mật khẩu mới phải có ít nhất 6 ký tự!');
     return;
   }
   if (newPassword !== validateNewPassword) {
-    ElMessage.error('❌ Mật khẩu nhập lại không khớp!');
+    ElMessage.error('Mật khẩu nhập lại không khớp!');
     return;
   }
 
   try {
     const res = await readerStore.changePassword(currentPassword, newPassword);
     if (res.message === 'Đổi mật khẩu thành công.') {
-      ElMessage.success('✅ Đổi mật khẩu thành công!');
+      ElMessage.success('Đổi mật khẩu thành công!');
       router.push('/account-user');
     } else {
-      ElMessage.error(res.message || '❌ Đổi mật khẩu thất bại!');
+      ElMessage.error(res.message || 'Đổi mật khẩu thất bại!');
       return;
     }
   } catch (error) {
-    const msg = error?.response?.data?.message || '❌ Đổi mật khẩu thất bại!';
+    const msg = error?.response?.data?.message || 'Đổi mật khẩu thất bại!';
     ElMessage.error(msg);
   }
 };
