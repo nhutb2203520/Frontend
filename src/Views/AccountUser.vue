@@ -58,7 +58,9 @@ import { ElMessageBox, ElMessage } from 'element-plus';
 import { useReaderStore } from '@/Store/Reader.store';
 import { formatDate } from '../utils/formatDate'
 import { capitalizeWords } from '../utils/stringUtils'
+import { useAuthStore } from '@/Store/auth.store';
 const userInfo = ref(null);
+const authStore = useAuthStore();
 const readerStore = useReaderStore();
 onMounted(async () => {
   try {
@@ -69,25 +71,38 @@ onMounted(async () => {
     ElMessage.error('Không thể tải thông tin người dùng!');
   }
 });
+const handleDeleteAccount = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động không thể hoàn tác.",
+      "Xác nhận xóa tài khoản",
+      {
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Hủy",
+        type: "warning",
+        confirmButtonClass: 'el-button--danger'
+      }
+    );
 
-const handleDeleteAccount = () => {
-  ElMessageBox.confirm(
-    "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động không thể hoàn tác.",
-    "Xác nhận xóa tài khoản",
-    {
-      confirmButtonText: "Xác nhận",
-      cancelButtonText: "Hủy",
-      type: "warning",
+    const res = await readerStore.deleteMyAccount();
+    if (res.message === 'Xóa tài khoản thành công.') {
+      ElMessage.success("Tài khoản đã được xóa.");
+      authStore.logout();
+    } else {
+      ElMessage.error(res.message)
     }
-  )
-    .then(() => {
-      // TODO: Gọi API xóa tài khoản tại đây
-      ElMessage.success("✅ Tài khoản đã được xóa.");
-    })
-    .catch(() => {
-      ElMessage.info("❌ Hủy xóa tài khoản.");
-    });
+
+  } catch (err) {
+    if (err !== 'cancel') {
+      // Nếu không phải do cancel popup
+      console.error(err);
+      ElMessage.error("Không thể xóa tài khoản. Vui lòng thử lại sau.");
+    } else {
+      ElMessage.info("Hủy xóa tài khoản.");
+    }
+  }
 };
+
 </script>
 
 

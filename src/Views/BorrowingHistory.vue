@@ -1,59 +1,7 @@
-<template> 
-    <div class="borrowing-slip container my-5 p-4 border rounded">
-      <div class="header text-center border-bottom pb-2 mb-4">
-        <h2 class="fst-italic">LỊCH SỬ MƯỢN SÁCH</h2>
-      </div>
-  
-      <!-- Responsive Table -->
-      <div class="table-responsive">
-        <table class="table table-bordered text-center">
-          <thead class="table-light">
-            <tr>
-              <th>STT</th>
-              <th>Thông tin sách</th>
-              <th>Ngày mượn</th>
-              <th>Ngày đến hạn trả</th>
-              <th>Trạng thái sách</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(borrow, index) in borrowDetails" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>
-                <strong>{{ capitalizeWords(borrow.MaSach?.TenSach) }}</strong><br />
-                <em>Tác giả: {{ capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', ')) }}</em>
-              </td>
-              <td>{{ formatDate(borrow.NgayMuon) }}</td>
-              <td>{{ formatDate(borrow.NgayTra) }}</td>
-              <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
-              <td>
-                <button
-                  v-if="borrow.MaTrangThai?.TenTrangThai === 'đang mượn'"
-                  class="btn btn-sm btn-primary"
-                  @click="extendBorrow(borrow)"
-                >
-                  Gia hạn
-                </button>
-                <button
-                  v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'"
-                  class="btn btn-sm btn-danger"
-                  @click="cancelBorrow(borrow)"
-                >
-                  Huỷ mượn
-                </button>
-                <button
-                  v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'"
-                  class="btn btn-sm btn-success"
-                  @click="borrowAgain(borrow)"
-                >
-                  Mượn lại
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<template>
+  <div class="borrowing-slip container my-5 p-4 border rounded">
+    <div class="header text-center border-bottom pb-2 mb-4">
+      <h2 class="fst-italic">LỊCH SỬ MƯỢN SÁCH</h2>
     </div>
   </template>
   
@@ -123,30 +71,39 @@ table td {
 @media (max-width: 992px) {
   .borrowing-slip {
     font-size: 18 px;
+
     padding: 20px;
   }
 
   table th,
   table td {
+
     font-size: 16px;
+
   }
 }
 
 @media (max-width: 768px) {
   .borrowing-slip {
+
     font-size: 16px;
+
     padding: 15px;
   }
 
   table th,
   table td {
+
     font-size: 14px;
+
   }
 }
 
 @media (max-width: 576px) {
   .borrowing-slip {
+
     font-size: 14px;
+
     padding: 10px;
   }
 
@@ -162,3 +119,4 @@ table td {
 
   </style>
   
+
