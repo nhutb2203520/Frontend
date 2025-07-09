@@ -16,9 +16,11 @@ export default {
             required: true
         }
     },
+    emits: ['genre-selected'],
     methods: {
         handleClick(item) {
-            console.log('Thể loại được chọn:', item);
+            this.$emit('genre-selected', item);
+            console.log(`Thể loại được chọn ở con genre: ${item}`);
         }
     }
 };

@@ -17,9 +17,11 @@ export default {
             required: true
         }
     },
+    emits: ['publisher-selected'],
     methods: {
         handleClick(item) {
-            console.log('Nhà xuất bản được chọn:', item);
+            this.$emit('publisher-selected', item);
+            console.log('Nhà xuất bản được chọn ở publisher:', item);
         }
     }
 };

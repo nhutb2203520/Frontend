@@ -1,14 +1,16 @@
 <template>
     <div class="home-wrapper position-relative  bg-light">
         <!-- Sidebar -->
-        <SideBar @toggle="handleSidebarToggle" />
+        <SideBar @toggle="handleSidebarToggle" @authorSelected="handleAuthor" @genreSelected="handleGenre"
+            @publisherSelected="handlePublisher" />
 
         <!-- Nội dung chính -->
         <div class="main-content p-3 p-md-4"
             :class="{ 'content-shifted': sidebarOpen, 'content-expanded': !sidebarOpen }">
             <HotBook />
             <NewBook />
-            <BookForYou />
+            <BookForYou :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
+                :selectedPublisher="selectedPublisher" />
             <Footer />
             <Chat />
         </div>
@@ -35,12 +37,27 @@ export default {
     },
     data() {
         return {
-            sidebarOpen: true
+            sidebarOpen: true,
+            selectedAuthor: null,
+            selectedGenre: null,
+            selectedPublisher: null
         };
     },
     methods: {
         handleSidebarToggle(isOpen) {
             this.sidebarOpen = isOpen;
+        },
+        handleAuthor(author) {
+            this.selectedAuthor = author;
+            console.log("Tác giả được chọn ở Catalog:", author);
+        },
+        handleGenre(genre) {
+            this.selectedGenre = genre;
+            console.log("Thể loại được chọn ở Catalog:", genre);
+        },
+        handlePublisher(publisher) {
+            this.selectedPublisher = publisher;
+            console.log("Nhà xuất bản được chọn ở Catalog:", publisher);
         }
     }
 };

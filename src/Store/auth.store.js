@@ -51,7 +51,7 @@ export const useAuthStore = defineStore("auth", {
           console.error("❌ Refresh thất bại:", err);
           this.logout();
         }
-      }, 25000);
+      }, 20000);
     },
   },
 });

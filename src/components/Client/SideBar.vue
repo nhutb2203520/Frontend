@@ -28,7 +28,8 @@
           <i :class="['bi', section.open ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
         </div>
         <div v-show="section.open" class="mt-2 ms-4">
-          <component :is="getComponent(section.label)" :items="section.items" />
+          <component :is="getComponent(section.label)" :items="section.items" @author-selected="handleAuthor"
+            @genre-selected="handleGenre" @publisher-selected="handlePublisher" />
         </div>
       </div>
     </div>
@@ -55,7 +56,7 @@ import { usePublisherStore } from '@/Store/publisher.store';
 import { useAuthorStore } from '@/Store/author.store'
 import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '../../utils/stringUtils'
-const emit = defineEmits(['toggle']);
+const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected']);
 
 const isOpen = ref(true);
 
@@ -93,7 +94,15 @@ const sections = ref([
 const toggleSection = (index) => {
   sections.value[index].open = !sections.value[index].open;
 };
-
+const handleAuthor = (author) => {
+  emit('authorSelected', author); //truyền tiếp lên Catalog.vue
+};
+const handleGenre = (genre) => {
+  emit('genreSelected', genre); //truyền tiếp lên Catalog.vue
+};
+const handlePublisher = (publisher) => {
+  emit('publisherSelected', publisher); //truyền tiếp lên Catalog.vue
+};
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
   emit('toggle', isOpen.value);

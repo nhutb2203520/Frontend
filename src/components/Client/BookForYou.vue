@@ -10,11 +10,15 @@
     </div>
 
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
-      <div v-for="(book, index) in books" :key="index" class="col">
-        <!-- 🔁 Tái sử dụng BookCard.vue -->
-        <BookCard :book="book" />
-      </div>
+      <template v-if="books.length > 0">
+        <div v-for="(book, index) in books" :key="index" class="col">
+          <BookCard :book="book" />
+        </div>
+      </template>
+
+      <p v-else class="text-center text-warning w-100">Thư viện không có sách phù hợp.</p>
     </div>
+
   </div>
 </template>
 
@@ -27,23 +31,88 @@ export default {
   components: {
     BookCard
   },
+  props: {
+    selectedAuthor: {
+      type: String,
+      default: null
+    },
+    selectedGenre: {
+      type: String,
+      default: null
+    },
+    selectedPublisher: {
+      type: String,
+      default: null
+    }
+  },
   data() {
     return {
-      books: []
+      allBooks: [],   // chứa toàn bộ sách
+      books: []       // chứa sách được hiển thị sau lọc
     };
+  },
+  watch: {
+    selectedAuthor: {
+      handler(newAuthor) {
+        this.filterBooksByAuthor(newAuthor);
+      },
+      immediate: true
+    },
+    selectedGenre: {
+      handler(newGenre) {
+        this.filterBooksByGenre(newGenre);
+      },
+      immediate: true
+    },
+    selectedPublisher: {
+      handler(newPublisher) {
+        this.books = this.allBooks.filter(book => book.MaNXB.TenNXB.toLowerCase().includes(newPublisher.toLowerCase()));
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    filterBooksByAuthor(author) {
+      if (!author) {
+        this.books = this.allBooks;
+        return;
+      }
+
+      const searchTerm = author.toLowerCase();
+
+      this.books = this.allBooks.filter(book => {
+        if (!Array.isArray(book.TacGia)) return false;
+
+        return book.TacGia.some(tg =>
+          typeof tg.TenTG === 'string' && tg.TenTG.toLowerCase().includes(searchTerm)
+        );
+      });
+    },
+    filterBooksByGenre(genre) {
+      if (!genre) {
+        this.books = this.allBooks;
+        return;
+      }
+
+      const searchTerm = genre.toLowerCase();
+
+      this.books = this.allBooks.filter(book => book.MaLoai.TenLoai.toLowerCase().includes(searchTerm));
+    }
   },
   async mounted() {
     try {
-      const bookStore = useBookStore()
+      const bookStore = useBookStore();
       const result = await bookStore.fetchBooks();
-      this.books = result
+      this.allBooks = result;
+      this.filterBooksByAuthor(this.selectedAuthor); // Lọc lần đầu nếu có sẵn
     } catch (error) {
       console.error('Lỗi khi lấy sách gợi ý:', error);
-      this.books = []; // Đặt mảng sách là rỗng nếu có lỗi
+      this.books = [];
     }
-  },
+  }
 };
 </script>
+
 
 <style scoped>
 .ratio img {
