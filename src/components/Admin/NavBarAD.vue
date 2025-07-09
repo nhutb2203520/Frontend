@@ -1,71 +1,86 @@
 <template>
     <nav class="navbar">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <!-- Logo bên trái -->
         <div class="navbar-left">
-            <router-link to="/homeadmin" class="navbar-logo">
-                <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
-                <span class="title">QUẢN LÝ THƯ VIỆN NLN</span>
+          <router-link to="/homeadmin" class="navbar-logo">
+            <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
+            <span class="title">QUẢN LÝ THƯ VIỆN NLN</span>
+          </router-link>
+        </div>
+  
+        <!-- Menu giữa (ẩn trên mobile) -->
+        <ul class="navbar-menu d-none d-lg-flex">
+          <li>
+            <router-link to="/homeadmin" :class="{ active: $route.path === '/homeadmin' }">
+              Trang Tổng Quan
             </router-link>
-        </div>
-
-        <ul class="navbar-menu">
-            <li>
-                <router-link to="/homeadmin" :class="{ active: $route.path === '/homeadmin' }">
-                    Trang Tổng Quan
-                </router-link>
-            </li>
+          </li>
         </ul>
-
-        <div class="navbar-right">
-            <div class="account-link" @click="toggleAccountMenu">
-                <img src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User Icon" />
-                <span>Tài Khoản Thủ Thư</span>
-
-                <div v-if="showAccountMenu" class="account-dropdown">
-                    <template v-if="isLoggedIn">
-                        <p>Xin chào, {{ userInfo.name }}</p>
-                        <router-link to="/profile">Thông tin cá nhân</router-link>
-                        <button @click="logout">Đăng xuất</button>
-                    </template>
-                    <template v-else>
-                        <router-link to="/admin/signin">Đăng nhập</router-link>
-                    </template>
-                </div>
+  
+        <!-- Phần bên phải -->
+        <div class="navbar-right d-flex align-items-center gap-3">
+          <!-- Tài khoản -->
+          <div class="account-link" @click="toggleAccountMenu">
+            <img src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User Icon" />
+            <span>Tài Khoản Thủ Thư</span>
+  
+            <div v-if="showAccountMenu" class="account-dropdown">
+              <template v-if="isLoggedIn">
+                <p>Xin chào, {{ userInfo.name }}</p>
+                <router-link to="/profile">Thông tin cá nhân</router-link>
+                <button @click="logout">Đăng xuất</button>
+              </template>
+              <template v-else>
+                <router-link to="/admin/signin">Đăng nhập</router-link>
+              </template>
             </div>
-
-            <div class="navbar-search">
-                <input type="text" placeholder="Tìm kiếm ..." />
-                <button>
-                    <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search Icon" />
-                </button>
+          </div>
+  
+          <!-- Nút menu mobile -->
+          <div class="mobile-menu d-lg-none">
+            <button class="btn btn-light" @click="toggleMobileMenu">
+              <i class="bi bi-list"></i>
+            </button>
+  
+            <!-- Dropdown cho mobile -->
+            <div v-if="showMobileMenu" class="mobile-dropdown">
+              <router-link to="/homeadmin" class="dropdown-item">Trang Tổng Quan</router-link>
             </div>
+          </div>
         </div>
+      </div>
     </nav>
-</template>
-
-<script>
-export default {
-    name: 'NavBar',
+  </template>
+  
+  <script>
+  export default {
+    name: 'NavBarAd',
     data() {
-        return {
-            showAccountMenu: false,
-            isLoggedIn: false, // ⚠️ sau này dùng localStorage hoặc Vuex
-            userInfo: {
-                name: 'Nguyễn Văn A'
-            }
-        };
+      return {
+        showAccountMenu: false,
+        showMobileMenu: false,
+        isLoggedIn: true, // sau này dùng Vuex/localStorage
+        userInfo: {
+          name: 'Nguyễn Văn A'
+        }
+      };
     },
     methods: {
-        toggleAccountMenu() {
-            this.showAccountMenu = !this.showAccountMenu;
-        },
-        logout() {
-            this.isLoggedIn = false;
-            this.showAccountMenu = false;
-            alert("Đã đăng xuất!");
-            // Nếu có token/localStorage → xóa tại đây
-        }
+      toggleAccountMenu() {
+        this.showAccountMenu = !this.showAccountMenu;
+      },
+      toggleMobileMenu() {
+        this.showMobileMenu = !this.showMobileMenu;
+      },
+      logout() {
+        this.isLoggedIn = false;
+        this.showAccountMenu = false;
+        alert("Đã đăng xuất!");
+      }
     }
-};
-</script>
-
-<style src="src/assets/navbar.css"></style>
+  };
+  </script>
+  
+  <style src="@/assets/navbar.css"></style>
+  

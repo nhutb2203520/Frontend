@@ -1,67 +1,71 @@
 <template>
-  <div class="overlay">
-    <NavBarAD />
+  <div class="overlay d-flex">
     <SideBarAD />
+    <div class="flex-grow-1">
+      <NavBarAD />
 
-    <div class="publisher-management">
-      <h1 class="title">Quản lý loại sách</h1>
+      <div class="container-fluid px-3">
+        <div class="publisher-management mx-auto mt-4">
+          <h1 class="title">Quản lý loại sách</h1>
 
-      <div class="top-bar">
-        <button class="total-btn">Tổng loại sách: {{ totalCategories }}</button>
-        <div class="search">
-          <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên loại sách..." />
-        </div>
-        <button class="add-btn" @click="toggleAddForm">
-          {{ showAddForm ? '❌ Hủy thêm' : '➕ Thêm loại sách' }}
-        </button>
-      </div>
-
-      <div class="reader-list">
-        <h3>Danh sách loại sách</h3>
-
-        <div v-if="showAddForm" class="add-form">
-          <input v-model="newCategory.name" placeholder="Nhập tên loại sách" />
-          <textarea v-model="newCategory.description" placeholder="Nhập mô tả loại sách" rows="2" />
-          <div class="detail-actions">
-            <button class="btn btn-success" @click="addCategory">💾 Lưu</button>
-            <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
+          <div class="top-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+            <button class="total-btn">Tổng loại sách: {{ totalCategories }}</button>
+            <div class="search flex-grow-1">
+              <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên loại sách..." />
+            </div>
+            <button class="add-btn" @click="toggleAddForm">
+              {{ showAddForm ? '❌ Hủy thêm' : '➕ Thêm loại sách' }}
+            </button>
           </div>
-          <hr />
-        </div>
 
-        <div class="scrollable-list">
-          <ul>
-            <li
-              v-for="cat in filteredCategories"
-              :key="cat.id"
-              @click="toggleCategory(cat)"
-              class="reader-item"
-            >
-              <strong>{{ cat.name }}</strong>
+          <div class="reader-list">
+            <h3>Danh sách loại sách</h3>
 
-              <div v-if="selectedCategory?.id === cat.id" class="reader-detail" @click.stop>
-                <div v-if="editingCategoryId === cat.id">
-                  <p><strong>Tên loại sách:</strong></p>
-                  <input v-model="editedCategory.name" />
-                  <p><strong>Mô tả:</strong></p>
-                  <textarea v-model="editedCategory.description" rows="2" />
-                  <div class="detail-actions">
-                    <button class="btn btn-success" @click="saveEdit(cat.id)">💾 Lưu</button>
-                    <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
-                  </div>
-                </div>
-                <div v-else>
-                  <p><strong>ID:</strong> {{ cat.id }}</p>
-                  <p><strong>Tên loại sách:</strong> {{ cat.name }}</p>
-                  <p><strong>Mô tả:</strong> {{ cat.description }}</p>
-                  <div class="detail-actions">
-                    <button class="btn btn-warning" @click.stop="editCategory(cat)">✏️ Chỉnh sửa</button>
-                    <button class="btn btn-danger" @click.stop="deleteCategory(cat)">🗑️ Xóa</button>
-                  </div>
-                </div>
+            <div v-if="showAddForm" class="add-form">
+              <input v-model="newCategory.name" placeholder="Nhập tên loại sách" />
+              <textarea v-model="newCategory.description" placeholder="Nhập mô tả loại sách" rows="2" />
+              <div class="detail-actions">
+                <button class="btn btn-success" @click="addCategory">💾 Lưu</button>
+                <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
               </div>
-            </li>
-          </ul>
+              <hr />
+            </div>
+
+            <div class="scrollable-list">
+              <ul>
+                <li
+                  v-for="cat in filteredCategories"
+                  :key="cat.id"
+                  @click="toggleCategory(cat)"
+                  class="reader-item"
+                >
+                  <strong>{{ cat.name }}</strong>
+
+                  <div v-if="selectedCategory?.id === cat.id" class="reader-detail" @click.stop>
+                    <div v-if="editingCategoryId === cat.id">
+                      <p><strong>Tên loại sách:</strong></p>
+                      <input v-model="editedCategory.name" />
+                      <p><strong>Mô tả:</strong></p>
+                      <textarea v-model="editedCategory.description" rows="2" />
+                      <div class="detail-actions">
+                        <button class="btn btn-success" @click="saveEdit(cat.id)">💾 Lưu</button>
+                        <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <p><strong>ID:</strong> {{ cat.id }}</p>
+                      <p><strong>Tên loại sách:</strong> {{ cat.name }}</p>
+                      <p><strong>Mô tả:</strong> {{ cat.description }}</p>
+                      <div class="detail-actions">
+                        <button class="btn btn-warning" @click.stop="editCategory(cat)">✏️ Chỉnh sửa</button>
+                        <button class="btn btn-danger" @click.stop="deleteCategory(cat)">🗑️ Xóa</button>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -162,32 +166,30 @@ export default {
 </script>
 
 <style scoped>
-/* Dùng lại CSS như trước đây - đã tối ưu */
 .overlay {
   position: fixed;
-  top: 0;
+  padding: 15px;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(20, 20, 20, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 120px 20px 20px;
   overflow-y: auto;
   z-index: 1;
 }
 
 .publisher-management {
-  max-width: 900px;
-  width: 100%;
+  margin-top: 105px !important;
+  width: 65%;
+  max-width: 65%;
   background: #fff;
   padding: 30px;
+  margin: 0 auto;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   font-family: 'Segoe UI', sans-serif;
   z-index: 2;
   position: relative;
+  box-sizing: border-box;
 }
 
 .title {
@@ -197,40 +199,31 @@ export default {
   color: #2c3e50;
 }
 
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.total-btn {
-  background-color: #f1f1f1;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
-.search input {
+.top-bar input {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  width: 100%;
   min-width: 250px;
 }
 
+.total-btn,
 .add-btn {
   padding: 12px 20px;
-  background-color: #3498db;
-  color: white;
-  border: none;
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
+  border: none;
+}
+.total-btn {
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.add-btn {
+  background-color: #3498db;
+  color: white;
 }
 .add-btn:hover {
   background-color: #2980b9;
@@ -266,10 +259,10 @@ export default {
 }
 
 .detail-actions {
-  margin-top: 10px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .add-form input,
@@ -307,5 +300,34 @@ export default {
 .btn-secondary {
   background-color: #7f8c8d;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .publisher-management {
+    padding: 15px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 95%;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .top-bar input,
+  .total-btn,
+  .add-btn {
+    width: 100% !important;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 </style>

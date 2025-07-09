@@ -184,7 +184,7 @@ export default {
 .overlay {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 5px;
   width: 100vw;
   height: 100vh;
   background: rgba(20, 20, 20, 0.85);
@@ -197,8 +197,9 @@ export default {
 }
 
 .publisher-management {
-  max-width: 900px;
-  width: 100%;
+
+  width: 65%;
+  max-width: 65%;
   background: #fff;
   padding: 30px;
   border-radius: 16px;
