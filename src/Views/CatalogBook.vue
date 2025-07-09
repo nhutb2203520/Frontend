@@ -1,80 +1,105 @@
 <template>
     <div class="home-wrapper position-relative  bg-light">
         <!-- Sidebar -->
-        <SideBar @toggle="handleSidebarToggle" @authorSelected="handleAuthor" @genreSelected="handleGenre"
-            @publisherSelected="handlePublisher" @yearSelected="handleYear" @allBooks="handleAllBooks" />
+        <NavBar @resetSidebar="handleSidebarReset" />
+        <SideBar ref="sidebarRef" @toggle="handleSidebarToggle" @authorSelected="handleAuthor"
+            @genreSelected="handleGenre" @publisherSelected="handlePublisher" @yearSelected="handleYear"
+            @allBooks="handleAllBooks" />
 
         <!-- Nội dung chính -->
         <div class="main-content p-3 p-md-4"
             :class="{ 'content-shifted': sidebarOpen, 'content-expanded': !sidebarOpen }">
-            <HotBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
-            <NewBook :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
-            <BookForYou :selectedAuthor="selectedAuthor" :selectedGenre="selectedGenre"
-                :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
+            <SearchBook v-if="shouldShowSearch" :searchKeyword="searchKeyword" :selectedAuthor="selectedAuthor"
+                :selectedGenre="selectedGenre" :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
+
+
+            <template v-else>
+                <HotBook />
+                <NewBook />
+                <BookForYou />
+            </template>
+
             <Footer />
             <Chat />
         </div>
     </div>
 </template>
-
-<script>
+<script setup>
+import { ref, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import SideBar from '@/components/Client/SideBar.vue';
 import HotBook from '@/components/Client/HotBook.vue';
 import NewBook from '@/components/Client/NewBook.vue';
 import BookForYou from '@/components/Client/BookForYou.vue';
 import Footer from '@/components/Client/Footer.vue';
 import Chat from '@/components/Client/Chat.vue';
+import NavBar from '@/components/Client/NavBar.vue';
+import SearchBook from '@/components/Client/SearchBook.vue';
 
-export default {
-    name: 'Catalog',
-    components: {
-        SideBar,
-        HotBook,
-        NewBook,
-        BookForYou,
-        Footer,
-        Chat
-    },
-    data() {
-        return {
-            sidebarOpen: true,
-            selectedAuthor: null,
-            selectedGenre: null,
-            selectedPublisher: null,
-            selectedYear: null
-        };
-    },
-    methods: {
-        handleSidebarToggle(isOpen) {
-            this.sidebarOpen = isOpen;
-        },
-        handleAuthor(author) {
-            this.selectedAuthor = author;
-            console.log("Tác giả được chọn ở Catalog:", author);
-        },
-        handleGenre(genre) {
-            this.selectedGenre = genre;
-            console.log("Thể loại được chọn ở Catalog:", genre);
-        },
-        handlePublisher(publisher) {
-            this.selectedPublisher = publisher;
-            console.log("Nhà xuất bản được chọn ở Catalog:", publisher);
-        },
-        handleYear(year) {
-            this.selectedYear = year;
-            console.log("Năm xuất bản được chọn ở Catalog:", year);
-        },
-        handleAllBooks() {
-            this.selectedAuthor = null;
-            this.selectedGenre = null;
-            this.selectedPublisher = null;
-            this.selectedYear = null;
-            console.log("Đã reset tất cả bộ lọc về mặc định.");
-        }
-    }
-};
+const sidebarRef = ref(null);
+
+function handleSidebarReset() {
+    sidebarRef.value?.resetSidebarSelections();
+}
+const route = useRoute();
+
+const sidebarOpen = ref(true);
+const selectedAuthor = ref(null);
+const selectedGenre = ref(null);
+const selectedPublisher = ref(null);
+const selectedYear = ref(null);
+const searchKeyword = ref('');
+
+// Đọc từ khóa tìm kiếm từ URL (query param)
+watch(() => route.query.search, (newSearch) => {
+    searchKeyword.value = newSearch || '';
+}, { immediate: true });
+
+const shouldShowSearch = computed(() =>
+    !!searchKeyword.value ||
+    !!selectedAuthor.value ||
+    !!selectedGenre.value ||
+    !!selectedPublisher.value ||
+    !!selectedYear.value
+);
+function handleSidebarToggle(isOpen) {
+    sidebarOpen.value = isOpen;
+}
+function handleAuthor(author) {
+    selectedAuthor.value = author;
+    selectedGenre.value = null;
+    selectedPublisher.value = null;
+    selectedYear.value = null;
+    searchKeyword.value = '';
+}
+function handleGenre(genre) {
+    selectedGenre.value = genre;
+    selectedAuthor.value = null;
+    selectedPublisher.value = null;
+    selectedYear.value = null;
+    searchKeyword.value = '';
+}
+function handlePublisher(publisher) {
+    selectedPublisher.value = publisher;
+    selectedAuthor.value = null;
+    selectedGenre.value = null;
+    selectedYear.value = null;
+    searchKeyword.value = '';
+}
+function handleYear(year) {
+    selectedYear.value = year;
+    selectedAuthor.value = null;
+    selectedGenre.value = null;
+    selectedPublisher.value = null;
+    searchKeyword.value = '';
+}
+function handleAllBooks() {
+    selectedAuthor.value = null;
+    selectedGenre.value = null;
+    selectedPublisher.value = null;
+    selectedYear.value = null;
+    searchKeyword.value = '';
+}
 </script>
 
 <style scoped>

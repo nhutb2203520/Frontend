@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 25px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
+  <div style="margin-top: 24px;" :class="['sidebar bg-white border-end shadow-sm position-fixed start-0 overflow-auto', {
     'sidebar-collapsed': !isOpen
   }]">
     <!-- Header -->
@@ -35,8 +35,9 @@
             <i :class="['bi', section.open ? 'bi-chevron-down' : 'bi-chevron-right']"></i>
           </div>
           <div v-show="section.open" class="mt-2 ms-4">
-            <component :is="getComponent(section.label)" :items="section.items" @author-selected="handleAuthor"
-              @genre-selected="handleGenre" @publisher-selected="handlePublisher" @year-selected="handleYear" />
+            <component :is="getComponent(section.label)" :items="section.items"
+              :selected="selected[mapKey(section.label)]" @author-selected="handleAuthor" @genre-selected="handleGenre"
+              @publisher-selected="handlePublisher" @year-selected="handleYear" />
           </div>
         </div>
       </div>
@@ -64,10 +65,10 @@ import { usePublisherStore } from '@/Store/publisher.store';
 import { useAuthorStore } from '@/Store/author.store';
 import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '../../utils/stringUtils';
-
+import { useRouter } from 'vue-router';
 const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected', 'yearSelected', 'allBooks']);
 const isOpen = ref(true);
-
+const router = useRouter();
 const sections = ref([
   {
     label: 'Tất cả sách',
@@ -105,9 +106,6 @@ const sections = ref([
   }
 ]);
 
-const handleAllBooks = () => {
-  emit('allBooks'); // Gửi về Catalog.vue để reset filter
-};
 
 const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
@@ -115,9 +113,11 @@ const toggleSidebar = () => {
 };
 
 const toggleSection = (index) => {
-  // index sẽ luôn đúng vì đã xử lý phần tử "Tất cả sách" riêng
-  sections.value[index].open = !sections.value[index].open;
+  sections.value.forEach((section, i) => {
+    section.open = i === index ? !section.open : false;
+  });
 };
+
 
 const expandAndOpenSection = (index) => {
   isOpen.value = true;
@@ -126,7 +126,21 @@ const expandAndOpenSection = (index) => {
   });
   emit('toggle', isOpen.value);
 };
-
+const selected = ref({
+  genre: null,
+  author: null,
+  publisher: null,
+  year: null,
+});
+const mapKey = (label) => {
+  switch (label) {
+    case 'Thể loại': return 'genre';
+    case 'Tác giả': return 'author';
+    case 'Nhà xuất bản': return 'publisher';
+    case 'Năm xuất bản': return 'year';
+    default: return null;
+  }
+};
 const getComponent = (label) => {
   switch (label) {
     case 'Thể loại': return Genre;
@@ -136,11 +150,39 @@ const getComponent = (label) => {
     default: return null;
   }
 };
+const handleGenre = (genre) => {
+  selected.value = { genre, publisher: null, year: null, author: null };
+  emit('genreSelected', genre);
+  router.push('/catalogbook');
 
-const handleAuthor = (author) => emit('authorSelected', author);
-const handleGenre = (genre) => emit('genreSelected', genre);
-const handlePublisher = (publisher) => emit('publisherSelected', publisher);
-const handleYear = (year) => emit('yearSelected', year);
+};
+
+
+const handleAuthor = (author) => {
+  selected.value = { genre: null, publisher: null, year: null, author };
+  emit('authorSelected', author);
+  router.push('/catalogbook');
+};
+
+const handlePublisher = (publisher) => {
+  selected.value = { genre: null, publisher, year: null, author: null };
+  emit('publisherSelected', publisher);
+  router.push('/catalogbook');
+};
+
+const handleYear = (year) => {
+  selected.value = { genre: null, publisher: null, year, author: null };
+  emit('yearSelected', year);
+  router.push('/catalogbook');
+};
+const handleAllBooks = () => {
+  selected.value = { genre: null, publisher: null, year: null, author: null };
+  sections.value.forEach(section => {
+    if (!section.isAll) section.open = false;
+  });
+  emit('allBooks'); // Gửi về Catalog.vue để reset filter
+  router.push('/catalogbook'); // Chuyển hướng đến trang danh mục sách
+};
 
 onMounted(async () => {
   const categoryStore = useCategoryBookStore();
@@ -167,6 +209,21 @@ onMounted(async () => {
   const authors = await authorStore.fetchAuthors();
   sections.value[4].items = authors.map(author => capitalizeWords(author.TenTG));
 });
+function resetSidebarSelections() {
+  selected.value = {
+    genre: null,
+    author: null,
+    publisher: null,
+    year: null,
+  };
+  sections.value.forEach(section => {
+    if (!section.isAll) section.open = false;
+  });
+}
+defineExpose({
+  resetSidebarSelections
+});
+
 </script>
 
 <style scoped>

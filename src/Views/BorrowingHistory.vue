@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="borrowing-slip container my-5 p-4 border rounded">
     <div class="header text-center border-bottom pb-2 mb-4">
       <h2 class="fst-italic">LỊCH SỬ MƯỢN SÁCH</h2>
@@ -22,31 +22,22 @@
             <td>{{ index + 1 }}</td>
             <td>
               <strong>{{ capitalizeWords(borrow.MaSach?.TenSach) }}</strong><br />
-              <em>Tác giả: {{ capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', ')) }}</em>
+              <em>Tác giả: {{capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))}}</em>
             </td>
             <td>{{ formatDate(borrow.NgayMuon) }}</td>
             <td>{{ formatDate(borrow.NgayTra) }}</td>
             <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
             <td>
-              <button
-                v-if="borrow.MaTrangThai?.TenTrangThai === 'đang mượn'"
-                class="btn btn-sm btn-primary"
-                @click="extendBorrow(borrow)"
-              >
+              <button v-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'" class="btn btn-sm btn-primary"
+                @click="extendBorrow(borrow)">
                 Gia hạn
               </button>
-              <button
-                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'"
-                class="btn btn-sm btn-danger"
-                @click="cancelBorrow(borrow)"
-              >
+              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'" class="btn btn-sm btn-danger"
+                @click="cancelBorrow(borrow)">
                 Huỷ mượn
               </button>
-              <button
-                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'"
-                class="btn btn-sm btn-success"
-                @click="borrowAgain(borrow)"
-              >
+              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'" class="btn btn-sm btn-success"
+                @click="borrowAgain(borrow)">
                 Mượn lại
               </button>
             </td>
@@ -89,12 +80,13 @@ function borrowAgain(borrow) {
 
 <style scoped>
 .borrowing-slip {
-border-width: 2px;
-border-color: black;
-border-radius: 10px;
-box-sizing: border-box;
-background-color: #7d8287ae;
-font-size: 20px; /* Giảm cỡ chữ toàn bộ */
+  border-width: 2px;
+  border-color: black;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background-color: #7d8287ae;
+  font-size: 20px;
+  /* Giảm cỡ chữ toàn bộ */
 }
 
 .header {
@@ -108,11 +100,12 @@ border-collapse: collapse;
 
 table th,
 table td {
-vertical-align: middle;
-border: 1px solid black !important;
-white-space: normal; /* Cho phép xuống dòng */
-font-size: 30px; 
-word-break: break-word;
+  vertical-align: middle;
+  border: 1px solid black !important;
+  white-space: normal;
+  /* Cho phép xuống dòng */
+  font-size: 30px;
+  word-break: break-word;
 }
 
 .table thead th {
@@ -159,5 +152,4 @@ h2 {
   font-size: 20px;
 }
 }
-
 </style>

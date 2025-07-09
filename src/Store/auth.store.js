@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "@/utils/axios";
-
+import router from "@/router";
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     accessToken: sessionStorage.getItem("accessToken") || "",
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore("auth", {
         clearInterval(this.refreshInterval);
         this.refreshInterval = null;
       }
-      window.location.href = "/";
+      router.push("/");
     },
 
     // Auto refresh mỗi 25s

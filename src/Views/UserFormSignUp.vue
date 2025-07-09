@@ -78,10 +78,6 @@
         <!-- Nút Đăng Ký -->
         <button type="submit" class="btn btn-primary w-100">Đăng Ký</button>
 
-        <!-- Thông báo -->
-        <div v-if="message" class="mt-3">
-          <div :class="success ? 'alert alert-success' : 'alert alert-danger'">{{ message }}</div>
-        </div>
       </form>
       <div>
         <p class="mt-3 text-center" style="color: white;">

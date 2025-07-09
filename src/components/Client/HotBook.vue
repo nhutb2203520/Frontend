@@ -86,8 +86,6 @@ export default {
 
         return matchAuthor && matchGenre && matchPublisher && matchYear;
       });
-
-      // Reset slide nếu cần
       this.currentIndex = 0;
     },
     nextSlide() {
