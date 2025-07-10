@@ -8,6 +8,7 @@ const route = useRoute();
 
 const isLoginPage = computed(() => route.path === '/catalogbook');
 const isAdminPage = computed(() => route.path.startsWith('/admin')); // ví dụ: /admin/dashboard
+
 </script>
 
 <template>

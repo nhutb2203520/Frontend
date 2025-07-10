@@ -104,29 +104,35 @@ const routes = [
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
   {
-    path: "/homeadmin",
-    name: "Home Admin",
-    component: HomeAdmin,
+    path: '/homeadmin',
+    name: 'HomeAdmin',
+    component: () => import('@/Views/HomeAdmin.vue'),
+    meta: { role: 'admin' }
   },
   {
-    path: "/admin/signin",
+    path: "/admin/signin",  
     name: "Signin Admin",
-    component: AdminFormSignIn,
+    component: () => import('@/Views/AdminFormSignIn.vue'),
+    meta: { role: 'admin' }
   },
   {
     path: "/admin/account",
     name: "AccountInforAdmin",
     component: AccountAdmin,
+    meta: { role: 'admin' }
+    
   },
   {
     path: "/admin/account/change-pass-ad",
     name: "ChangePassAD",
     component: ChangePassAD,
+    meta: { role: 'admin' }
   },
   {
     path: "/admin/account/update-account-ad",
     name: "UpdateAccountAD",
     component: UpdateAccountAD,
+    meta: { role: 'admin' }
   },
   {
     path: "/admin/management-reader",
@@ -144,11 +150,13 @@ const routes = [
     path: "/admin/category-management",
     name: "CategoryManagement",
     component: CategoryManagement,
+    meta: { role: 'admin' }
   },
   {
     path: "/admin/management-publisher",
     name: " ManagementPublisher",
     component: PublisherManager,
+    meta: { role: 'admin' }
   },
   {
     path: "/admin/book-management",

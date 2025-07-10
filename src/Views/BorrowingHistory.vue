@@ -135,12 +135,12 @@ const goToBookDetail = (maSach) => {
 }
 
 .header {
-  border-bottom: 2px solid black;
+border-bottom: 2px solid black;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
+width: 100%;
+border-collapse: collapse;
 }
 
 table th,
@@ -154,47 +154,47 @@ table td {
 }
 
 .table thead th {
-  background-color: #808385 !important;
+background-color: #808385 !important;
 }
 
 /* Responsive font scaling */
 @media (max-width: 992px) {
-  .borrowing-slip {
-    font-size: 18 px;
-    padding: 20px;
-  }
+.borrowing-slip {
+  font-size: 18 px;
+  padding: 20px;
+}
 
-  table th,
-  table td {
-    font-size: 16px;
-  }
+table th,
+table td {
+  font-size: 16px;
+}
 }
 
 @media (max-width: 768px) {
-  .borrowing-slip {
-    font-size: 16px;
-    padding: 15px;
-  }
+.borrowing-slip {
+  font-size: 16px;
+  padding: 15px;
+}
 
-  table th,
-  table td {
-    font-size: 14px;
-  }
+table th,
+table td {
+  font-size: 14px;
+}
 }
 
 @media (max-width: 576px) {
-  .borrowing-slip {
-    font-size: 14px;
-    padding: 10px;
-  }
+.borrowing-slip {
+  font-size: 14px;
+  padding: 10px;
+}
 
-  table th,
-  table td {
-    font-size: 13px;
-  }
+table th,
+table td {
+  font-size: 13px;
+}
 
-  h2 {
-    font-size: 20px;
-  }
+h2 {
+  font-size: 20px;
+}
 }
 </style>
