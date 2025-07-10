@@ -29,15 +29,15 @@
             <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
             <td>
               <button v-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'" class="btn btn-sm btn-primary"
-                @click="extendBorrow(borrow)">
+                @click="extendBorrow(borrow.MaMuonSach, capitalizeWords(borrow.MaSach?.TenSach))">
                 Gia hạn
               </button>
               <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'" class="btn btn-sm btn-danger"
-                @click="cancelBorrow(borrow)">
+                @click="cancelBorrow(borrow.MaMuonSach)">
                 Huỷ mượn
               </button>
               <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'" class="btn btn-sm btn-success"
-                @click="borrowAgain(borrow)">
+                @click="goToBookDetail(borrow.MaSach?.MaSach)">
                 Mượn lại
               </button>
             </td>
@@ -53,28 +53,73 @@ import { onMounted, ref } from 'vue';
 import { useBorrowBookStore } from '@/Store/BorrowBook.store';
 import { capitalizeWords } from '@/utils/stringUtils';
 import { formatDate } from '@/utils/formatDate';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 const borrowDetails = ref([]);
-
+const borrowBookStore = useBorrowBookStore();
 onMounted(async () => {
-  const borrowBookStore = useBorrowBookStore();
-  borrowDetails.value = await borrowBookStore.fetchBorrowBooks();
+  borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
 });
 
 // Các hành động
-function extendBorrow(borrow) {
-  alert(`📚 Gia hạn sách: ${borrow.MaSach?.TenSach}`);
-  // Thực tế gọi API ở đây
+const extendBorrow = async (maMuon, tenSach) => {
+  try {
+    await ElMessageBox.confirm(
+      'Bạn muốn gia hạn quyển sách này?',
+      'Xác nhận gia hạn',
+      {
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Huỷ bỏ',
+        type: 'success',
+      }
+    );
+    const res = await borrowBookStore.extendBorrowBook(maMuon)
+    if (res.message === 'Gia hạn mượn sách thành công.') {
+      ElMessage.success(`Gia hạn quyển sách ${tenSach} thành công.`);
+      borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
+    } else {
+      ElMessage.error(res.message);
+    }
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error('Đã xảy ra lỗi khi gia hạn phiếu mượn');
+    } else {
+      ElMessage.error('Hủy thao tác gia hạn.');
+    }
+  }
 }
 
-function cancelBorrow(borrow) {
-  alert(`❌ Huỷ mượn sách: ${borrow.MaSach?.TenSach}`);
-  // Thực tế gọi API ở đây
-}
+const cancelBorrow = async (maMuon) => {
+  try {
+    await ElMessageBox.confirm(
+      'Bạn có chắc chắn muốn huỷ yêu cầu mượn sách này không?',
+      'Xác nhận huỷ mượn',
+      {
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Huỷ bỏ',
+        type: 'warning',
+      }
+    );
+    const res = await borrowBookStore.cancelBorrowBook(maMuon);
+    if (res.message === 'Đã hủy thành công yêu cầu mượn sách.') {
+      ElMessage.success(res.message);
+      borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
+    } else {
+      ElMessage.error(res.message);
+    }
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error('Đã xảy ra lỗi khi huỷ phiếu mượn');
+    } else {
+      ElMessage.error('Hủy thao tác hủy đăng ký mượn.');
+    }
+  }
+};
 
-function borrowAgain(borrow) {
-  alert(`🔁 Mượn lại sách: ${borrow.MaSach?.TenSach}`);
-  // Thực tế gọi API ở đây
+const goToBookDetail = (maSach) => {
+  router.push(`/book/${maSach}`)
 }
 </script>
 

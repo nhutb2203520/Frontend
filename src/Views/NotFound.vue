@@ -1,6 +1,5 @@
 <template>
   <div class="not-found-page-container">
-    <NavBar /> <!-- Bổ sung NavBar ở đây -->
     <div class="not-found-page d-flex flex-column justify-content-center align-items-center text-center">
       <h1 class="display-1 fw-bold text-danger">404</h1>
       <p class="lead mb-4">
@@ -13,7 +12,6 @@
 </template>
 
 <script setup>
-import NavBar from '@/components/Client/NavBar.vue';
 
 </script>
 

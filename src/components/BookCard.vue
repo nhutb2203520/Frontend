@@ -1,6 +1,6 @@
 <template>
   <router-link class="text-decoration-none text-white" :to="`/book/${book.MaSach}`">
-    <div
+    <div data-aos="fade-up" data-aos-duration="800"
       class="bg-dark bg-opacity-75 border border-light rounded-3 p-3 h-100 d-flex flex-column align-items-center text-center book-hover">
       <div class="ratio ratio-4x3 mb-3 rounded overflow-hidden w-100">
         <img :src="book.image" :alt="book.TenSach" class="img-fluid rounded" />

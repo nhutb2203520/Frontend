@@ -1,7 +1,9 @@
 <template>
-    <div class="home-wrapper position-relative  bg-light">
-        <!-- Sidebar -->
+    <div class="home-wrapper position-relative bg-light">
+        <!-- Thanh điều hướng -->
         <NavBar @resetSidebar="handleSidebarReset" />
+
+        <!-- Sidebar lọc -->
         <SideBar ref="sidebarRef" @toggle="handleSidebarToggle" @authorSelected="handleAuthor"
             @genreSelected="handleGenre" @publisherSelected="handlePublisher" @yearSelected="handleYear"
             @allBooks="handleAllBooks" />
@@ -9,10 +11,12 @@
         <!-- Nội dung chính -->
         <div class="main-content p-3 p-md-4"
             :class="{ 'content-shifted': sidebarOpen, 'content-expanded': !sidebarOpen }">
+
+            <!-- Nếu có bộ lọc được chọn thì hiện kết quả tìm kiếm -->
             <SearchBook v-if="shouldShowSearch" :searchKeyword="searchKeyword" :selectedAuthor="selectedAuthor"
                 :selectedGenre="selectedGenre" :selectedPublisher="selectedPublisher" :selectedYear="selectedYear" />
 
-
+            <!-- Nếu không có bộ lọc, hiện trang chủ dạng danh mục -->
             <template v-else>
                 <HotBook />
                 <NewBook />
@@ -24,37 +28,52 @@
         </div>
     </div>
 </template>
+
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useSearchFilterStore } from '@/Store/SearchFilter.store';
+
+import NavBar from '@/components/Client/NavBar.vue';
 import SideBar from '@/components/Client/SideBar.vue';
 import HotBook from '@/components/Client/HotBook.vue';
 import NewBook from '@/components/Client/NewBook.vue';
 import BookForYou from '@/components/Client/BookForYou.vue';
+import SearchBook from '@/components/Client/SearchBook.vue';
 import Footer from '@/components/Client/Footer.vue';
 import Chat from '@/components/Client/Chat.vue';
-import NavBar from '@/components/Client/NavBar.vue';
-import SearchBook from '@/components/Client/SearchBook.vue';
 
-const sidebarRef = ref(null);
-
-function handleSidebarReset() {
-    sidebarRef.value?.resetSidebarSelections();
-}
 const route = useRoute();
-
+const sidebarRef = ref(null);
 const sidebarOpen = ref(true);
-const selectedAuthor = ref(null);
-const selectedGenre = ref(null);
-const selectedPublisher = ref(null);
-const selectedYear = ref(null);
-const searchKeyword = ref('');
 
-// Đọc từ khóa tìm kiếm từ URL (query param)
+// Pinia store chứa các filter toàn cục
+const filterStore = useSearchFilterStore();
+const {
+    selectedAuthor,
+    selectedGenre,
+    selectedPublisher,
+    selectedYear,
+    searchKeyword
+} = storeToRefs(filterStore);
+
+// Đọc query param "search" từ URL để đồng bộ keyword
 watch(() => route.query.search, (newSearch) => {
     searchKeyword.value = newSearch || '';
 }, { immediate: true });
-
+watch(
+    () => route.query.reset,
+    (newVal) => {
+        if (newVal) {
+            filterStore.clearAll(); // Hàm bạn đã có
+            // Xóa query khỏi URL (nếu muốn)
+            window.history.replaceState(null, '', '/catalogbook');
+        }
+    },
+    { immediate: true }
+);
+// Hiển thị SearchBook khi có bất kỳ filter nào
 const shouldShowSearch = computed(() =>
     !!searchKeyword.value ||
     !!selectedAuthor.value ||
@@ -62,9 +81,16 @@ const shouldShowSearch = computed(() =>
     !!selectedPublisher.value ||
     !!selectedYear.value
 );
+
+// Các hàm xử lý sự kiện từ SideBar
+function handleSidebarReset() {
+    sidebarRef.value?.resetSidebarSelections();
+}
+
 function handleSidebarToggle(isOpen) {
     sidebarOpen.value = isOpen;
 }
+
 function handleAuthor(author) {
     selectedAuthor.value = author;
     selectedGenre.value = null;
@@ -72,6 +98,7 @@ function handleAuthor(author) {
     selectedYear.value = null;
     searchKeyword.value = '';
 }
+
 function handleGenre(genre) {
     selectedGenre.value = genre;
     selectedAuthor.value = null;
@@ -79,6 +106,7 @@ function handleGenre(genre) {
     selectedYear.value = null;
     searchKeyword.value = '';
 }
+
 function handlePublisher(publisher) {
     selectedPublisher.value = publisher;
     selectedAuthor.value = null;
@@ -86,6 +114,7 @@ function handlePublisher(publisher) {
     selectedYear.value = null;
     searchKeyword.value = '';
 }
+
 function handleYear(year) {
     selectedYear.value = year;
     selectedAuthor.value = null;
@@ -93,6 +122,7 @@ function handleYear(year) {
     selectedPublisher.value = null;
     searchKeyword.value = '';
 }
+
 function handleAllBooks() {
     selectedAuthor.value = null;
     selectedGenre.value = null;
@@ -103,10 +133,9 @@ function handleAllBooks() {
 </script>
 
 <style scoped>
-/* Chỉ giữ lại CSS transition và responsive, phần còn lại dùng Bootstrap */
 .main-content {
     transition: margin-left 0.3s ease;
-    margin-top: 0px !important;
+    margin-top: 0 !important;
     position: relative;
     z-index: 1;
     padding-top: 0 !important;
@@ -115,15 +144,12 @@ function handleAllBooks() {
 
 .content-shifted {
     margin-left: 250px;
-    /* Khi sidebar mở */
 }
 
 .content-expanded {
     margin-left: 60px;
-    /* Khi sidebar thu gọn */
 }
 
-/* Responsive design với Bootstrap breakpoints */
 @media (max-width: 768px) {
 
     .content-shifted,
