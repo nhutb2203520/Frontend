@@ -6,55 +6,79 @@
       </div>
       <h2>Tài Khoản Thủ Thư</h2>
       <div class="info-box">
-        <p class="info-text">Thông tin chi tiết tài khoản</p>
+        <p class="info-text">Thông tin tài khoản</p>
+
+        <p v-if="staff"><el-icon><UserFilled /></el-icon> <strong>Họ tên:</strong> {{ capitalizeWords(staff.HoTenNV) }}</p>
+        <p v-if="staff"><el-icon><Message /></el-icon> <strong>Email:</strong> {{ staff.Email }}</p>
+        <p v-if="staff"><el-icon><PhoneFilled /></el-icon> <strong>Số điện thoại:</strong> {{ staff.SoDienThoai }}</p>
+        <p v-if="staff"><el-icon><LocationFilled /></el-icon> <strong>Địa chỉ:</strong> {{ staff.DiaChi }}</p>
+        <p v-if="staff"><el-icon><Calendar /></el-icon> <strong>Ngày tạo:</strong> {{ formatDate(staff.createdAt) }}</p>
+        <p v-if="staff"><el-icon><User /></el-icon> <strong>Chức vụ:</strong> {{ staff.ChucVu }}</p>
       </div>
 
       <div class="action-buttons">
-        <button class="action-btn update" @click="$router.push('/admin/account/update-account-ad')">
-          Cập nhật
-        </button>
-        <button class="action-btn password" @click="$router.push('/admin/account/change-pass-ad')">
-          Đổi mật khẩu
-        </button>
-        <button class="action-btn delete" @click="handleDeleteAccount">
-          Xóa tài khoản
-        </button>
+        <button class="action-btn update" @click="$router.push('/admin/account/update-account-ad')">Cập nhật</button>
+        <button class="action-btn password" @click="$router.push('/admin/account/change-pass-ad')">Đổi mật khẩu</button>
+        <button class="action-btn delete" @click="handleDeleteAccount">Xóa tài khoản</button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ElMessageBox, ElMessage } from "element-plus";
+<script setup>
+import { ref, onMounted } from 'vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import { formatDate } from '@/utils/formatDate';
+import { capitalizeWords } from '@/utils/stringUtils';
+import axios from '@/utils/axiosAdmin';
 
-export default {
-  name: "AccountInfor",
-  methods: {
-    handleDeleteAccount() {
-      ElMessageBox.confirm(
-        "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này sẽ không thể hoàn tác.",
-        "Xác nhận xóa tài khoản",
-        {
-          confirmButtonText: "Xác nhận",
-          cancelButtonText: "Hủy",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          // TODO: Gọi API xóa tài khoản tại đây
-          // Ví dụ: await axios.delete(`/api/account/delete/${id}`)
-          ElMessage.success("Tài khoản đã được xóa.");
-          this.$router.push("/");
-        })
-        .catch(() => {
-          ElMessage.info("Hủy xóa tài khoản.");
-        });
-    },
-  },
+const staff = ref(null);
+
+onMounted(() => {
+  const stored = sessionStorage.getItem("adminInfo");
+  if (stored) {
+    try {
+      staff.value = JSON.parse(stored);
+    } catch (e) {
+      ElMessage.error("Không thể đọc thông tin tài khoản.");
+    }
+  }
+});
+
+const handleDeleteAccount = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này sẽ không thể hoàn tác.",
+      "Xác nhận xóa tài khoản",
+      {
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Hủy",
+        type: "warning",
+        confirmButtonClass: 'el-button--danger'
+      }
+    );
+
+    const res = await axios.delete(`/staffs/${staff.value._id}`);
+    if (res.data.message === "Xóa tài khoản thành công.") {
+      ElMessage.success("Tài khoản đã được xóa.");
+      sessionStorage.clear();
+      window.location.href = "/admin/signin";
+    } else {
+      ElMessage.error(res.data.message);
+    }
+
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error("Không thể xóa tài khoản. Vui lòng thử lại sau.");
+    } else {
+      ElMessage.info("Hủy xóa tài khoản.");
+    }
+  }
 };
 </script>
 
 <style scoped>
+/* giống hoàn toàn bản đọc giả */
 .background-wrapper {
   min-height: 100vh;
   background: url("@/assets/background.jpg") no-repeat center center fixed;
@@ -100,7 +124,7 @@ export default {
 
 .info-box {
   border: 2px solid #070606;
-  padding: 60px 30px;
+  padding: 30px 30px;
   margin-top: 60px;
   min-height: 250px;
   background-color: rgba(255, 252, 252, 0.805);
@@ -109,9 +133,15 @@ export default {
 }
 
 .info-text {
-  font-style: italic;
   font-size: 22px;
-  color: #000;
+  font-weight: 700;
+  color: #0b2b64;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #0b2b64;
+  padding-bottom: 4px;
+  display: inline-block;
 }
 
 .action-buttons {

@@ -1,7 +1,6 @@
 <template>
     <div>
-      <!-- Navbar -->
-      <NavBarAD />
+  
   
       <!-- Dashboard -->
       <div class="dashboard-container">
@@ -34,11 +33,11 @@
   </template>
   
   <script>
-  import NavBarAD from '@/components/Admin/NavBarAD.vue';
+
   
   export default {
     name: 'AdminDashboard',
-    components: { NavBarAD },
+    components: {},
     methods: {
       goTo(page) {
         const routes = {

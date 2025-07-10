@@ -1,8 +1,6 @@
 <template>
   <div class="overlay">
-    <NavBarAD />
     <SideBarAD />
-
     <div class="publisher-management">
       <h1 class="title">Quản lý nhà xuất bản</h1>
 
@@ -24,8 +22,8 @@
 
       <!-- Form thêm nhà xuất bản -->
       <div v-if="showAddForm" class="add-form">
-        <input v-model="newPublisher.name" placeholder="Nhập tên nhà xuất bản" />
-        <textarea v-model="newPublisher.address" placeholder="Nhập địa chỉ" rows="2" />
+        <input v-model="newPublisher.TenNXB" placeholder="Nhập tên nhà xuất bản" />
+        <textarea v-model="newPublisher.DiaChi" placeholder="Nhập địa chỉ" rows="2" />
         <div class="detail-actions">
           <button class="btn btn-success" @click="addPublisher">💾 Lưu</button>
           <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
@@ -40,34 +38,32 @@
           <ul>
             <li
               v-for="pub in filteredPublishers"
-              :key="pub.id"
+              :key="pub.MaNXB"
               @click="togglePublisher(pub)"
               class="reader-item"
             >
-              <strong>{{ pub.name }}</strong>
+              <strong>{{ pub.TenNXB }}</strong>
 
               <div
-                v-if="selectedPublisher?.id === pub.id"
+                v-if="selectedPublisher?.MaNXB === pub.MaNXB"
                 class="reader-detail"
                 @click.stop
               >
-                <!-- Nếu đang chỉnh sửa -->
-                <div v-if="editingPublisherId === pub.id">
+                <div v-if="editingPublisherId === pub.MaNXB">
                   <p><strong>Tên NXB:</strong></p>
-                  <input v-model="editedPublisher.name" />
+                  <input v-model="editedPublisher.TenNXB" />
                   <p><strong>Địa chỉ:</strong></p>
-                  <textarea v-model="editedPublisher.address" rows="2" />
+                  <textarea v-model="editedPublisher.DiaChi" rows="2" />
                   <div class="detail-actions">
-                    <button class="btn btn-success" @click="saveEdit(pub.id)">💾 Lưu</button>
+                    <button class="btn btn-success" @click="saveEdit(pub.MaNXB)">💾 Lưu</button>
                     <button class="btn btn-secondary" @click="cancelEdit">❌ Hủy</button>
                   </div>
                 </div>
 
-                <!-- Nếu không chỉnh sửa -->
                 <div v-else>
-                  <p><strong>ID:</strong> {{ pub.id }}</p>
-                  <p><strong>Tên NXB:</strong> {{ pub.name }}</p>
-                  <p><strong>Địa chỉ:</strong> {{ pub.address }}</p>
+                  <p><strong>Mã NXB:</strong> {{ pub.MaNXB }}</p>
+                  <p><strong>Tên NXB:</strong> {{ pub.TenNXB }}</p>
+                  <p><strong>Địa chỉ:</strong> {{ pub.DiaChi }}</p>
                   <div class="detail-actions">
                     <button class="btn btn-warning" @click.stop="editPublisher(pub)">✏️ Chỉnh sửa</button>
                     <button class="btn btn-danger" @click.stop="deletePublisher(pub)">🗑️ Xóa</button>
@@ -83,103 +79,110 @@
 </template>
 
 <script>
-import NavBarAD from '@/components/Admin/NavBarAD.vue';
 import SideBarAD from '@/components/Admin/SideBarAD.vue';
+import { usePublisherStore } from '@/Store/publisher.store';
+import axios from "@/utils/axiosAdmin"; // ✅ Đúng cho Admin
+
 
 export default {
-  components: { NavBarAD, SideBarAD },
+  components: { SideBarAD },
   data() {
     return {
-      searchKeyword: "",
+      searchKeyword: '',
       selectedPublisher: null,
       editingPublisherId: null,
       showAddForm: false,
-      newPublisher: { name: "", address: "" },
-      editedPublisher: { name: "", address: "" },
-      nextId: 7,
-      publishers: [
-        { id: 1, name: "NXB HÀ NỘI", address: "Hà Nội" },
-        { id: 2, name: "NXB TRẺ", address: "TP.HCM" },
-        { id: 3, name: "NXB CẦN THƠ", address: "Cần Thơ" },
-        { id: 4, name: "NXB VĨNH LONG", address: "Vĩnh Long" },
-        { id: 5, name: "NXB ĐÀ NẴNG", address: "Đà Nẵng" },
-        { id: 6, name: "NXB AN GIANG", address: "An Giang" },
-      ],
+      newPublisher: { TenNXB: '', DiaChi: '' },
+      editedPublisher: { TenNXB: '', DiaChi: '' },
+      publisherStore: usePublisherStore(),
     };
   },
   computed: {
     totalPublishers() {
-      return this.publishers.length;
+      return this.publisherStore.publishers.length;
     },
     filteredPublishers() {
-      return this.publishers.filter((p) =>
-        p.name.toLowerCase().includes(this.searchKeyword.toLowerCase())
+      return this.publisherStore.publishers.filter((p) =>
+        p.TenNXB.toLowerCase().includes(this.searchKeyword.toLowerCase())
       );
     },
+  },
+  mounted() {
+    this.publisherStore.fetchPublishers();
   },
   methods: {
     togglePublisher(pub) {
       if (this.editingPublisherId !== null) return;
-      this.selectedPublisher = this.selectedPublisher?.id === pub.id ? null : pub;
+      this.selectedPublisher = this.selectedPublisher?.MaNXB === pub.MaNXB ? null : pub;
     },
     toggleAddForm() {
       this.showAddForm = !this.showAddForm;
-      this.newPublisher = { name: "", address: "" };
+      this.newPublisher = { TenNXB: '', DiaChi: '' };
     },
-    addPublisher() {
-      if (!this.newPublisher.name.trim()) {
-        alert("⚠️ Vui lòng nhập tên nhà xuất bản.");
-      return;
-      }
-
-      try {
-        this.publishers.push({
-          id: this.nextId++,
-          name: this.newPublisher.name.trim(),
-          address: this.newPublisher.address.trim(),
-        });
-        this.toggleAddForm();
-        alert("✅ Thêm nhà xuất bản thành công!");
-      } catch (e) {
-        alert("❌ Có lỗi xảy ra khi thêm nhà xuất bản.");
-      }
-    },
-
     cancelAdd() {
       this.toggleAddForm();
     },
+    async addPublisher() {
+      if (!this.newPublisher.TenNXB.trim()) {
+        alert('⚠️ Vui lòng nhập tên nhà xuất bản.');
+        return;
+      }
+
+      try {
+        const response = await axios.post('/publishers', this.newPublisher);
+        if (response.data?.nxb) {
+          this.publisherStore.addPublisher(response.data.nxb);
+          this.toggleAddForm();
+          alert('✅ Thêm nhà xuất bản thành công!');
+        } else {
+          alert('⚠️ ' + (response.data.message || 'Không thể thêm nhà xuất bản.'));
+        }
+      } catch (e) {
+        alert('❌ Có lỗi xảy ra khi thêm nhà xuất bản.');
+      }
+    },
     editPublisher(pub) {
-      this.editingPublisherId = pub.id;
-      this.editedPublisher = { name: pub.name, address: pub.address };
+      this.editingPublisherId = pub.MaNXB;
+      this.editedPublisher = {
+        TenNXB: pub.TenNXB,
+        DiaChi: pub.DiaChi,
+      };
     },
     cancelEdit() {
       this.editingPublisherId = null;
-      this.editedPublisher = { name: "", address: "" };
+      this.editedPublisher = { TenNXB: '', DiaChi: '' };
     },
-    saveEdit(id) {
-      const index = this.publishers.findIndex((p) => p.id === id);
-      if (index !== -1) {
-       try {
-        this.publishers[index].name = this.editedPublisher.name.trim();
-        this.publishers[index].address = this.editedPublisher.address.trim();
+    async saveEdit(MaNXB) {
+      try {
+        const response = await axios.patch(`/publishers/${MaNXB}`, this.editedPublisher);
+        const index = this.publisherStore.publishers.findIndex((p) => p.MaNXB === MaNXB);
+        if (index !== -1) {
+          this.publisherStore.publishers[index] = {
+            ...this.publisherStore.publishers[index],
+            ...this.editedPublisher,
+          };
+        }
         this.cancelEdit();
-      alert("✅ Cập nhật thành công!");
-    } catch (e) {
-      alert("❌ Có lỗi xảy ra khi cập nhật.");
-    }
-  }
-},
-
-    deletePublisher(pub) {
-      if (confirm(`Bạn có chắc chắn muốn xóa nhà xuất bản "${pub.name}" không?`)) {
-        this.publishers = this.publishers.filter((p) => p.id !== pub.id);
-        this.selectedPublisher = null;
+        alert(response.data.message || '✅ Cập nhật thành công!');
+      } catch (e) {
+        alert('❌ Có lỗi xảy ra khi cập nhật.');
+      }
+    },
+    async deletePublisher(pub) {
+      if (confirm(`Bạn có chắc chắn muốn xóa nhà xuất bản "${pub.TenNXB}" không?`)) {
+        try {
+          const response = await axios.delete(`/publishers/${pub.MaNXB}`);
+          this.publisherStore.removePublisher(pub.MaNXB);
+          this.selectedPublisher = null;
+          alert(response.data.message || '✅ Xóa thành công!');
+        } catch (e) {
+          alert('❌ Xóa thất bại.');
+        }
       }
     },
   },
 };
 </script>
-
 <style scoped>
 .overlay {
   position: fixed;
@@ -197,7 +200,6 @@ export default {
 }
 
 .publisher-management {
-
   width: 65%;
   max-width: 65%;
   background: #fff;

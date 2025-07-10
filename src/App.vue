@@ -7,7 +7,7 @@ import NavBarAD from '@/components/Admin/NavBarAD.vue';
 const route = useRoute();
 
 const isLoginPage = computed(() => route.path === '/login');
-const isAdminPage = computed(() => route.path.startsWith('/admin')); // ví dụ: /admin/dashboard
+const isAdminPage = computed(() => route.meta.role === 'admin');
 </script>
 
 <template>
