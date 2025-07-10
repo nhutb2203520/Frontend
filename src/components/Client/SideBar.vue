@@ -66,7 +66,8 @@ import { useAuthorStore } from '@/Store/author.store';
 import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '../../utils/stringUtils';
 import { useRouter } from 'vue-router';
-const emit = defineEmits(['toggle', 'authorSelected', 'genreSelected', 'publisherSelected', 'yearSelected', 'allBooks']);
+import { useSearchFilterStore } from '@/Store/SearchFilter.store';
+const searchFilterStore = useSearchFilterStore();
 const isOpen = ref(true);
 const router = useRouter();
 const sections = ref([
@@ -151,36 +152,28 @@ const getComponent = (label) => {
   }
 };
 const handleGenre = (genre) => {
-  selected.value = { genre, publisher: null, year: null, author: null };
-  emit('genreSelected', genre);
+  searchFilterStore.setGenre(genre)
   router.push('/catalogbook');
 
 };
 
 
 const handleAuthor = (author) => {
-  selected.value = { genre: null, publisher: null, year: null, author };
-  emit('authorSelected', author);
+  searchFilterStore.setAuthor(author);
   router.push('/catalogbook');
 };
 
 const handlePublisher = (publisher) => {
-  selected.value = { genre: null, publisher, year: null, author: null };
-  emit('publisherSelected', publisher);
+  searchFilterStore.setPublisher(publisher)
   router.push('/catalogbook');
 };
 
 const handleYear = (year) => {
-  selected.value = { genre: null, publisher: null, year, author: null };
-  emit('yearSelected', year);
+  searchFilterStore.setYear(year)
   router.push('/catalogbook');
 };
 const handleAllBooks = () => {
-  selected.value = { genre: null, publisher: null, year: null, author: null };
-  sections.value.forEach(section => {
-    if (!section.isAll) section.open = false;
-  });
-  emit('allBooks'); // Gửi về Catalog.vue để reset filter
+  searchFilterStore.clearAll()
   router.push('/catalogbook'); // Chuyển hướng đến trang danh mục sách
 };
 

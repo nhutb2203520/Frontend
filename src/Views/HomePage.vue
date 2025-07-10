@@ -1,6 +1,5 @@
 <template>
   <div class="home-container">
-    <NavBar />
     <!-- Nội dung chính -->
     <div class="page-content">
       <!-- Banner chào mừng -->
@@ -79,7 +78,6 @@
 </template>
 
 <script setup>
-import NavBar from '@/components/Client/NavBar.vue'
 import HotBook from '@/components/Client/HotBook.vue'
 import NewBook from '@/components/Client/NewBook.vue'
 import Footer from '@/components/Client/Footer.vue'

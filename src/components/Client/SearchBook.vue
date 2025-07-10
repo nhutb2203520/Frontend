@@ -22,60 +22,53 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import BookCard from '@/components/BookCard.vue';
 import { useBookStore } from '@/Store/Book.store';
+import { useSearchFilterStore } from '@/Store/SearchFilter.store';
+import BookCard from '@/components/BookCard.vue';
+import { storeToRefs } from 'pinia';
+import { ref, watch, onMounted } from 'vue';
 
-const props = defineProps({
-    searchKeyword: String,
-    selectedAuthor: String,
-    selectedGenre: String,
-    selectedPublisher: String,
-    selectedYear: String
-});
-
-const emit = defineEmits(['clearSearch']);
+const searchFilterStore = useSearchFilterStore();
+const { searchKeyword, selectedAuthor, selectedGenre, selectedPublisher, selectedYear } = storeToRefs(searchFilterStore);
+const bookStore = useBookStore();
 
 const allBooks = ref([]);
 const filteredBooks = ref([]);
 
-// Hàm chuẩn hóa tiếng Việt không dấu
 function normalizeText(str) {
-    return str
-        .toLowerCase()
+    return str.toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/đ/g, 'd')
         .replace(/Đ/g, 'd');
 }
-function filterBooks() {
-    const keyword = normalizeText(props.searchKeyword?.trim() || '');
-    const authorFilter = normalizeText(props.selectedAuthor || '');
-    const genreFilter = normalizeText(props.selectedGenre || '');
-    const publisherFilter = normalizeText(props.selectedPublisher || '');
-    const yearFilter = props.selectedYear || '';
 
-    filteredBooks.value = allBooks.value.filter((book) => {
+function filterBooks() {
+    const keyword = normalizeText(searchKeyword.value || '');
+    const authorFilter = normalizeText(selectedAuthor.value || '');
+    const genreFilter = normalizeText(selectedGenre.value || '');
+    const publisherFilter = normalizeText(selectedPublisher.value || '');
+    const yearFilter = selectedYear.value || '';
+
+    filteredBooks.value = allBooks.value.filter(book => {
         const tenSach = normalizeText(book.TenSach || '');
-        const tacGiaList = book.TacGia?.map((tg) => normalizeText(tg.TenTG || '')) || [];
+        const tacGiaList = book.TacGia?.map(tg => normalizeText(tg.TenTG || '')) || [];
         const theLoai = normalizeText(book.MaLoai?.TenLoai || '');
         const nhaXuatBan = normalizeText(book.MaNXB?.TenNXB || '');
         const namXuatBan = String(book.NamXuatBan || '');
 
-        // Nếu có keyword -> tìm trong toàn bộ sách, bỏ qua các bộ lọc khác
         if (keyword) {
             return (
                 tenSach.includes(keyword) ||
-                tacGiaList.some((name) => name.includes(keyword)) ||
+                tacGiaList.some(name => name.includes(keyword)) ||
                 theLoai.includes(keyword) ||
                 nhaXuatBan.includes(keyword) ||
                 namXuatBan.includes(keyword)
             );
         }
 
-        // Nếu không có keyword -> dùng các bộ lọc riêng
         return (
-            (!authorFilter || tacGiaList.some((name) => name.includes(authorFilter))) &&
+            (!authorFilter || tacGiaList.some(name => name.includes(authorFilter))) &&
             (!genreFilter || theLoai.includes(genreFilter)) &&
             (!publisherFilter || nhaXuatBan.includes(publisherFilter)) &&
             (!yearFilter || namXuatBan === yearFilter)
@@ -83,32 +76,17 @@ function filterBooks() {
     });
 }
 
-const bookStore = useBookStore();
-async function fetchBooks() {
-    try {
-        const books = await bookStore.fetchBooks();
-        allBooks.value = books;
-        filterBooks();
-    } catch (error) {
-        console.error('Lỗi khi lấy sách:', error);
-    }
-}
+onMounted(async () => {
+    allBooks.value = await bookStore.fetchBooks();
+    filterBooks();
+});
 
 watch(
-    () => [props.searchKeyword, props.selectedAuthor, props.selectedGenre, props.selectedPublisher, props.selectedYear],
-    () => {
-        filterBooks();
-        // Không gọi emit clearSearch nếu đang lọc theo author/genre...
-        if (props.searchKeyword) {
-            emit('clearSearch');
-        }
-    },
-    { immediate: true }
+    [searchKeyword, selectedAuthor, selectedGenre, selectedPublisher, selectedYear],
+    () => filterBooks()
 );
-
-
-onMounted(fetchBooks);
 </script>
+
 
 <style scoped>
 .search-wrapper {

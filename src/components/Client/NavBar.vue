@@ -15,8 +15,11 @@
                     <router-link to="/" :class="{ active: $route.path === '/' }">Trang Chủ</router-link>
                 </li>
                 <li>
-                    <router-link to="/catalogbook" :class="{ active: $route.path === '/catalogbook' }">Danh Mục
-                        Sách</router-link>
+                    <router-link :to="{ path: '/catalogbook', query: { reset: true } }"
+                        :class="{ active: $route.path === '/catalogbook' }">
+                        Danh Mục Sách
+                    </router-link>
+
                 </li>
                 <li>
                     <router-link to="/borrowinghistory" :class="{ active: $route.path === '/borrowinghistory' }">Lịch Sử
@@ -47,7 +50,8 @@
                 </div>
 
                 <!-- Tìm kiếm (desktop only) -->
-                <div v-if="$route.path === '/catalogbook'" class="navbar-search d-none d-lg-flex">
+                <div v-if="$route.path === '/catalogbook' || $route.path.includes('/book')"
+                    class="navbar-search d-none d-lg-flex">
                     <input @keyup.enter="handleSearch" type="text" v-model="searchKeyword" placeholder="Tìm kiếm ..." />
                     <button @click="handleSearch">
                         <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search Icon" />

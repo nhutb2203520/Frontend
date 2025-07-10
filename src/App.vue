@@ -6,7 +6,7 @@ import NavBarAD from '@/components/Admin/NavBarAD.vue';
 
 const route = useRoute();
 
-const isLoginPage = computed(() => route.path === '/login');
+const isLoginPage = computed(() => route.path === '/catalogbook');
 const isAdminPage = computed(() => route.path.startsWith('/admin')); // ví dụ: /admin/dashboard
 </script>
 
@@ -15,7 +15,7 @@ const isAdminPage = computed(() => route.path.startsWith('/admin')); // ví dụ
     <!-- Hiển thị navbar phù hợp -->
     <NavBarAD v-if="isAdminPage && !isLoginPage" />
     <NavBar v-else-if="!isLoginPage" />
-    
+
     <router-view />
   </div>
 </template>

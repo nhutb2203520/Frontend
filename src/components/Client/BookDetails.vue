@@ -1,7 +1,8 @@
 <template>
   <div class="layout-wrapper py-4">
     <!-- Lỗi chỗ slidebar khi nhấn vào option con -->
-    <SideBar @toggle="sidebarOpen = $event" />
+    <SideBar @toggle="sidebarOpen = $event" @authorSelected="handleAuthor" @genreSelected="handleGenre"
+      @publisherSelected="handlePublisher" @yearSelected="handleYear" @allBooks="handleAllBooks" />
     <div :class="['main-content', { 'collapsed': !sidebarOpen }]">
       <div class="">
         <div v-if="book" class="book-card shadow-lg rounded-4 p-4 text-light">
@@ -63,6 +64,9 @@ import SideBar from '@/components/Client/SideBar.vue';
 import Footer from '@/components/Client/Footer.vue';
 import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '@/utils/stringUtils'
+import { useSearchFilterStore } from '@/Store/SearchFilter.store';
+import { useBorrowBookStore } from '@/Store/BorrowBook.store';
+import { ElMessage } from 'element-plus';
 export default {
   name: 'BookDetails',
   components: { SideBar, Footer },
@@ -83,14 +87,50 @@ export default {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;
     }
-  },
-  methods: {
+  }, methods: {
     capitalizeWords,
-    borrowBook() {
-      alert('Bạn đã chọn mượn sách: ' + this.book?.TenSach);
+    handleAuthor(author) {
+      const store = useSearchFilterStore();
+      store.setAuthor(author);
+      this.$router.push('/catalogbook');
+    },
+    handleGenre(genre) {
+      const store = useSearchFilterStore();
+      store.setGenre(genre);
+      this.$router.push('/catalogbook');
+    },
+    handlePublisher(publisher) {
+      const store = useSearchFilterStore();
+      store.setPublisher(publisher);
+      this.$router.push('/catalogbook');
+    },
+    handleYear(year) {
+      const store = useSearchFilterStore();
+      store.setYear(year);
+      this.$router.push('/catalogbook');
+    },
+    handleAllBooks() {
+      const store = useSearchFilterStore();
+      store.clearAll();
+      this.$router.push('/catalogbook');
+    },
+    async borrowBook() {
+      const borrowStore = useBorrowBookStore()
+      try {
+        const res = await borrowStore.registerBorrowBook(this.book._id)
+        if (res.message === 'Tạo phiếu mượn thành công.') {
+          ElMessage.success('Đăng ký mượn sách thành công.')
+          this.$router.push({ name: 'BorrowingHistory' })
+        } else {
+          ElMessage.error(res.message || 'lỗi')
+        }
+      } catch (err) {
+        ElMessage.error(err?.message || 'Đã xảy ra lỗi');
+
+      }
     }
   }
-};
+}
 </script>
 
 <style scoped>
