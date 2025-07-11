@@ -1,43 +1,34 @@
 // src/Store/admin.store.js
-import { defineStore } from 'pinia'
-import axios from '@/utils/axiosAdmin'
-import router from '@/router'
+import { defineStore } from "pinia";
+import axios from "@/utils/axios";
+import { useAuthStore } from "./auth.store";
 
-export const useAdminStore = defineStore('admin', {
+export const useAdminStore = defineStore("admin", {
   state: () => ({
-    accessToken: sessionStorage.getItem('adminToken') || '',
-    adminInfo: JSON.parse(sessionStorage.getItem('adminInfo') || 'null'),
+    adminInfo: sessionStorage.getItem("adminInfo") || " ",
   }),
 
   actions: {
-    async login({ identifier, Password }) {
-      try {
-        const res = await axios.post('/staffs/login', {
-          identifier,
-          Password,
+    login(data) {
+      return axios
+        .post("/staffs/login", data)
+        .then((response) => {
+          if (response.data && response.data.nhanvien) {
+            const hoTen = response.data.nhanvien.HoTenNV;
+            this.adminInfo = hoTen; // Gán vào state Pinia
+            const authStore = useAuthStore();
+            sessionStorage.setItem("adminInfo", hoTen);
+            authStore.setTokens(
+              response.data.token,
+              response.data.refreshToken
+            );
+            authStore.startRefreshLoop();
+          }
+          return response.data;
         })
-
-        if (res.data.token) {
-          this.accessToken = res.data.token
-          this.adminInfo = res.data.nhanvien
-
-          sessionStorage.setItem('adminToken', res.data.token)
-          sessionStorage.setItem('adminInfo', JSON.stringify(res.data.nhanvien))
-        }
-
-        return res.data
-      } catch (err) {
-        console.error('Đăng nhập thất bại:', err)
-        throw err.response?.data || { message: 'Lỗi không xác định khi đăng nhập' }
-      }
-    },
-
-    logout() {
-      this.accessToken = ''
-      this.adminInfo = null
-      sessionStorage.removeItem('adminToken')
-      sessionStorage.removeItem('adminInfo')
-      router.push('/')
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
     },
   },
-})
+});

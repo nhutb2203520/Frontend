@@ -9,10 +9,7 @@
         <button class="total-btn">Tổng NXB: {{ totalPublishers }}</button>
 
         <div class="search">
-          <input
-            v-model="searchKeyword"
-            placeholder="Tìm kiếm theo tên NXB..."
-          />
+          <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên NXB..." />
         </div>
 
         <button class="add-btn" @click="toggleAddForm">
@@ -36,19 +33,10 @@
         <h3>Danh sách nhà xuất bản</h3>
         <div class="scrollable-list">
           <ul>
-            <li
-              v-for="pub in filteredPublishers"
-              :key="pub.MaNXB"
-              @click="togglePublisher(pub)"
-              class="reader-item"
-            >
+            <li v-for="pub in filteredPublishers" :key="pub.MaNXB" @click="togglePublisher(pub)" class="reader-item">
               <strong>{{ pub.TenNXB }}</strong>
 
-              <div
-                v-if="selectedPublisher?.MaNXB === pub.MaNXB"
-                class="reader-detail"
-                @click.stop
-              >
+              <div v-if="selectedPublisher?.MaNXB === pub.MaNXB" class="reader-detail" @click.stop>
                 <div v-if="editingPublisherId === pub.MaNXB">
                   <p><strong>Tên NXB:</strong></p>
                   <input v-model="editedPublisher.TenNXB" />
@@ -314,18 +302,22 @@ export default {
   cursor: pointer;
   border: none;
 }
+
 .btn-warning {
   background-color: #f1c40f;
   color: #000;
 }
+
 .btn-danger {
   background-color: #e74c3c;
   color: #fff;
 }
+
 .btn-success {
   background-color: #27ae60;
   color: white;
 }
+
 .btn-secondary {
   background-color: #7f8c8d;
   color: white;

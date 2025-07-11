@@ -3,7 +3,7 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Logo -->
             <div class="navbar-left d-flex align-items-center">
-                <router-link to="/" class="navbar-logo d-flex align-items-center">
+                <router-link to="/" replace class="navbar-logo d-flex align-items-center">
                     <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
                     <span class="title text-white pt-4">QUẢN LÝ THƯ VIỆN NLN</span>
                 </router-link>
@@ -12,7 +12,7 @@
             <!-- Menu giữa (chỉ hiện trên desktop) -->
             <ul class="navbar-menu d-flex d-none d-lg-flex">
                 <li>
-                    <router-link to="/" :class="{ active: $route.path === '/' }">Trang Chủ</router-link>
+                    <router-link to="/" replace :class="{ active: $route.path === '/' }">Trang Chủ</router-link>
                 </li>
                 <li>
                     <router-link :to="{ path: '/catalogbook', query: { reset: true } }"

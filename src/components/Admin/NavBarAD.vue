@@ -56,18 +56,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-const router = useRouter();
+import { useAuthStore } from '@/Store/auth.store';
+import { useAdminStore } from '@/Store/Admin.store';
+import { ElMessage } from 'element-plus';
 const route = useRoute();
-
+const router = useRouter()
+const auth = useAuthStore()
+const adminStore = useAdminStore()
 const showAccountMenu = ref(false);
 const showMobileMenu = ref(false);
-const isLoggedIn = ref(false);
-const userInfo = ref({
-  name: '',
-});
+const isLoggedIn = computed(() => !!auth.accessToken);
+const userInfo = computed(() => ({
+  name: adminStore.adminInfo || 'Admin'
+}));
 onMounted(() => {
   window.addEventListener('click', closeMenusOutside);
 });
@@ -87,26 +90,11 @@ const toggleAccountMenu = () => {
 const toggleMobileMenu = () => {
   showMobileMenu.value = !showMobileMenu.value;
 };
-
 const logout = () => {
-  sessionStorage.clear();
-  isLoggedIn.value = false;
-  showAccountMenu.value = false;
-  router.push('/admin/signin').then(() => window.location.reload());
-};
-
-onMounted(() => {
-  const adminStr = sessionStorage.getItem('adminInfo');
-  if (adminStr) {
-    try {
-      const admin = JSON.parse(adminStr);
-      isLoggedIn.value = true;
-      userInfo.value.name = admin.HoTenNV || 'Không rõ';
-    } catch (error) {
-      console.error('❌ Lỗi đọc adminInfo:', error);
-    }
-  }
-});
+  auth.logout()
+  ElMessage.success('Đăng xuất thành công!');
+  router.push('/');
+}
 </script>
 
 <style src="@/assets/navbar.css"></style>
