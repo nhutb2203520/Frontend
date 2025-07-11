@@ -4,10 +4,6 @@
       <div class="login-form">
         <img src="@/assets/Logo.jpg" alt="Logo" class="logo_Login" />
 
-        <p v-if="message" :class="['alert', success ? 'alert-success' : 'alert-danger']" role="alert">
-          {{ message }}
-        </p>
-
         <h2>Đăng Nhập Tài Khoản Thủ Thư</h2>
 
         <form @submit.prevent="submitLogin">
@@ -29,67 +25,46 @@
   </div>
 </template>
 
-<script>
-import axios from "@/utils/axiosAdmin"; // Sử dụng axiosAdmin đã cấu hình sessionStorage
-import { useRouter } from "vue-router";
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAdminStore } from '@/Store/Admin.store'
+import { ElMessage } from 'element-plus'
 
-export default {
-  data() {
-    return {
-      loginData: {
-        USERNAME: "",
-        PASSWORD: "",
-      },
-      message: "",
-      success: false,
-    };
-  },
-  setup() {
-    const router = useRouter();
-    return { router };
-  },
-  methods: {
-    async submitLogin() {
-      const username = this.loginData.USERNAME.trim();
-      const isPhone = /^[0-9]{10}$/.test(username);
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(username);
+const router = useRouter()
+const adminStore = useAdminStore()
 
-      if (!isPhone && !isEmail) {
-        this.message = "Vui lòng nhập số điện thoại (10 số) hoặc email hợp lệ!";
-        this.success = false;
-        return;
-      }
+const loginData = ref({
+  USERNAME: '',
+  PASSWORD: ''
+})
 
-      try {
-        const response = await axios.post("/staffs/login", {
-          identifier: username,
-          Password: this.loginData.PASSWORD,
-        });
+const submitLogin = async () => {
+  const username = loginData.value.USERNAME.trim()
+  const isPhone = /^[0-9]{10}$/.test(username)
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(username)
 
-        const { token, nhanvien, message } = response.data;
+  if (!isPhone && !isEmail) {
+    ElMessage.warning('Vui lòng nhập số điện thoại (10 số) hoặc email hợp lệ!')
+    return
+  }
 
-        if (token) {
-          sessionStorage.setItem("tokenuser", JSON.stringify(token));
-          sessionStorage.setItem("role", JSON.stringify("admin"));
-          sessionStorage.setItem("adminInfo", JSON.stringify(nhanvien));
+  try {
+    const result = await adminStore.login({
+      identifier: username,
+      Password: loginData.value.PASSWORD
+    })
 
-          this.message = message || "Đăng nhập thành công!";
-          this.success = true;
-
-          setTimeout(() => {
-            this.$router.push("/admin/dashboard").then(() => window.location.reload());
-          }, 1000);
-        } else {
-          this.message = message || "Đăng nhập thất bại.";
-          this.success = false;
-        }
-      } catch (error) {
-        this.message = error.response?.data?.message || "Lỗi không xác định.";
-        this.success = false;
-      }
-    },
-  },
-};
+    if (result.message === 'Đăng nhập thành công.') {
+      ElMessage.success(result.message)
+      router.push('/admin/dashboard')
+    } else {
+      ElMessage.error(result.message || 'Đăng nhập thất bại.')
+    }
+  } catch (error) {
+    ElMessage.error(error.message || 'Lỗi không xác định.')
+  }
+}
 </script>
 
 <style scoped>
