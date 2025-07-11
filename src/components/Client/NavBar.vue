@@ -22,8 +22,11 @@
 
                 </li>
                 <li>
-                    <router-link to="/borrowinghistory" :class="{ active: $route.path === '/borrowinghistory' }">Lịch Sử
-                        Mượn</router-link>
+                    <router-link to="/borrowinghistory" replace
+                        :class="{ active: $route.path === '/borrowinghistory' }">
+                        Lịch Sử Mượn
+                    </router-link>
+
                 </li>
             </ul>
 
@@ -92,6 +95,16 @@ import { ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { onMounted, onBeforeUnmount } from 'vue';
 
+
+
+const auth = useAuthStore();
+const reader = useReaderStore();
+const router = useRouter();
+const route = useRoute();
+const searchKeyword = ref('');
+const emit = defineEmits(['resetSidebar']);
+const showAccountMenu = ref(false);
+const showMobileMenu = ref(false);
 onMounted(() => {
     window.addEventListener('click', closeMenusOutside);
 });
@@ -104,16 +117,6 @@ function closeMenusOutside() {
     showAccountMenu.value = false;
     showMobileMenu.value = false;
 }
-
-const auth = useAuthStore();
-const reader = useReaderStore();
-const router = useRouter();
-const route = useRoute();
-const searchKeyword = ref('');
-const emit = defineEmits(['resetSidebar']);
-const showAccountMenu = ref(false);
-const showMobileMenu = ref(false);
-
 const isLoggedIn = computed(() => !!auth.accessToken);
 const userInfo = computed(() => ({
     name: reader.infoReader || 'Người dùng'

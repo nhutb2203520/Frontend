@@ -13,24 +13,13 @@
         <form @submit.prevent="submitLogin">
           <div>
             <label for="username">Số Điện Thoại/Email:</label>
-            <input
-              type="text"
-              id="username"
-              v-model="loginData.USERNAME"
-              required
-              placeholder="Nhập số điện thoại hoặc email"
-            />
+            <input type="text" id="username" v-model="loginData.USERNAME" required
+              placeholder="Nhập số điện thoại hoặc email" />
           </div>
 
           <div>
             <label for="password">Mật Khẩu:</label>
-            <input
-              type="password"
-              id="password"
-              v-model="loginData.PASSWORD"
-              required
-              placeholder="Nhập mật khẩu"
-            />
+            <input type="password" id="password" v-model="loginData.PASSWORD" required placeholder="Nhập mật khẩu" />
           </div>
 
           <button type="submit">Đăng Nhập</button>
@@ -88,7 +77,7 @@ export default {
           this.success = true;
 
           setTimeout(() => {
-            this.$router.push("/homeadmin").then(() => window.location.reload());
+            this.$router.push("/admin/dashboard").then(() => window.location.reload());
           }, 1000);
         } else {
           this.message = message || "Đăng nhập thất bại.";

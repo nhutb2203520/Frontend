@@ -70,7 +70,7 @@ const routes = [
           type: "warning",
         });
         // Chuyển hướng đến trang đăng nhập nếu không có accessToken
-        next({ name: "Signin User" });
+        next({ name: "Signin User", replace: true });
       } else {
         next();
       }
@@ -103,36 +103,35 @@ const routes = [
   },
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
-  {meta: { role: 'admin' },
+  {
     path: '/homeadmin',
     name: 'HomeAdmin',
     component: () => import('@/Views/HomeAdmin.vue'),
     meta: { role: 'admin' }
   },
   {
-    path: "/admin/signin",  
+    path: "/admin/signin",
     name: "Signin Admin",
-    component: () => import('@/Views/AdminFormSignIn.vue'),
-    meta: { role: 'admin' }
+    component: () => import("@/Views/AdminFormSignIn.vue"),
+    meta: { role: "admin" },
   },
   {
     path: "/admin/account",
     name: "AccountInforAdmin",
     component: AccountAdmin,
-    meta: { role: 'admin' }
-    
+    meta: { role: "admin" },
   },
   {
     path: "/admin/account/change-pass-ad",
     name: "ChangePassAD",
     component: ChangePassAD,
-    meta: { role: 'admin' }
+    meta: { role: "admin" },
   },
   {
     path: "/admin/account/update-account-ad",
     name: "UpdateAccountAD",
     component: UpdateAccountAD,
-    meta: { role: 'admin' }
+    meta: { role: "admin" },
   },
   {
     path: "/admin/management-reader",
@@ -150,13 +149,13 @@ const routes = [
     path: "/admin/category-management",
     name: "CategoryManagement",
     component: CategoryManagement,
-    meta: { role: 'admin' }
+    meta: { role: "admin" },
   },
   {
     path: "/admin/management-publisher",
     name: " ManagementPublisher",
     component: PublisherManager,
-    meta: { role: 'admin' }
+    meta: { role: "admin" },
   },
   {
     path: "/admin/book-management",
