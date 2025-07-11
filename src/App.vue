@@ -15,7 +15,7 @@ const isAdminPage = computed(() => route.path.startsWith('/admin')); // ví dụ
   <div id="app">
     <!-- Hiển thị navbar phù hợp -->
     <NavBarAD v-if="isAdminPage && !isLoginPage" />
-    <NavBar v-else-if="!isLoginPage" />
+    <NavBar v-else-if="!isLoginPage && !isAdminPage" />
 
     <router-view />
   </div>

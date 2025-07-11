@@ -10,7 +10,8 @@
       </h5>
       <div class="mt-auto">
         <!-- 🔗 Điều hướng tới trang chi tiết sách -->
-        <router-link :to="`/book/${book.MaSach}`" class="btn btn-info rounded-pill px-4 fw-bold text-decoration-none">
+        <router-link :to="`/book/${book.MaSach}`" replace
+          class="btn btn-info rounded-pill px-4 fw-bold text-decoration-none">
           XEM CHI TIẾT
         </router-link>
       </div>

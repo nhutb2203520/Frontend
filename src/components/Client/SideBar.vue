@@ -68,6 +68,7 @@ import { capitalizeWords } from '../../utils/stringUtils';
 import { useRouter } from 'vue-router';
 import { useSearchFilterStore } from '@/Store/SearchFilter.store';
 const searchFilterStore = useSearchFilterStore();
+const emit = defineEmits(['toggle',])
 const isOpen = ref(true);
 const router = useRouter();
 const sections = ref([

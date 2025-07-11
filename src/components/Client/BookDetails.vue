@@ -92,27 +92,27 @@ export default {
     handleAuthor(author) {
       const store = useSearchFilterStore();
       store.setAuthor(author);
-      this.$router.push('/catalogbook');
+      this.$router.replace('/catalogbook');
     },
     handleGenre(genre) {
       const store = useSearchFilterStore();
       store.setGenre(genre);
-      this.$router.push('/catalogbook');
+      this.$router.replace('/catalogbook');
     },
     handlePublisher(publisher) {
       const store = useSearchFilterStore();
       store.setPublisher(publisher);
-      this.$router.push('/catalogbook');
+      this.$router.replace('/catalogbook');
     },
     handleYear(year) {
       const store = useSearchFilterStore();
       store.setYear(year);
-      this.$router.push('/catalogbook');
+      this.$router.replace('/catalogbook');
     },
     handleAllBooks() {
       const store = useSearchFilterStore();
       store.clearAll();
-      this.$router.push('/catalogbook');
+      this.$router.replace('/catalogbook');
     },
     async borrowBook() {
       const borrowStore = useBorrowBookStore()

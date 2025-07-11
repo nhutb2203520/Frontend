@@ -16,7 +16,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async refreshAccessToken() {
-      const res = await axios.post("/readers/refresh-token", {
+      const res = await axios.post("/auth/refresh-token", {
         refreshToken: this.refreshToken,
       });
 
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore("auth", {
         clearInterval(this.refreshInterval);
         this.refreshInterval = null;
       }
-      router.push("/");
+      router.replace("/");
     },
 
     // Auto refresh mỗi 25s
