@@ -29,7 +29,7 @@
           </el-icon> <strong>Địa chỉ:</strong> {{ userInfo.DiaChi }}</p>
         <p v-if="userInfo"><el-icon>
             <Calendar />
-          </el-icon> <strong>Ngày tạo:</strong> {{ formatDate(userInfo.createdAt) }}</p>
+          </el-icon> <strong>Ngày tạo tài khoản:</strong> {{ formatDate(userInfo.createdAt) }}</p>
         <p v-if="userInfo"><el-icon>
             <CircleCheckFilled />
           </el-icon> <strong>Trạng thái:</strong> {{ capitalizeWords(userInfo.MaTT?.TenTT) }}</p>

@@ -8,12 +8,30 @@
       <div class="info-box">
         <p class="info-text">Thông tin tài khoản</p>
 
-        <p v-if="staff"><el-icon><UserFilled /></el-icon> <strong>Họ tên:</strong> {{ capitalizeWords(staff.HoTenNV) }}</p>
-        <p v-if="staff"><el-icon><Message /></el-icon> <strong>Email:</strong> {{ staff.Email }}</p>
-        <p v-if="staff"><el-icon><PhoneFilled /></el-icon> <strong>Số điện thoại:</strong> {{ staff.SoDienThoai }}</p>
-        <p v-if="staff"><el-icon><LocationFilled /></el-icon> <strong>Địa chỉ:</strong> {{ staff.DiaChi }}</p>
-        <p v-if="staff"><el-icon><Calendar /></el-icon> <strong>Ngày tạo:</strong> {{ formatDate(staff.createdAt) }}</p>
-        <p v-if="staff"><el-icon><User /></el-icon> <strong>Chức vụ:</strong> {{ staff.ChucVu }}</p>
+        <p v-if="staff"><el-icon>
+            <UserFilled />
+          </el-icon> <strong>Họ tên:</strong> {{ capitalizeWords(staff.HoTenNV) }}</p>
+        <p v-if="staff">
+          <el-icon>
+            <Calendar />
+          </el-icon>
+          <strong>Ngày sinh:</strong> {{ formatDate(staff.NgaySinh) }}
+        </p>
+        <p v-if="staff"><el-icon>
+            <Message />
+          </el-icon> <strong>Email:</strong> {{ staff.Email }}</p>
+        <p v-if="staff"><el-icon>
+            <PhoneFilled />
+          </el-icon> <strong>Số điện thoại:</strong> {{ staff.SoDienThoai }}</p>
+        <p v-if="staff"><el-icon>
+            <LocationFilled />
+          </el-icon> <strong>Địa chỉ:</strong> {{ staff.DiaChi }}</p>
+        <p v-if="staff"><el-icon>
+            <Calendar />
+          </el-icon> <strong>Ngày tạo tài khoản:</strong> {{ formatDate(staff.createdAt) }}</p>
+        <p v-if="staff"><el-icon>
+            <User />
+          </el-icon> <strong>Chức vụ:</strong> {{ staff.ChucVu }}</p>
       </div>
 
       <div class="action-buttons">
@@ -30,19 +48,14 @@ import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { formatDate } from '@/utils/formatDate';
 import { capitalizeWords } from '@/utils/stringUtils';
-import axios from '@/utils/axiosAdmin';
-
+import { useAdminStore } from '@/Store/Admin.store';
+import { useAuthStore } from '@/Store/auth.store';
+const authStore = useAuthStore()
 const staff = ref(null);
+const adminStore = useAdminStore()
+onMounted(async () => {
+  staff.value = await adminStore.getMyAccount()
 
-onMounted(() => {
-  const stored = sessionStorage.getItem("adminInfo");
-  if (stored) {
-    try {
-      staff.value = JSON.parse(stored);
-    } catch (e) {
-      ElMessage.error("Không thể đọc thông tin tài khoản.");
-    }
-  }
 });
 
 const handleDeleteAccount = async () => {
@@ -58,17 +71,18 @@ const handleDeleteAccount = async () => {
       }
     );
 
-    const res = await axios.delete(`/staffs/${staff.value._id}`);
-    if (res.data.message === "Xóa tài khoản thành công.") {
+    const res = await adminStore.deleteMyAccount();
+    if (res.message === 'Xóa tài khoản thành công.') {
       ElMessage.success("Tài khoản đã được xóa.");
-      sessionStorage.clear();
-      window.location.href = "/admin/signin";
+      authStore.logout();
     } else {
-      ElMessage.error(res.data.message);
+      ElMessage.error(res.message)
     }
 
   } catch (err) {
     if (err !== 'cancel') {
+      // Nếu không phải do cancel popup
+      console.error(err);
       ElMessage.error("Không thể xóa tài khoản. Vui lòng thử lại sau.");
     } else {
       ElMessage.info("Hủy xóa tài khoản.");
