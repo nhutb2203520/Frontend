@@ -20,5 +20,32 @@ export const useCategoryBookStore = defineStore("categoryBook", {
         console.log(err.message);
       }
     },
+    async addCategoryBook(data) {
+      try {
+        const response = await axios.post("/categorys", data);
+        if (response.data.loaisach) {
+          this.categorys.push(response.data.loaisach);
+        }
+        return response.data;
+      } catch (err) {
+        console.log(err.message);
+      }
+    },
+    async updateCategoryBook(data) {
+      try {
+        const response = await axios.patch(`/categorys/${data.MaLoai}`, data);
+        return response.data;
+      } catch (err) {
+        console.log(err.message);
+      }
+    },
+    async deleteCategoryBook(MaLoai) {
+      try {
+        const response = await axios.delete(`/categorys/${MaLoai}`);
+        return response.data;
+      } catch (err) {
+        console.log(err.message);
+      }
+    },
   },
 });

@@ -95,13 +95,11 @@ export const useReaderStore = defineStore("reader", {
     async changePassword(currentPassword, newPassword) {
       this.setLoading(true);
       this.setError(null);
-      console.log("Changing password for reader...");
       try {
         const response = await axios.patch("/readers/change-password", {
           currentPassword,
           newPassword,
         });
-        console.log("Password changed successfully:", response.data);
         return response.data;
       } catch (err) {
         this.setError(err.response?.data?.message || err.message);

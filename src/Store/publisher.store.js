@@ -37,5 +37,45 @@ export const usePublisherStore = defineStore("publisher", {
         this.setLoading(false);
       }
     },
+    async addPublisher(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.post("/publishers", data);
+        if (response.data.nxb) {
+          this.addPublisher(response.data.nxb);
+        }
+        console.log(response.data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async update(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.patch(`/publishers/${data.MaNXB}`, data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async deletePublisher(MaNXB) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.delete(`/publishers/${MaNXB}`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 });

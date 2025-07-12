@@ -30,5 +30,50 @@ export const useAdminStore = defineStore("admin", {
           throw new Error(error.response?.data?.message || error.message);
         });
     },
+    getMyAccount() {
+      return axios
+        .get("/staffs/me")
+        .then((res) => {
+          return res.data.nhanvien;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    updateAccount(data) {
+      return axios
+        .patch("/staffs/me", data)
+        .then((res) => {
+          if (res.data.nhanvien) {
+            const updatedStaff = res.data.nhanvien;
+            this.adminInfo = updatedStaff.HoTenNV;
+            sessionStorage.setItem("adminInfo", updatedStaff.HoTenNV);
+          }
+          return res.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    changePassword(data) {
+      return axios
+        .patch("/staffs/change-password", data)
+        .then((res) => {
+          return res.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
+    deleteMyAccount() {
+      return axios
+        .delete("/staffs/me")
+        .then((res) => {
+          return res.data;
+        })
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || error.message);
+        });
+    },
   },
 });
