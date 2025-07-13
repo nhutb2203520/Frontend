@@ -144,7 +144,25 @@ export const useReaderStore = defineStore("reader", {
       this.setError(null);
       try {
         const response = await axios.get("/readers");
-        this.setReaders(response.data);
+        if (response.data.danhsachdocgia) {
+          this.setReaders(response.data.danhsachdocgia);
+        }
+        return response.data.danhsachdocgia;
+      } catch (err) {
+        this.setError(err.response?.data?.message || err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async updateStatus(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.patch(
+          `/readers/update-status/${data._id}`,
+          data
+        );
+        return response.data;
       } catch (err) {
         this.setError(err.response?.data?.message || err.message);
       } finally {

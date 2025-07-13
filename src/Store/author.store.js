@@ -35,5 +35,44 @@ export const useAuthorStore = defineStore("author", {
         this.setLoading(false);
       }
     },
+    async addOneAuthor(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.post("/authors", data);
+        if (response.data.tacgia) {
+          this.addAuthor(response.data.tacgia);
+        }
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async updateAuthor(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.patch(`/authors/${data._id}`, data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async deleteAuthor(id) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.delete(`/authors/${id}`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 });

@@ -19,38 +19,38 @@
 
           <div class="actions d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên hoặc email..." />
-            <button class="add-btn" @click="goToAddReader">Thêm độc giả</button>
           </div>
 
           <div class="reader-list">
             <h3>Danh sách độc giả</h3>
             <div class="scrollable-list">
               <ul>
-                <li
-                  v-for="reader in filteredReaders"
-                  :key="reader.id"
-                  @click="toggleReader(reader)"
-                  class="reader-item"
-                >
-                  <strong>{{ reader.name }}</strong> - {{ reader.email }} -
-                  <span :class="reader.status === 'active' ? 'text-success' : 'text-danger'">
-                    {{ reader.status === 'active' ? 'Hoạt động' : 'Bị khóa' }}
+                <li v-for="reader in filteredReaders" :key="reader._id" @click="toggleReader(reader)"
+                  class="reader-item">
+                  <strong>{{ capitalizeWords(reader.HoTen) }}</strong> - {{ reader.Email }} -
+                  <span :class="reader.MaTT?.TenTT === 'active' ? 'text-success' : 'text-danger'">
+                    {{ reader.MaTT?.TenTT === 'active' ? 'Hoạt động' : 'Bị khóa' }}
                   </span>
 
-                  <div v-if="selectedReader?.id === reader.id" class="reader-detail">
-                    <p><strong>📧 Email:</strong> {{ reader.email }}</p>
+                  <div v-if="selectedReader?._id === reader._id" class="reader-detail">
+                    <p><strong><el-icon>
+                          <UserFilled />
+                        </el-icon>Họ Tên:</strong> {{ capitalizeWords(reader.HoTen) }}</p>
+                    <p><strong><el-icon>
+                          <Message />
+                        </el-icon>Email:</strong> {{ reader.Email }}</p>
                     <p>
-                      <strong>Trạng thái:</strong>
-                      <span :class="reader.status === 'active' ? 'text-success' : 'text-danger'">
-                        {{ reader.status === 'active' ? 'Hoạt động' : 'Bị khóa' }}
-                      </span>
+                    <p><strong><el-icon>
+                          <Calendar />
+                        </el-icon>Ngày Tạo tài khoản:</strong> {{ formatDate(reader.createdAt) }}</p>
+                    <strong>Trạng thái:</strong>
+                    <span :class="reader.MaTT?.TenTT === 'active' ? 'text-success' : 'text-danger'">
+                      {{ reader.MaTT?.TenTT === 'active' ? 'Hoạt động' : 'Bị khóa' }}
+                    </span>
                     </p>
-                    <button
-                      class="btn"
-                      :class="reader.status === 'active' ? 'btn-danger' : 'btn-success'"
-                      @click.stop="toggleStatus(reader)"
-                    >
-                      {{ reader.status === 'active' ? '🔒 Khóa' : '🔓 Mở khóa' }}
+                    <button class="btn" :class="reader.MaTT?.TenTT === 'active' ? 'btn-danger' : 'btn-success'"
+                      @click.stop="toggleStatus(reader)">
+                      {{ reader.MaTT?.TenTT === 'active' ? '🔒 Khóa' : '🔓 Mở khóa' }}
                     </button>
                   </div>
                 </li>
@@ -65,7 +65,10 @@
 
 <script>
 import SideBarAD from '@/components/Admin/SideBarAD.vue';
-
+import { useReaderStore } from '@/Store/Reader.store';
+import { capitalizeWords } from '@/utils/stringUtils'
+import { formatDate } from '@/utils/formatDate';
+import { ElMessage } from 'element-plus';
 export default {
   components: { SideBarAD },
   data() {
@@ -73,11 +76,7 @@ export default {
       searchKeyword: "",
       filterType: "all",
       selectedReader: null,
-      readers: [
-        { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", status: "active" },
-        { id: 2, name: "Lê Thị B", email: "b@gmail.com", status: "blocked" },
-        { id: 3, name: "Trần Văn C", email: "c@gmail.com", status: "active" },
-      ]
+      readers: []
     };
   },
   computed: {
@@ -85,25 +84,27 @@ export default {
       return this.readers.length;
     },
     activeReaders() {
-      return this.readers.filter(r => r.status === "active").length;
+      return this.readers.filter(r => r.MaTT.TenTT === "active").length;
     },
     blockedReaders() {
-      return this.readers.filter(r => r.status === "blocked").length;
+      return this.readers.filter(r => r.MaTT.TenTT === "blocked").length;
     },
     filteredReaders() {
       return this.readers
         .filter(r => {
-          if (this.filterType === 'active') return r.status === 'active';
-          if (this.filterType === 'blocked') return r.status === 'blocked';
+          if (this.filterType === 'active') return r.MaTT.TenTT === 'active';
+          if (this.filterType === 'blocked') return r.MaTT.TenTT === 'blocked';
           return true;
         })
         .filter(r =>
-          r.name.toLowerCase().includes(this.searchKeyword.toLowerCase()) ||
-          r.email.toLowerCase().includes(this.searchKeyword.toLowerCase())
+          r.HoTen.toLowerCase().includes(this.searchKeyword.toLowerCase()) ||
+          r.Email.toLowerCase().includes(this.searchKeyword.toLowerCase())
         );
     }
   },
   methods: {
+    formatDate,
+    capitalizeWords,
     filterAll() {
       this.filterType = 'all';
       this.selectedReader = null;
@@ -117,20 +118,35 @@ export default {
       this.selectedReader = null;
     },
     toggleReader(reader) {
-      this.selectedReader = this.selectedReader?.id === reader.id ? null : reader;
+      this.selectedReader = this.selectedReader?._id === reader._id ? null : reader;
     },
-    goToAddReader() {
-      this.$router.push({ name: "AddReader" });
-    },
-    toggleStatus(reader) {
-      reader.status = reader.status === 'active' ? 'blocked' : 'active';
+    async toggleStatus(reader) {
+      const newStatus = reader.MaTT.TenTT === 'active' ? 'blocked' : 'active';
+      const data = {
+        _id: reader._id,
+        TrangThai: newStatus
+      }
+      try {
+        const res = await useReaderStore().updateStatus(data)
+        if (res.message === 'Cập nhật trạng thái tài khoản độc giả thành công.') {
+          ElMessage.success('Cập nhật trạng thái độc giả thành công.')
+          this.readers = await useReaderStore().fetchReaders()
+          this.selectedReader = null
+        } else {
+          ElMessage.error(res.message)
+        }
+      } catch (err) {
+        this.$message.error(`Cập nhật thất bại: ${err}`)
+      }
     }
+  },
+  async mounted() {
+    this.readers = await useReaderStore().fetchReaders()
   }
 };
 </script>
 
 <style scoped>
-
 .overlay {
   position: fixed;
   padding: 15px;
@@ -173,6 +189,7 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .top-buttons button:hover {
   background-color: #2980b9;
   color: white;
@@ -197,6 +214,7 @@ export default {
   transition: 0.3s;
   cursor: pointer;
 }
+
 .add-btn:hover {
   background-color: #2980b9;
 }

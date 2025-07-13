@@ -11,6 +11,7 @@
           <tr>
             <th>STT</th>
             <th>Thông tin sách</th>
+            <th>Loại CSDL</th>
             <th>Ngày mượn</th>
             <th>Ngày đến hạn trả</th>
             <th>Trạng thái sách</th>
@@ -21,9 +22,10 @@
           <tr v-for="(borrow, index) in borrowDetails" :key="index">
             <td>{{ index + 1 }}</td>
             <td>
-              <strong>{{ capitalizeWords(borrow.MaSach?.TenSach) }}</strong><br />
-              <em>Tác giả: {{capitalizeWords(borrow.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))}}</em>
+              <strong>{{ capitalizeWords(borrow.MaSachCopy?.MaSach.TenSach) }}</strong><br />
+              <em>Tác giả: {{capitalizeWords(borrow.MaSachCopy.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))}}</em>
             </td>
+            <td>{{ borrow.MaSachCopy.TenLoaiBanSao }}</td>
             <td>{{ formatDate(borrow.NgayMuon) }}</td>
             <td>{{ formatDate(borrow.NgayTra) }}</td>
             <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
@@ -135,12 +137,12 @@ const goToBookDetail = (maSach) => {
 }
 
 .header {
-border-bottom: 2px solid black;
+  border-bottom: 2px solid black;
 }
 
 table {
-width: 100%;
-border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 table th,
@@ -154,47 +156,47 @@ table td {
 }
 
 .table thead th {
-background-color: #808385 !important;
+  background-color: #808385 !important;
 }
 
 /* Responsive font scaling */
 @media (max-width: 992px) {
-.borrowing-slip {
-  font-size: 18 px;
-  padding: 20px;
-}
+  .borrowing-slip {
+    font-size: 18 px;
+    padding: 20px;
+  }
 
-table th,
-table td {
-  font-size: 16px;
-}
+  table th,
+  table td {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 768px) {
-.borrowing-slip {
-  font-size: 16px;
-  padding: 15px;
-}
+  .borrowing-slip {
+    font-size: 16px;
+    padding: 15px;
+  }
 
-table th,
-table td {
-  font-size: 14px;
-}
+  table th,
+  table td {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 576px) {
-.borrowing-slip {
-  font-size: 14px;
-  padding: 10px;
-}
+  .borrowing-slip {
+    font-size: 14px;
+    padding: 10px;
+  }
 
-table th,
-table td {
-  font-size: 13px;
-}
+  table th,
+  table td {
+    font-size: 13px;
+  }
 
-h2 {
-  font-size: 20px;
-}
+  h2 {
+    font-size: 20px;
+  }
 }
 </style>

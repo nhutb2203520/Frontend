@@ -1,44 +1,76 @@
 <template>
   <div class="layout-wrapper py-4">
-    <!-- Lỗi chỗ slidebar khi nhấn vào option con -->
-    <SideBar @toggle="sidebarOpen = $event" @authorSelected="handleAuthor" @genreSelected="handleGenre"
-      @publisherSelected="handlePublisher" @yearSelected="handleYear" @allBooks="handleAllBooks" />
-    <div :class="['main-content', { 'collapsed': !sidebarOpen }]">
-      <div class="">
+    <!-- Sidebar -->
+    <SideBar @toggle="sidebarOpen = $event" @allBooks="handleAllBooks" @authorSelected="handleAuthor"
+      @genreSelected="handleGenre" @publisherSelected="handlePublisher" @yearSelected="handleYear" />
+
+    <!-- Main Content -->
+    <div :class="['main-content', { collapsed: !sidebarOpen }]">
+      <div>
         <div v-if="book" class="book-card shadow-lg rounded-4 p-4 text-light">
           <h4 class="text-info fw-bold text-center mb-4">📘 Thông tin chi tiết sách</h4>
 
           <div class="row">
-            <!-- Hình ảnh -->
+            <!-- Hình ảnh sách -->
             <div class="col-md-5 d-flex justify-content-center align-items-center">
               <img :src="book.image" alt="Ảnh sách" class="book-image rounded" />
             </div>
 
-            <!-- Thông tin chi tiết -->
+            <!-- Thông tin sách -->
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
                 <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
                 <p><strong>Loại sách:</strong> {{ capitalizeWords(book.MaLoai?.TenLoai) }}</p>
-                <p><strong>Số quyển trong kho:</strong> {{ book.SoQuyen - book.SoLuongDaMuon }}</p>
                 <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
-                <p><strong>Nhà xuất bản:</strong> {{ capitalizeWords(book.MaNXB?.TenNXB) }}</p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
 
                 <!-- Nút hành động -->
                 <div class="d-flex flex-wrap gap-3 mt-3">
                   <button class="btn btn-outline-info" @click="borrowBook">📚 Mượn sách</button>
-                  <button class="btn btn-outline-light" @click="showLocation = !showLocation">
+                  <button v-if="selectedCopy" class="btn btn-outline-light" @click="showLocation = !showLocation">
                     {{ showLocation ? '🙈 Ẩn vị trí sách' : '📍 Xem vị trí sách' }}
                   </button>
                 </div>
 
                 <!-- Vị trí sách -->
                 <div v-if="showLocation" class="mt-3 book-info">
-                  <p><strong>Vị trí:</strong> {{ book.MaViTri?.TenViTri || 'Không rõ' }}</p>
-                  <p><strong>Mô tả:</strong> {{ book.MaViTri?.MoTa || 'Không rõ' }}</p>
+                  <p><strong>Vị trí:</strong> {{ selectedCopy.MaViTri?.TenViTri || 'Không rõ' }}</p>
+                  <p><strong>Mô tả:</strong> {{ selectedCopy.MaViTri?.MoTa || 'Không rõ' }}</p>
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Bảng bản sao sách -->
+          <div class="mt-4">
+            <h5 class="fw-bold text-white mb-2">📄 Danh sách bản sao sách</h5>
+            <table class="table table-bordered table-dark table-striped rounded">
+              <thead>
+                <tr>
+                  <th>Tên bản sao</th>
+                  <th>Số lượng</th>
+                  <th>Đã mượn</th>
+                  <th>Còn lại</th>
+                  <th>Chọn</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="copy in sachCopies" :key="copy._id">
+                  <td>{{ copy.TenLoaiBanSao }}</td>
+                  <td>{{ copy.SoQuyen }}</td>
+                  <td>{{ copy.SoLuongDaMuon }}</td>
+                  <td>
+                    <span class="badge" :class="(copy.SoQuyen - copy.SoLuongDaMuon) > 0 ? 'bg-success' : 'bg-danger'">
+                      {{ copy.SoQuyen - copy.SoLuongDaMuon }}
+                    </span>
+                  </td>
+                  <td>
+                    <input type="radio" :value="copy._id" v-model="selectedCopyId"
+                      :disabled="(copy.SoQuyen - copy.SoLuongDaMuon) <= 0" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- Mô tả sách -->
@@ -48,7 +80,7 @@
           </div>
         </div>
 
-        <!-- Khi không tìm thấy -->
+        <!-- Không tìm thấy sách -->
         <div v-else class="text-center text-danger py-5">
           <h4>Không tìm thấy sách với mã: {{ $route.params.MaSach }}</h4>
         </div>
@@ -63,10 +95,11 @@
 import SideBar from '@/components/Client/SideBar.vue';
 import Footer from '@/components/Client/Footer.vue';
 import { useBookStore } from '@/Store/Book.store';
-import { capitalizeWords } from '@/utils/stringUtils'
+import { capitalizeWords } from '@/utils/stringUtils';
 import { useSearchFilterStore } from '@/Store/SearchFilter.store';
 import { useBorrowBookStore } from '@/Store/BorrowBook.store';
 import { ElMessage } from 'element-plus';
+
 export default {
   name: 'BookDetails',
   components: { SideBar, Footer },
@@ -74,7 +107,9 @@ export default {
     return {
       sidebarOpen: true,
       showLocation: false,
-      book: null
+      book: null,
+      sachCopies: [],
+      selectedCopyId: null,
     };
   },
   async mounted() {
@@ -82,12 +117,18 @@ export default {
     try {
       const bookStore = useBookStore();
       const response = await bookStore.fetchBookByMaSach(MaSach);
-      this.book = response;
+      this.book = response.sach;
+      this.sachCopies = response.sachCopies
     } catch (err) {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;
     }
-  }, methods: {
+  }, computed: {
+    selectedCopy() {
+      return this.sachCopies.find(copy => copy._id === this.selectedCopyId) || null;
+    }
+  },
+  methods: {
     capitalizeWords,
     handleAuthor(author) {
       const store = useSearchFilterStore();
@@ -115,29 +156,31 @@ export default {
       this.$router.replace('/catalogbook');
     },
     async borrowBook() {
-      const borrowStore = useBorrowBookStore()
+      if (!this.selectedCopyId) {
+        ElMessage.warning('Vui lòng chọn một bản sao sách để mượn!');
+        return;
+      }
+      const borrowStore = useBorrowBookStore();
       try {
-        const res = await borrowStore.registerBorrowBook(this.book._id)
+        const res = await borrowStore.registerBorrowBook(this.selectedCopyId);
         if (res.message === 'Tạo phiếu mượn thành công.') {
-          ElMessage.success('Đăng ký mượn sách thành công.')
-          this.$router.push({ name: 'BorrowingHistory' })
+          ElMessage.success('Đăng ký mượn sách thành công.');
+          this.$router.push({ name: 'BorrowingHistory' });
         } else {
-          ElMessage.error(res.message || 'lỗi')
+          ElMessage.error(res.message || 'Lỗi mượn sách.');
         }
       } catch (err) {
         ElMessage.error(err?.message || 'Đã xảy ra lỗi');
-
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
 .layout-wrapper {
   display: flex;
   min-height: 100vh;
-  /* Tông nền tối */
 }
 
 .main-content {
@@ -169,5 +212,10 @@ export default {
 .book-info p {
   margin-bottom: 10px;
   font-size: 1rem;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 5px 10px;
 }
 </style>

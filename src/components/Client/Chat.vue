@@ -1,13 +1,7 @@
 <template>
   <div class="chat-container">
     <!-- Nút mở chat -->
-    <img
-      v-if="!isChatOpen"
-      src="@/assets/ChatGPT.png"
-      alt="ChatGPT Logo"
-      class="chat-image"
-      @click="openChat"
-    />
+    <img v-if="!isChatOpen" src="@/assets/ChatGPT.png" alt="ChatGPT Logo" class="chat-image" @click="openChat" />
 
     <!-- Overlay và khung chat -->
     <div v-if="isChatOpen" class="chat-overlay" @click.self="closeChat">
@@ -20,24 +14,15 @@
 
         <!-- Tin nhắn -->
         <div class="chat-messages">
-          <div
-            v-for="(msg, index) in messages"
-            :key="index"
-            :class="msg.sender === 'user' ? 'msg-user' : 'msg-bot'"
-          >
+          <div v-for="(msg, index) in messages" :key="index" :class="msg.sender === 'user' ? 'msg-user' : 'msg-bot'">
             <span>{{ msg.text }}</span>
           </div>
         </div>
 
         <!-- Input -->
         <div class="chat-input-area">
-          <input
-            type="text"
-            v-model="userInput"
-            class="chat-input form-control"
-            placeholder="Nhập câu hỏi..."
-            @keyup.enter="sendMessage"
-          />
+          <input type="text" v-model="userInput" class="chat-input form-control" placeholder="Nhập câu hỏi..."
+            @keyup.enter="sendMessage" />
           <button @click="sendMessage" class="chat-send btn btn-primary">Gửi</button>
         </div>
       </div>
@@ -46,6 +31,7 @@
 </template>
 
 <script>
+import axios from '@/utils/axios';
 export default {
   name: "Chat",
   data() {
@@ -61,7 +47,7 @@ export default {
       if (this.messages.length === 0) {
         this.messages.push({
           sender: "bot",
-          text: "Xin chào bạn đến với Thư viện! Hãy đặt cho tôi câu hỏi bất kỳ về sách, thư viện,... Tôi sẽ trả lời cho bạn!!!",
+          text: "👋 Xin chào! Bạn muốn hỏi gì về sách, tác giả hay thư viện? Tôi luôn sẵn sàng giúp đỡ.",
         });
       }
       this.$nextTick(() => this.scrollToBottom());
@@ -69,21 +55,33 @@ export default {
     closeChat() {
       this.isChatOpen = false;
     },
-    sendMessage() {
+    async sendMessage() {
       const text = this.userInput.trim();
       if (!text) return;
+
       this.messages.push({ sender: "user", text });
       this.userInput = "";
-
       this.$nextTick(() => this.scrollToBottom());
 
-      setTimeout(() => {
+      try {
+        const MaDocGia = localStorage.getItem("MaDocGia") || "guest"; // hoặc lấy từ Pinia/Vuex
+        const res = await axios.post("http://localhost:3000/chatbot", {
+          message: text,
+        });
+
         this.messages.push({
           sender: "bot",
-          text: "Cảm ơn bạn đã hỏi! (Đây là phản hồi mẫu)",
+          text: res.data.answer || "🤖 Tôi không hiểu ý bạn, hãy hỏi rõ hơn nhé.",
         });
-        this.$nextTick(() => this.scrollToBottom());
-      }, 500);
+      } catch (err) {
+        console.error("Chat error:", err);
+        this.messages.push({
+          sender: "bot",
+          text: "Bạn hãy đăng nhập để có thể chat với tôi.",
+        });
+      }
+
+      this.$nextTick(() => this.scrollToBottom());
     },
     scrollToBottom() {
       const container = this.$el.querySelector(".chat-messages");
