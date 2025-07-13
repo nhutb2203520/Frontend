@@ -68,7 +68,7 @@ export const useBookStore = defineStore("book", {
       this.setError(null);
       try {
         const response = await axios.get(`/books/${MaSach}`);
-        return response.data.sach;
+        return response.data;
       } catch (err) {
         this.setError(err.message);
       } finally {

@@ -10,7 +10,7 @@
 
           <div class="top-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
             <button class="total-btn">Tổng loại sách: {{ totalCategories }}</button>
-            <div class="search flex-grow-1">
+            <div class="search" v-if="!showAddForm">
               <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên loại sách..." />
             </div>
             <button class="add-btn" @click="toggleAddForm">

@@ -5,7 +5,7 @@
 
       <div class="top-bar">
         <button class="total-btn">Tổng vị trí: {{ totalLocations }}</button>
-        <div class="search">
+        <div class="search" v-if="!showAddForm">
           <input v-model="searchKeyword" placeholder="Tìm kiếm theo vị trí..." />
         </div>
         <button class="add-btn" @click="toggleAddForm">

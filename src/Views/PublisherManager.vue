@@ -7,7 +7,7 @@
       <!-- Top Bar -->
       <div class="top-bar">
         <button class="total-btn">Tổng NXB: {{ totalPublishers }}</button>
-        <div class="search">
+        <div class="search" v-if="!showAddForm">
           <input v-model="searchKeyword" placeholder="Tìm kiếm theo tên NXB..." />
         </div>
         <button class="add-btn" @click="toggleAddForm">
@@ -15,20 +15,21 @@
         </button>
       </div>
 
-      <!-- Form Thêm NXB -->
-      <div v-if="showAddForm" class="add-form" @keyup.enter="addPublisher">
-        <input v-model="newPublisher.TenNXB" placeholder="Nhập tên nhà xuất bản" />
-        <textarea v-model="newPublisher.DiaChi" placeholder="Nhập địa chỉ" rows="2" />
-        <div class="detail-actions">
-          <button class="btn btn-success" @click="addPublisher">💾 Lưu</button>
-          <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
-        </div>
-        <hr />
-      </div>
+
 
       <!-- Danh sách NXB -->
       <div class="reader-list">
         <h3 class="text-center">Danh sách nhà xuất bản</h3>
+        <!-- Form Thêm NXB -->
+        <div v-if="showAddForm" class="add-form" @keyup.enter="addPublisher">
+          <input v-model="newPublisher.TenNXB" placeholder="Nhập tên nhà xuất bản" />
+          <textarea v-model="newPublisher.DiaChi" placeholder="Nhập địa chỉ" rows="2" />
+          <div class="detail-actions">
+            <button class="btn btn-success" @click="addPublisher">💾 Lưu</button>
+            <button class="btn btn-secondary" @click="cancelAdd">❌ Hủy</button>
+          </div>
+          <hr />
+        </div>
         <div class="scrollable-list">
           <ul>
             <li v-for="pub in filteredPublishers" :key="pub.MaNXB" @click="togglePublisher(pub)" class="reader-item">
