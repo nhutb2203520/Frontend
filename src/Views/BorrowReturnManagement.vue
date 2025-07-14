@@ -2,8 +2,6 @@
   <div class="overlay d-flex">
     <SideBarAD />
     <div class="flex-grow-1">
-    
-
       <div class="container-fluid px-3">
         <div class="borrow-management mx-auto mt-4">
           <h1 class="title">Quản lý mượn – trả sách</h1>
@@ -14,6 +12,7 @@
             <button @click="filterByStatus('borrowing')">Đang mượn: {{ countByStatus('borrowing') }}</button>
             <button @click="filterByStatus('pending')">Chờ duyệt: {{ countByStatus('pending') }}</button>
             <button @click="filterByStatus('overdue')">Quá hạn: {{ countByStatus('overdue') }}</button>
+            <button @click="filterByStatus('returned')">Đã trả: {{ countByStatus('returned') }}</button>
           </div>
 
           <!-- Tìm kiếm và nhắc -->
@@ -35,18 +34,27 @@
                     {{ statusLabels[entry.status].text }}
                   </span>
 
+                  <!-- Chi tiết -->
                   <div v-if="selectedBorrower && selectedBorrower.id === entry.id" class="reader-detail">
                     <p><strong>Họ tên:</strong> {{ entry.reader }}</p>
                     <p><strong>Sách:</strong> {{ entry.book }}</p>
                     <p><strong>Trạng thái:</strong> {{ statusLabels[entry.status].text }}</p>
                     <p><strong>Mượn:</strong> {{ formatDate(entry.borrowDate) }}</p>
                     <p v-if="entry.dueDate"><strong>Hạn trả:</strong> {{ formatDate(entry.dueDate) }}</p>
+                    <p v-if="entry.returnDate"><strong>Ngày trả:</strong> {{ formatDate(entry.returnDate) }}</p>
                     <p v-if="entry.status === 'overdue'" class="text-danger fw-bold">
                       ⚠️ Quá hạn {{ getOverdueDays(entry.dueDate) }} ngày
                     </p>
                     <div class="detail-actions">
-                      <button v-if="entry.status === 'pending'" class="btn btn-success btn-sm" @click.stop="approve(entry)">Duyệt</button>
-                      <button v-else-if="entry.status === 'overdue'" class="btn btn-warning btn-sm" @click.stop="remind(entry)">Nhắc</button>
+                      <button v-if="entry.status === 'borrowing'" class="btn btn-danger btn-sm" @click.stop="returnBook(entry)">
+                        Trả sách
+                      </button>
+                      <button v-else-if="entry.status === 'pending'" class="btn btn-success btn-sm" @click.stop="approve(entry)">
+                        Duyệt mượn
+                      </button>
+                      <button v-else-if="entry.status === 'overdue'" class="btn btn-warning btn-sm" @click.stop="remind(entry)">
+                        Nhắc nhở
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -63,11 +71,10 @@
 </template>
 
 <script>
-
 import SideBarAD from "@/components/Admin/SideBarAD.vue";
 
 export default {
-  components: {SideBarAD },
+  components: { SideBarAD },
   data() {
     return {
       searchKeyword: "",
@@ -85,6 +92,7 @@ export default {
         borrowing: { text: "Đang mượn", color: "primary" },
         pending: { text: "Chờ duyệt", color: "warning" },
         overdue: { text: "Quá hạn", color: "danger" },
+        returned: { text: "Đã trả", color: "success" },
       },
     };
   },
@@ -134,6 +142,11 @@ export default {
       entry.dueDate = due.toISOString().split("T")[0];
       alert(`✅ Đã duyệt ${entry.reader}`);
     },
+    returnBook(entry) {
+      entry.status = "returned";
+      entry.returnDate = new Date().toISOString().split("T")[0];
+      alert(`📚 Đã trả sách: "${entry.book}" của ${entry.reader}`);
+    },
     remind(entry) {
       alert(`📢 Nhắc nhở ${entry.reader}`);
     },
@@ -147,6 +160,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .overlay {
