@@ -13,7 +13,7 @@
           <div class="row">
             <!-- Hình ảnh sách -->
             <div class="col-md-5 d-flex justify-content-center align-items-center">
-              <img :src="book.image" alt="Ảnh sách" class="book-image rounded" />
+              <img :src="'http://localhost:3000' + book.image" alt="Ảnh sách" class="book-image rounded" />
             </div>
 
             <!-- Thông tin sách -->

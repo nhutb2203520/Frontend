@@ -27,12 +27,19 @@
               <label>Tác giả:</label>
               <div class="dropdown-multi">
                 <div class="form-control dropdown-toggle" @click.stop="toggleAuthorDropdown">
-                  {{ book.authors.length ? book.authors.join(', ') : 'Chọn tác giả' }}
+                  {{
+                    book.authors.length
+                      ? authorOptions
+                        .filter(author => book.authors.includes(author._id))
+                        .map(author => capitalizeWords(author.TenTG))
+                        .join(', ')
+                      : 'Chọn tác giả'
+                  }}
                 </div>
                 <div v-if="showAuthorDropdown" class="dropdown-list">
                   <label v-for="author in authorOptions" :key="author" class="dropdown-item">
-                    <input type="checkbox" :value="author" v-model="book.authors" />
-                    <span class="circle"></span> {{ author }}
+                    <input type="checkbox" :value="author._id" v-model="book.authors" />
+                    <span class="circle"></span> {{ capitalizeWords(author.TenTG) }}
                   </label>
                 </div>
               </div>
@@ -43,12 +50,17 @@
               <label>Loại sách:</label>
               <div class="dropdown-multi">
                 <div class="form-control dropdown-toggle" @click.stop="toggleCatalogDropdown">
-                  {{ book.catalogs.length ? book.catalogs.join(', ') : 'Chọn loại sách' }}
+                  {{book.catalogs.length ?
+                    catalogOptions
+                      .filter(catalog => book.catalogs.includes(catalog._id))
+                      .map(catalog => capitalizeWords(catalog.TenLoai))
+                      .join(', ')
+                    : 'Chọn loại sách'}}
                 </div>
                 <div v-if="showCatalogDropdown" class="dropdown-list">
                   <label v-for="catalog in catalogOptions" :key="catalog" class="dropdown-item">
-                    <input type="checkbox" :value="catalog" v-model="book.catalogs" />
-                    <span class="circle"></span> {{ catalog }}
+                    <input type="checkbox" :value="catalog._id" v-model="book.catalogs" />
+                    <span class="circle"></span> {{ capitalizeWords(catalog.TenLoai) }}
                   </label>
                 </div>
               </div>
@@ -86,8 +98,8 @@
                 <label>Nhà xuất bản:</label>
                 <select v-model="copy.publisher" class="form-control">
                   <option disabled value="">-- Chọn NXB --</option>
-                  <option v-for="publisher in publisherOptions" :key="publisher" :value="publisher">
-                    {{ publisher }}
+                  <option v-for="publisher in publisherOptions" :key="publisher._id" :value="publisher">
+                    {{ capitalizeWords(publisher.TenNXB) }}
                   </option>
                 </select>
               </div>
@@ -99,7 +111,8 @@
                 <label>Vị trí sách:</label>
                 <select v-model="copy.location" class="form-control">
                   <option disabled value="">-- Chọn vị trí --</option>
-                  <option v-for="loc in locationOptions" :key="loc" :value="loc">{{ loc }}</option>
+                  <option v-for="loc in locationOptions" :key="loc" :value="loc._id">{{ capitalizeWords(loc.TenViTri) }}
+                  </option>
                 </select>
               </div>
               <div class="text-end">
@@ -131,6 +144,7 @@ import { useAuthorStore } from '@/Store/author.store';
 import { useCategoryBookStore } from '@/Store/category.store';
 import { usePublisherStore } from '@/Store/publisher.store';
 import { useLocationStore } from '@/Store/Location.store';
+import { capitalizeWords } from '@/utils/stringUtils'
 const router = useRouter();
 
 const bookStore = useBookStore()
@@ -166,10 +180,10 @@ const catalogOptions = ref([]);
 const publisherOptions = ref([]);
 const locationOptions = ref([]);
 onMounted(async () => {
-  authorOptions.value = useAuthorStore().fetchAuthors()
-  catalogOptions.value = useCategoryBookStore().fetchCategoryBooks()
-  publisherOptions.value = usePublisherStore().fetchPublishers()
-  locationOptions.value = useLocationStore().fetchLocationBooks()
+  authorOptions.value = await useAuthorStore().fetchAuthors()
+  catalogOptions.value = await useCategoryBookStore().fetchCategoryBooks()
+  publisherOptions.value = await usePublisherStore().fetchPublishers()
+  locationOptions.value = await useLocationStore().fetchLocationBooks()
 })
 // Methods
 async function handleImageUpload(event) {
@@ -226,14 +240,28 @@ function removeBookCopy(index) {
   bookCopies.value.splice(index, 1);
 }
 
-function submitBook() {
+async function submitBook() {
   try {
     const data = {
       TenSach: book.name,
       NamXuatBan: book.year,
       MoTa: book.description,
       image: book.image,
-      TacGia: []
+      TacGia: book.authors,
+      MaLoai: book.catalogs,
+      BanSao: bookCopies.value.map(copy => ({
+        TenLoaiBanSao: copy.name,
+        SoQuyen: copy.quantity,
+        MaViTri: copy.location,
+        MaNXB: copy.publisher
+      }))
+    }
+    const res = await bookStore.addOneBook(data)
+    if (res.message === 'Thêm sách và bản sao thành công.') {
+      ElMessage.success(res.message)
+      router.replace('admin/book-management')
+    } else {
+      ElMessage.error(res.message || 'Lỗi trong khi thêm sách')
     }
   } catch (err) {
     ElMessage.error('Lỗi khi thêm sách.')

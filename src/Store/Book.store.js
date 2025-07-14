@@ -95,7 +95,7 @@ export const useBookStore = defineStore("book", {
         this.setLoading(false);
       }
     },
-    async addBook(data) {
+    async addOneBook(data) {
       this.setLoading(true);
       this.setError(null);
       try {

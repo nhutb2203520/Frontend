@@ -3,7 +3,7 @@
     <div data-aos="fade-up" data-aos-duration="800"
       class="bg-dark bg-opacity-75 border border-light rounded-3 p-3 h-100 d-flex flex-column align-items-center text-center book-hover">
       <div class="ratio ratio-4x3 mb-3 rounded overflow-hidden w-100">
-        <img :src="book.image" :alt="book.TenSach" class="img-fluid rounded" />
+        <img :src="'http://localhost:3000' + book.image" :alt="book.TenSach" class="img-fluid rounded" />
       </div>
       <h5 class="text-white fw-semibold mb-3" style="min-height: 48px">
         {{ capitalizeWords(book.TenSach) }}

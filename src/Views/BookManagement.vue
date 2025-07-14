@@ -1,36 +1,26 @@
 <template>
-  
   <div class="overlay">
-
     <!-- Sidebar bên trái -->
     <SideBarAD @toggle="handleSidebarToggle" />
-  
+
     <router-view />
+
     <!-- Nội dung quản lý -->
-    <div v-if ="route.name ==='BookManagement'" class="book-management">
-    
-      <h1 class="title" >Quản lý sách</h1>
-     
+    <div v-if="route.name === 'BookManagement'" class="book-management">
+      <h1 class="title">Quản lý sách</h1>
+
       <!-- Thanh công cụ đầu -->
       <div class="top-bar">
         <button class="total-btn">Tổng số sách: {{ totalBooks }}</button>
         <div class="group-actions">
-          <button class="action-btn" @click="goToManageLocation">
-            Quản lý vị trí sách
-          </button>
-          <button class="action-btn" @click="goToManageAuthor">
-            Quản lý tác giả
-          </button>
+          <button class="action-btn" @click="goToManageLocation">Quản lý vị trí sách</button>
+          <button class="action-btn" @click="goToManageAuthor">Quản lý tác giả</button>
         </div>
       </div>
 
       <!-- Tìm kiếm và thêm -->
       <div class="actions">
-        <input
-          type="text"
-          v-model="searchKeyword"
-          placeholder="Tìm kiếm theo tên sách..."
-        />
+        <input type="text" v-model="searchKeyword" placeholder="Tìm kiếm theo tên sách..." />
         <button class="add-btn" @click="goToAddBook">Thêm sách</button>
       </div>
 
@@ -39,24 +29,15 @@
         <h3>Danh sách sách</h3>
         <div class="scrollable-list">
           <ul>
-            <li
-              v-for="book in filteredBooks"
-              :key="book.id"
-              @click="toggleBook(book)"
-              class="book-item"
-            >
-              <strong>{{ book.name }}</strong>
+            <li v-for="book in filteredBooks" :key="book.MaSach" @click="toggleBook(book)" class="book-item">
+              <strong>{{ book.TenSach }}</strong>
 
-              <div v-if="selectedBook?.id === book.id" class="book-detail">
-                <p><strong>ID:</strong> {{ book.id }}</p>
-                <p><strong>Tên sách:</strong> {{ book.name }}</p>
+              <div v-if="selectedBook?.MaSach === book.MaSach" class="book-detail">
+                <p><strong>ID:</strong> {{ book.MaSach }}</p>
+                <p><strong>Tên sách:</strong> {{ book.TenSach }}</p>
                 <div class="detail-actions">
-                  <button class="btn btn-warning" @click.stop="editBook(book)">
-                    ✏️ Chỉnh sửa
-                  </button>
-                  <button class="btn btn-danger" @click.stop="deleteBook(book)">
-                    🗑️ Xóa
-                  </button>
+                  <button class="btn btn-warning" @click.stop="editBook(book)">✏️ Chỉnh sửa</button>
+                  <button class="btn btn-danger" @click.stop="deleteBook(book)">🗑️ Xóa</button>
                 </div>
               </div>
             </li>
@@ -67,85 +48,62 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import SideBarAD from '@/components/Admin/SideBarAD.vue';
+import { useBookStore } from '@/Store/Book.store';
 
-import SideBarAD from "@/components/Admin/SideBarAD.vue";
-import AddBook from "@/components/Admin/AddBook.vue";
-import EditBook from "@/components/Admin/EditBook.vue";
-import LocationManagement from "@/components/Admin/LocationManagement.vue";
-export default {
-  name: "BookManagement",
-  components: {
+const router = useRouter();
+const route = useRoute();
 
-    SideBarAD,
-    AddBook,
-    EditBook,
-    LocationManagement,
-  },
-  data() {
-    return {
-      sidebarOpen: true,
-      searchKeyword: "",
-      selectedBook: null,
-      books: [
-        { id: 1, name: "Lập trình Python cơ bản" },
-        { id: 2, name: "Tâm lý học hiện đại" },
-        { id: 3, name: "Dữ liệu lớn và AI" },
-        { id: 4, name: "Thiết kế phần mềm hướng đối tượng" },
-        { id: 5, name: "Trí tuệ nhân tạo ứng dụng" },
-        
-      ],
-    };
-  },
-  computed: {
-    totalBooks() {
-      return this.books.length;
-    },
-    filteredBooks() {
-      return this.books.filter((book) =>
-        book.name.toLowerCase().includes(this.searchKeyword.toLowerCase())
-      );
-    },
-    route() {
-      return this.$route;
-    },
-  },
-  methods: {
-    handleSidebarToggle(isOpen) {
-      this.sidebarOpen = isOpen;
-    },
-    goToAddBook() {
-      this.$router.push({
-        name: "AddBook",
-      });
-    },
-    goToManageLocation() {
-      this.$router.push({
-      name: "LocationManagement",  
-    });
-    },
-    goToManageAuthor() {
-      this.$router.push({
-        name: "AuthorManagement",
-      });
-    },
-    toggleBook(book) {
-      this.selectedBook = this.selectedBook?.id === book.id ? null : book;
-    },
-    editBook(book) {
-      this.$router.push({
-    name: "EditBook",
-    params: { id: book.id }
-      });
-    },
-    deleteBook(book) {
-      if (confirm(`Bạn có chắc chắn muốn xóa sách "${book.name}" không?`)) {
-        this.books = this.books.filter((b) => b.id !== book.id);
-        this.selectedBook = null;
-      }
-    },
-  },
-};
+const bookStore = useBookStore()
+const sidebarOpen = ref(true);
+const searchKeyword = ref('');
+const selectedBook = ref(null);
+const books = ref([]);
+
+onMounted(async () => {
+  const res = await bookStore.fetchBooks()
+  books.value = res.danhsachsach
+})
+const totalBooks = computed(() => books.value.length);
+const filteredBooks = computed(() => {
+  return books.value.filter((book) =>
+    book.TenSach.toLowerCase().includes(searchKeyword.value.toLowerCase())
+  );
+});
+
+function handleSidebarToggle(isOpen) {
+  sidebarOpen.value = isOpen;
+}
+
+function goToAddBook() {
+  router.push({ name: 'AddBook' });
+}
+
+function goToManageLocation() {
+  router.push({ name: 'LocationManagement' });
+}
+
+function goToManageAuthor() {
+  router.push({ name: 'AuthorManagement' });
+}
+
+function toggleBook(book) {
+  selectedBook.value = selectedBook.value?.id === book.id ? null : book;
+}
+
+function editBook(book) {
+  router.push({ name: 'EditBook', params: { id: book.id } });
+}
+
+function deleteBook(book) {
+  if (confirm(`Bạn có chắc chắn muốn xóa sách "${book.name}" không?`)) {
+    books.value = books.value.filter((b) => b.id !== book.id);
+    selectedBook.value = null;
+  }
+}
 </script>
 
 <style scoped>
@@ -165,7 +123,7 @@ export default {
 }
 
 .book-management {
-  margin-top: 12  px !important;
+  margin-top: 12px !important;
   width: 65%;
   max-width: 65%;
   background: #fff;
