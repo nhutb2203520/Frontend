@@ -1,8 +1,7 @@
 <template>
   
   <div class="overlay">
-    <!-- NavBar trên cùng -->
-    <NavBarAD />
+
     <!-- Sidebar bên trái -->
     <SideBarAD @toggle="handleSidebarToggle" />
   
@@ -69,7 +68,7 @@
 </template>
 
 <script>
-import NavBarAD from "@/components/Admin/NavBarAD.vue";
+
 import SideBarAD from "@/components/Admin/SideBarAD.vue";
 import AddBook from "@/components/Admin/AddBook.vue";
 import EditBook from "@/components/Admin/EditBook.vue";
@@ -77,7 +76,7 @@ import LocationManagement from "@/components/Admin/LocationManagement.vue";
 export default {
   name: "BookManagement",
   components: {
-    NavBarAD,
+
     SideBarAD,
     AddBook,
     EditBook,
