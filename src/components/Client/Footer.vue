@@ -1,7 +1,7 @@
 <template>
   <footer class="footer-wrapper">
     <div class="footer-header">
-      <h2>QUẢN LÝ THƯ VIỆN NLN</h2>
+      <h2>QUẢN LÝ MƯỢN TRẢ SÁCH PTW</h2>
     </div>
 
     <div class="footer-icons">
