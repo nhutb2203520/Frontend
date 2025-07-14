@@ -6,16 +6,14 @@
         <div class="borrow-management mx-auto mt-4">
           <h1 class="title">Quản lý mượn – trả sách</h1>
 
-          <!-- Bộ lọc -->
           <div class="top-buttons d-flex flex-wrap justify-content-center gap-3 mb-4">
-            <button @click="filterByStatus('all')">Tất cả: {{ borrowList.length }}</button>
+            <button @click="filterByStatus('all')">Tất cả: {{ borrowList?.length || 0 }}</button>
             <button @click="filterByStatus('borrowing')">Đang mượn: {{ countByStatus('borrowing') }}</button>
             <button @click="filterByStatus('pending')">Chờ duyệt: {{ countByStatus('pending') }}</button>
             <button @click="filterByStatus('overdue')">Quá hạn: {{ countByStatus('overdue') }}</button>
             <button @click="filterByStatus('returned')">Đã trả: {{ countByStatus('returned') }}</button>
           </div>
 
-          <!-- Tìm kiếm và nhắc -->
           <div class="actions d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <input v-model="searchKeyword" placeholder="Tìm kiếm người mượn, sách..." />
             <button v-if="activeFilter === 'overdue' && overdueCount" class="btn btn-warning" @click="remindAll">
@@ -23,37 +21,43 @@
             </button>
           </div>
 
-          <!-- Danh sách phiếu mượn -->
           <div class="reader-list">
             <h3>Danh sách phiếu mượn</h3>
             <div class="scrollable-list">
               <ul>
-                <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)" class="reader-item">
+                <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)"
+                  class="reader-item">
                   <strong>{{ entry.reader }}</strong> - "{{ entry.book }}" -
-                  <span :class="'text-' + statusLabels[entry.status].color">
-                    {{ statusLabels[entry.status].text }}
+                  <span :class="'text-' + (entry.isOverdue ? 'danger' : statusLabels[entry.status].color)">
+                    {{ entry.isOverdue ? 'Quá hạn' : capitalizeWords(statusLabels[entry.status].text) }}
                   </span>
 
-                  <!-- Chi tiết -->
                   <div v-if="selectedBorrower && selectedBorrower.id === entry.id" class="reader-detail">
                     <p><strong>Họ tên:</strong> {{ entry.reader }}</p>
                     <p><strong>Sách:</strong> {{ entry.book }}</p>
                     <p><strong>Trạng thái:</strong> {{ statusLabels[entry.status].text }}</p>
-                    <p><strong>Mượn:</strong> {{ formatDate(entry.borrowDate) }}</p>
+                    <p><strong>Ngày đăng ký mượn:</strong> {{ formatDate(entry.borrowDate) }}</p>
+                    <p><strong>Ngày lấy sách:</strong> {{ entry.getBookDate ? formatDate(entry.getBookDate) :
+                      'Bạn chưa lấy sách' }}</p>
                     <p v-if="entry.dueDate"><strong>Hạn trả:</strong> {{ formatDate(entry.dueDate) }}</p>
-                    <p v-if="entry.returnDate"><strong>Ngày trả:</strong> {{ formatDate(entry.returnDate) }}</p>
-                    <p v-if="entry.status === 'overdue'" class="text-danger fw-bold">
+                    <p v-if="entry.returnDate && entry.status === 'returned'"><strong>Ngày trả:</strong> {{
+                      formatDate(entry.returnDate) }}</p>
+                    <p v-if="entry.status === 'borrowing' && entry.isOverdue" class="text-danger fw-bold">
                       ⚠️ Quá hạn {{ getOverdueDays(entry.dueDate) }} ngày
                     </p>
                     <div class="detail-actions">
-                      <button v-if="entry.status === 'borrowing'" class="btn btn-danger btn-sm" @click.stop="returnBook(entry)">
+                      <button v-if="entry.status === 'borrowing'" class="btn btn-danger btn-sm"
+                        @click.stop="returnBook(entry)">
                         Trả sách
                       </button>
-                      <button v-else-if="entry.status === 'pending'" class="btn btn-success btn-sm" @click.stop="approve(entry)">
+                      <button v-else-if="entry.status === 'pending'" class="btn btn-success btn-sm"
+                        @click.stop="approve(entry)">
                         Duyệt mượn
                       </button>
-                      <button v-else-if="entry.status === 'overdue'" class="btn btn-warning btn-sm" @click.stop="remind(entry)">
-                        Nhắc nhở
+                      <button v-if="entry.status === 'borrowing' && entry.isOverdue" class="btn btn-warning btn-sm"
+                        @click.stop="remind(entry)" :disabled="remindingIds.includes(entry.id)">
+                        <span v-if="remindingIds.includes(entry.id)">⏳ Đang gửi...</span>
+                        <span v-else>Nhắc nhở</span>
                       </button>
                     </div>
                   </div>
@@ -68,99 +72,194 @@
       </div>
     </div>
   </div>
+  <div v-if="isLoading" class="fullscreen-loading">
+    <div class="spinner"></div>
+    <p>Đang gửi email nhắc nhở...</p>
+  </div>
+
 </template>
 
-<script>
-import SideBarAD from "@/components/Admin/SideBarAD.vue";
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import SideBarAD from '@/components/Admin/SideBarAD.vue';
+import { useBorrowBookStore } from '@/Store/BorrowBook.store';
+import { formatDate } from '../utils/formatDate';
+import { capitalizeWords } from '../utils/stringUtils';
+import { ElMessage } from 'element-plus';
 
-export default {
-  components: { SideBarAD },
-  data() {
-    return {
-      searchKeyword: "",
-      selectedBorrower: null,
-      activeFilter: "all",
-      borrowList: [
-        { id: 1, reader: "Nguyễn Văn A", book: "Lập trình C++", status: "borrowing", borrowDate: "2025-06-15", dueDate: "2025-07-15" },
-        { id: 2, reader: "Trần Thị B", book: "Tâm lý học", status: "pending", borrowDate: "2025-07-01" },
-        { id: 3, reader: "Lê Văn C", book: "AI & Big Data", status: "overdue", borrowDate: "2025-05-20", dueDate: "2025-06-20" },
-        { id: 4, reader: "Phạm Văn D", book: "JavaScript", status: "borrowing", borrowDate: "2025-06-25", dueDate: "2025-07-25" },
-        { id: 5, reader: "Hoàng Thị E", book: "Python cơ bản", status: "pending", borrowDate: "2025-07-02" },
-        { id: 6, reader: "Võ Văn F", book: "Java Spring Boot", status: "overdue", borrowDate: "2025-05-10", dueDate: "2025-06-10" },
-      ],
-      statusLabels: {
-        borrowing: { text: "Đang mượn", color: "primary" },
-        pending: { text: "Chờ duyệt", color: "warning" },
-        overdue: { text: "Quá hạn", color: "danger" },
-        returned: { text: "Đã trả", color: "success" },
-      },
-    };
-  },
-  computed: {
-    filteredBorrowList() {
-      let list = this.borrowList;
-      if (this.activeFilter !== "all") {
-        list = list.filter((e) => e.status === this.activeFilter);
-      }
-      if (this.searchKeyword) {
-        const keyword = this.searchKeyword.toLowerCase();
-        list = list.filter(
-          (e) =>
-            e.reader.toLowerCase().includes(keyword) ||
-            e.book.toLowerCase().includes(keyword)
-        );
-      }
-      return list;
-    },
-    overdueCount() {
-      return this.countByStatus("overdue");
-    },
-  },
-  methods: {
-    countByStatus(status) {
-      return this.borrowList.filter((e) => e.status === status).length;
-    },
-    formatDate(date) {
-      return new Date(date).toLocaleDateString("vi-VN");
-    },
-    getOverdueDays(due) {
-      const today = new Date();
-      const diff = today - new Date(due);
-      return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-    },
-    filterByStatus(status) {
-      this.activeFilter = status;
-      this.selectedBorrower = null;
-    },
-    selectBorrower(entry) {
-      this.selectedBorrower = this.selectedBorrower?.id === entry.id ? null : entry;
-    },
-    approve(entry) {
-      entry.status = "borrowing";
-      const due = new Date();
-      due.setDate(due.getDate() + 30);
-      entry.dueDate = due.toISOString().split("T")[0];
-      alert(`✅ Đã duyệt ${entry.reader}`);
-    },
-    returnBook(entry) {
-      entry.status = "returned";
-      entry.returnDate = new Date().toISOString().split("T")[0];
-      alert(`📚 Đã trả sách: "${entry.book}" của ${entry.reader}`);
-    },
-    remind(entry) {
-      alert(`📢 Nhắc nhở ${entry.reader}`);
-    },
-    remindAll() {
-      const names = this.borrowList
-        .filter((e) => e.status === "overdue")
-        .map((e) => e.reader)
-        .join(", ");
-      alert(`📢 Đã nhắc ${names}`);
-    },
-  },
+const borrowBookStore = useBorrowBookStore();
+const searchKeyword = ref('');
+const selectedBorrower = ref(null);
+const activeFilter = ref('all');
+const borrowList = ref([]);
+const overdueList = ref([]);
+const remindingIds = ref([]);
+const isLoading = ref(false);
+
+function convertStatus(statusText) {
+  switch (statusText?.toLowerCase()) {
+    case 'chờ lấy': return 'pending';
+    case 'đã lấy': return 'borrowing';
+    case 'quá hạn': return 'overdue';
+    case 'đã trả': return 'returned';
+    default: return 'pending';
+  }
+}
+
+const statusLabels = {
+  borrowing: { text: 'Đang mượn', color: 'primary' },
+  pending: { text: 'Chờ duyệt', color: 'warning' },
+  overdue: { text: 'Quá hạn', color: 'danger' },
+  returned: { text: 'Đã trả', color: 'success' },
 };
-</script>
 
+async function reloadBorrowList() {
+  const result = await borrowBookStore.fetchBorrowBooksForAdmin();
+  borrowList.value = result.map((entry) => convertEntry(entry));
+}
+
+async function loadOverdueList() {
+  const res = await borrowBookStore.fetchBorrowBookDeadline();
+  const result = res.danhsachphieumuon;
+  if (Array.isArray(result)) {
+    overdueList.value = result.map((entry) => convertEntry(entry));
+  }
+}
+
+function convertEntry(entry) {
+  const status = convertStatus(entry.MaTrangThai?.TenTrangThai);
+  const dueDate = entry.NgayTra ? new Date(entry.NgayTra) : null;
+  const today = new Date();
+  const isOverdue = status === 'borrowing' && dueDate && dueDate < today;
+
+  return {
+    id: entry._id,
+    reader: entry.MaDocGia?.HoTen || 'Không rõ',
+    book: entry.MaSachCopy?.MaSach?.TenSach || 'Không rõ',
+    status,
+    isOverdue,
+    borrowDate: entry.createdAt,
+    getBookDate: entry.NgayMuon,
+    dueDate,
+    returnDate: entry.NgayTra || null,
+    raw: entry
+  };
+}
+
+const filteredBorrowList = computed(() => {
+  let list = activeFilter.value === 'overdue' ? overdueList.value : borrowList.value;
+  if (activeFilter.value !== 'all' && activeFilter.value !== 'overdue') {
+    list = list.filter(e => e.status === activeFilter.value);
+  }
+  if (searchKeyword.value) {
+    const keyword = searchKeyword.value.toLowerCase();
+    list = list.filter(e =>
+      e.reader.toLowerCase().includes(keyword) ||
+      e.book.toLowerCase().includes(keyword)
+    );
+  }
+  return list;
+});
+
+const overdueCount = computed(() => overdueList.value.length);
+function countByStatus(status) {
+  if (status === 'overdue') return overdueList.value.length;
+  return borrowList.value.filter(e => e.status === status).length;
+}
+
+function getOverdueDays(due) {
+  const today = new Date();
+  const diff = today - new Date(due);
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function filterByStatus(status) {
+  activeFilter.value = status;
+  selectedBorrower.value = null;
+  if (status === 'overdue') loadOverdueList();
+}
+
+function selectBorrower(entry) {
+  selectedBorrower.value = selectedBorrower.value?.id === entry.id ? null : entry;
+}
+
+async function approve(entry) {
+  try {
+    const data = {
+      MaMuonSach: entry.raw.MaMuonSach,
+      TrangThai: 'đã lấy'
+    };
+    const res = await borrowBookStore.updateBorrowBook(data);
+    if (res.message?.includes('thành công')) {
+      ElMessage.success(res.message);
+      await reloadBorrowList();
+    } else ElMessage.error(res.message || 'Duyệt mượn thất bại');
+  } catch (err) {
+    ElMessage.error('Lỗi khi duyệt phiếu mượn.');
+  }
+}
+
+async function returnBook(entry) {
+  try {
+    const data = {
+      MaMuonSach: entry.raw.MaMuonSach,
+      TrangThai: 'đã trả'
+    };
+    const res = await borrowBookStore.updateBorrowBook(data);
+    if (res.message?.includes('thành công')) {
+      ElMessage.success(res.message);
+      await reloadBorrowList();
+    } else ElMessage.error(res.message || 'Duyệt trả thất bại');
+  } catch (err) {
+    ElMessage.error('Lỗi khi duyệt độc giả trả sách');
+  }
+}
+
+async function remind(entry) {
+  const id = entry.id;
+  if (remindingIds.value.includes(id) || isLoading.value) return;
+
+  remindingIds.value.push(id);
+  isLoading.value = true;
+  try {
+    const MaMuonSach = entry.raw.MaMuonSach
+    const res = await borrowBookStore.sendEmailRemind(MaMuonSach)
+    if (res.message === 'Gửi email thông báo quá hạn trả sách thành công.') {
+      ElMessage.success(res.message)
+      await reloadBorrowList();
+    } else {
+      ElMessage.error(res.message || 'Lỗi gửi email.')
+    }
+  } catch (err) {
+    ElMessage.error('Lỗi khi gửi email nhắc nhở độc giả quá hạn trả sách.')
+  } finally {
+    remindingIds.value = remindingIds.value.filter((r) => r !== id);
+    selectedBorrower.value = null
+    isLoading.value = false;
+  }
+}
+
+async function remindAll() {
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    for (const entry of overdueList.value) {
+      const MaMuonSach = entry.raw.MaMuonSach
+      await borrowBookStore.sendEmailRemind(MaMuonSach)
+    }
+    ElMessage.success('Đã gửi nhắc tất cả thành công.');
+  } catch (err) {
+    ElMessage.error('Lỗi khi gửi nhắc tất cả.');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(async () => {
+  await reloadBorrowList();
+  await loadOverdueList();
+});
+</script>
 
 <style scoped>
 .overlay {
@@ -207,6 +306,7 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .top-buttons button:hover {
   background-color: #2980b9;
   color: white;
@@ -281,6 +381,45 @@ export default {
   .detail-actions {
     flex-direction: column;
     gap: 8px;
+  }
+}
+
+/* sendEmail hieu ung loading */
+.fullscreen-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 30, 30, 0.7);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  backdrop-filter: blur(2px);
+}
+
+.spinner {
+  border: 6px solid #ccc;
+  border-top: 6px solid #2980b9;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>
