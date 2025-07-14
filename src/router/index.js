@@ -104,10 +104,10 @@ const routes = [
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
   {
-    path: '/homeadmin',
-    name: 'HomeAdmin',
-    component: () => import('@/Views/HomeAdmin.vue'),
-    meta: { role: 'admin' }
+    path: "/admin/dashboard",
+    name: "HomeAdmin",
+    component: () => import("@/Views/HomeAdmin.vue"),
+    meta: { role: "admin" },
   },
   {
     path: "/admin/signin",
