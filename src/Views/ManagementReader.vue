@@ -2,7 +2,7 @@
   <div class="overlay d-flex">
     <SideBarAD />
     <div class="flex-grow-1">
-      <NavBarAD />
+    
       <div class="container-fluid px-3">
         <!-- Router View sẽ hiển thị form thêm độc giả nếu được định tuyến -->
         <router-view />
@@ -64,11 +64,10 @@
 </template>
 
 <script>
-import NavBarAD from '@/components/Admin/NavBarAD.vue';
 import SideBarAD from '@/components/Admin/SideBarAD.vue';
 
 export default {
-  components: { NavBarAD, SideBarAD },
+  components: { SideBarAD },
   data() {
     return {
       searchKeyword: "",

@@ -2,7 +2,7 @@
   <div class="overlay d-flex">
    
     <div class="flex-grow-1">
-      <NavBarAD />
+    
       <div class="container-fluid px-3">
         <div class="reader-management mx-auto my-4">
           <h1 class="title">Thêm độc giả mới</h1>
@@ -65,12 +65,12 @@
 </template>
 
 <script>
-import NavBarAD from "@/components/Admin/NavBarAD.vue";
+
 
 
 export default {
   name: "AddReader",
-  components: { NavBarAD, },
+  components: {  },
   data() {
     return {
       reader: {
