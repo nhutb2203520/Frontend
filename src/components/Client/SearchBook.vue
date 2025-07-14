@@ -77,7 +77,25 @@ function filterBooks() {
 }
 
 onMounted(async () => {
-    allBooks.value = await bookStore.fetchBooks();
+    const res = await bookStore.fetchBooks();
+    const sachcopies = res.sachcopies;
+
+    // Lấy ra danh sách sách duy nhất theo MaSach._id
+    const uniqueBooksMap = new Map();
+
+    sachcopies.forEach(copy => {
+        const sach = copy.MaSach;
+        if (sach && !uniqueBooksMap.has(sach._id)) {
+            // Gắn thêm các trường hỗ trợ lọc (NXB, bản sao đầu tiên,...)
+            uniqueBooksMap.set(sach._id, {
+                ...sach,
+                MaNXB: copy.MaNXB, // dùng NXB từ copy
+                FirstCopy: copy
+            });
+        }
+    });
+
+    allBooks.value = Array.from(uniqueBooksMap.values());
     filterBooks();
 });
 

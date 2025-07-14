@@ -39,7 +39,7 @@
                     <p><strong><el-icon>
                           <Message />
                         </el-icon>Email:</strong> {{ reader.Email }}</p>
-                    <p>
+
                     <p><strong><el-icon>
                           <Calendar />
                         </el-icon>Ngày Tạo tài khoản:</strong> {{ formatDate(reader.createdAt) }}</p>
@@ -47,7 +47,7 @@
                     <span :class="reader.MaTT?.TenTT === 'active' ? 'text-success' : 'text-danger'">
                       {{ reader.MaTT?.TenTT === 'active' ? 'Hoạt động' : 'Bị khóa' }}
                     </span>
-                    </p>
+
                     <button class="btn" :class="reader.MaTT?.TenTT === 'active' ? 'btn-danger' : 'btn-success'"
                       @click.stop="toggleStatus(reader)">
                       {{ reader.MaTT?.TenTT === 'active' ? '🔒 Khóa' : '🔓 Mở khóa' }}

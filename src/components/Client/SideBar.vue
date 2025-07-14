@@ -190,7 +190,8 @@ onMounted(async () => {
   const publishers = await publisherStore.fetchPublishers();
   sections.value[2].items = publishers.map(pub => capitalizeWords(pub.TenNXB));
 
-  const books = await bookStore.fetchBooks();
+  const res = await bookStore.fetchBooks();
+  const books = res.danhsachsach
   const years = books.map(book => parseInt(book.NamXuatBan)).filter(year => !isNaN(year));
   const minYear = Math.min(...years);
   const currentYear = new Date().getFullYear();

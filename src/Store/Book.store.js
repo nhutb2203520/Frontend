@@ -30,7 +30,7 @@ export const useBookStore = defineStore("book", {
       try {
         const response = await axios.get("/books");
         this.setBooks(response.data.danhsachsach);
-        return response.data.danhsachsach;
+        return response.data;
       } catch (err) {
         this.setError(err.message);
       } finally {

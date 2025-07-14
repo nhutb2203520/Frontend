@@ -86,8 +86,8 @@ export default {
     try {
       const bookStore = useBookStore();
       const result = await bookStore.fetchBooks();
-      this.allBooks = result;
-      this.books = result; // Khởi tạo sách hiển thị là toàn bộ sách
+      this.allBooks = result.danhsachsach;
+      this.books = result.danhsachsach; // Khởi tạo sách hiển thị là toàn bộ sách
     } catch (error) {
       console.error('Lỗi khi lấy sách gợi ý:', error);
       this.books = [];
