@@ -234,6 +234,10 @@ export default {
 .form-group {
   margin-bottom: 18px;
 }
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: bold;
+}
 .preview-img img {
   max-width: 200px;
   border-radius: 8px;
