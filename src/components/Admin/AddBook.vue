@@ -7,7 +7,7 @@
           <h2 class="title">Sách gốc</h2>
 
           <form class="book-form" @submit.prevent="submitBook">
-            <!-- Ảnh sách -->
+            <!-- 1. Ảnh sách -->
             <div class="form-group">
               <label>Ảnh sách:</label>
               <input type="file" accept="image/*" @change="handleImageUpload" class="form-control" />
@@ -16,13 +16,13 @@
               </div>
             </div>
 
-            <!-- Tên sách -->
+            <!-- 2. Tên sách -->
             <div class="form-group">
               <label>Tên sách:</label>
-              <input type="text" v-model="book.name" required class="form-control" placeholder="Nhập tên sách gốc"/>
+              <input type="text" v-model="book.name" required class="form-control" placeholder="Nhập tên sách gốc" />
             </div>
 
-            <!-- Tác giả -->
+            <!-- 3. Tác giả -->
             <div class="form-group" ref="authorGroup">
               <label>Tác giả:</label>
               <div class="dropdown-multi">
@@ -38,7 +38,7 @@
               </div>
             </div>
 
-            <!-- Loại sách -->
+            <!-- 4. Loại sách -->
             <div class="form-group" ref="catalogGroup">
               <label>Loại sách:</label>
               <div class="dropdown-multi">
@@ -54,13 +54,13 @@
               </div>
             </div>
 
-            <!-- Năm xuất bản -->
+            <!-- 5. Năm xuất bản -->
             <div class="form-group">
               <label>Năm xuất bản:</label>
               <input type="number" v-model="book.year" required min="1000" max="2100" class="form-control" />
             </div>
 
-            <!-- Mô tả -->
+            <!-- 6. Mô tả -->
             <div class="form-group">
               <label>Mô tả:</label>
               <div class="format-buttons mb-2">
@@ -68,48 +68,47 @@
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
               </div>
-              <div
-                ref="descriptionEditor"
-                class="editable-area"
-                contenteditable="true"
-                @input="updateDescription"
-              ></div>
+              <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription"></div>
             </div>
 
+            <!-- 7. Sách copy -->
             <h2 class="title">Sách Copy</h2>
-          <!-- Tên sách COPY-->
-            <div class="form-group">
-              <label>Tên sách copy:</label>
-              <input type="text" v-model="book.name" required class="form-control" placeholder="Nhập tên sách copy." />
+            <div v-for="(copy, index) in bookCopies" :key="index" class="copy-section">
+              <div class="form-group">
+                <label>Tên sách copy:</label>
+                <input type="text" v-model="copy.name" required class="form-control" :placeholder="`Tên copy ${index + 1}`" />
+              </div>
+              <div class="form-group">
+                <label>Nhà xuất bản:</label>
+                <select v-model="copy.publisher" class="form-control">
+                  <option disabled value="">-- Chọn NXB --</option>
+                  <option v-for="publisher in publisherOptions" :key="publisher" :value="publisher">
+                    {{ publisher }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Số lượng:</label>
+                <input type="number" v-model="copy.quantity" required min="1" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Vị trí sách:</label>
+                <select v-model="copy.location" class="form-control">
+                  <option disabled value="">-- Chọn vị trí --</option>
+                  <option v-for="loc in locationOptions" :key="loc" :value="loc">{{ loc }}</option>
+                </select>
+              </div>
+              <div class="text-end">
+                <button type="button" class="btn btn-danger btn-sm" @click="removeBookCopy(index)">Xóa</button>
+              </div>
             </div>
 
-            <!-- Nhà xuất bản -->
-            <div class="form-group">
-              <label>Nhà xuất bản:</label>
-              <select v-model="book.publisher" class="form-control">
-                <option disabled value="">-- Chọn NXB --</option>
-                <option v-for="publisher in publisherOptions" :key="publisher" :value="publisher">
-                  {{ publisher }}
-                </option>
-              </select>
+            <!-- Thêm copy -->
+            <div class="text-center my-3">
+              <button type="button" class="btn btn-secondary" @click="addBookCopy">+ Thêm sách copy</button>
             </div>
 
-            <!-- Số lượng -->
-            <div class="form-group">
-              <label>Số lượng:</label>
-              <input type="number" v-model="book.quantity" required min="1" class="form-control" />
-            </div>
-
-            <!-- Vị trí sách -->
-            <div class="form-group">
-              <label>Vị trí sách:</label>
-              <select v-model="book.location" class="form-control">
-                <option disabled value="">-- Chọn vị trí --</option>
-                <option v-for="loc in locationOptions" :key="loc" :value="loc">{{ loc }}</option>
-              </select>
-            </div>
-
-            <!-- Nút -->
+            <!-- Nút hành động -->
             <div class="button-group d-flex flex-wrap justify-content-center gap-3 mt-4">
               <button type="button" class="cancel-btn" @click="cancelAdd">❌ Hủy</button>
               <button type="submit" class="add-btn">📚 Thêm sách</button>
@@ -138,12 +137,15 @@ export default {
         publisher: "",
         quantity: 1,
         location: "",
-        image: null,
+        image: null
       },
+      bookCopies: [
+        { name: "", publisher: "", quantity: 1, location: "" }
+      ],
       authorOptions: ["Nguyễn Nhật Ánh", "Trịnh Hữu Tuệ", "J.K. Rowling", "Stephen King"],
       catalogOptions: ["Văn học", "Khoa học", "Thiếu nhi", "Lập trình", "Lịch sử"],
       publisherOptions: ["NXB Kim Đồng", "NXB Trẻ", "NXB Giáo Dục", "NXB Lao Động"],
-      locationOptions: ["Tầng 1 - Kệ A", "Tầng 2 - Kệ B", "Tầng 3 - Kệ C"],
+      locationOptions: ["Tầng 1 - Kệ A", "Tầng 2 - Kệ B", "Tầng 3 - Kệ C"]
     };
   },
   methods: {
@@ -177,8 +179,18 @@ export default {
         this.showCatalogDropdown = false;
       }
     },
+    addBookCopy() {
+      this.bookCopies.push({ name: "", publisher: "", quantity: 1, location: "" });
+    },
+    removeBookCopy(index) {
+      this.bookCopies.splice(index, 1);
+    },
     submitBook() {
-      console.log("📘 Thêm sách:", this.book);
+      const payload = {
+        ...this.book,
+        copies: this.bookCopies
+      };
+      console.log("📘 Thêm sách:", payload);
       alert("✅ Thêm sách thành công!");
       this.$router.push("/admin/book-management");
     },
@@ -186,8 +198,8 @@ export default {
       if (confirm("Bạn có chắc chắn muốn hủy?")) {
         this.$router.push("/admin/book-management");
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -316,5 +328,12 @@ export default {
   .button-group .cancel-btn {
     width: 100%;
   }
+  .copy-section {
+  border: 1px solid #c7c7c7;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f9f9f9;
+  margin-bottom: 16px;
+}
 }
 </style>
