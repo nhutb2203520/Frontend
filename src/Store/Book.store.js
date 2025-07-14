@@ -75,5 +75,40 @@ export const useBookStore = defineStore("book", {
         this.setLoading(false);
       }
     },
+    async uploadImageBook(file) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const formData = new FormData();
+        formData.append("image", file); // truyền file ảnh
+
+        const response = await axios.post(`/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        return response.data; // chứa { message, imgUrl }
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async addBook(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.post(`/books`, data);
+        if (response.data.sach) {
+          this.addBook(response.data.sach);
+        }
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 });

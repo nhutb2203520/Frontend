@@ -65,10 +65,13 @@
               <label>Mô tả:</label>
               <div class="format-buttons mb-2">
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('bold')"><b>B</b></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('italic')"><i>I</i></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('underline')"><u>U</u></button>
               </div>
-              <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription"></div>
+              <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription">
+              </div>
             </div>
 
             <!-- 7. Sách copy -->
@@ -76,7 +79,8 @@
             <div v-for="(copy, index) in bookCopies" :key="index" class="copy-section">
               <div class="form-group">
                 <label>Tên sách copy:</label>
-                <input type="text" v-model="copy.name" required class="form-control" :placeholder="`Tên copy ${index + 1}`" />
+                <input type="text" v-model="copy.name" required class="form-control"
+                  :placeholder="`Tên copy ${index + 1}`" />
               </div>
               <div class="form-group">
                 <label>Nhà xuất bản:</label>
@@ -103,12 +107,10 @@
               </div>
             </div>
 
-            <!-- Thêm copy -->
             <div class="text-center my-3">
               <button type="button" class="btn btn-secondary" @click="addBookCopy">+ Thêm sách copy</button>
             </div>
 
-            <!-- Nút hành động -->
             <div class="button-group d-flex flex-wrap justify-content-center gap-3 mt-4">
               <button type="button" class="cancel-btn" @click="cancelAdd">❌ Hủy</button>
               <button type="submit" class="add-btn">📚 Thêm sách</button>
@@ -120,88 +122,131 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "AddBook",
-  data() {
-    return {
-      previewImage: null,
-      showAuthorDropdown: false,
-      showCatalogDropdown: false,
-      book: {
-        name: "",
-        authors: [],
-        catalogs: [],
-        year: new Date().getFullYear(),
-        description: "",
-        publisher: "",
-        quantity: 1,
-        location: "",
-        image: null
-      },
-      bookCopies: [
-        { name: "", publisher: "", quantity: 1, location: "" }
-      ],
-      authorOptions: ["Nguyễn Nhật Ánh", "Trịnh Hữu Tuệ", "J.K. Rowling", "Stephen King"],
-      catalogOptions: ["Văn học", "Khoa học", "Thiếu nhi", "Lập trình", "Lịch sử"],
-      publisherOptions: ["NXB Kim Đồng", "NXB Trẻ", "NXB Giáo Dục", "NXB Lao Động"],
-      locationOptions: ["Tầng 1 - Kệ A", "Tầng 2 - Kệ B", "Tầng 3 - Kệ C"]
-    };
-  },
-  methods: {
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.book.image = file;
-        this.previewImage = URL.createObjectURL(file);
-      }
-    },
-    formatText(command) {
-      document.execCommand(command, false, null);
-      this.updateDescription();
-    },
-    updateDescription() {
-      this.book.description = this.$refs.descriptionEditor.innerHTML;
-    },
-    toggleAuthorDropdown() {
-      this.showAuthorDropdown = !this.showAuthorDropdown;
-      this.showCatalogDropdown = false;
-    },
-    toggleCatalogDropdown() {
-      this.showCatalogDropdown = !this.showCatalogDropdown;
-      this.showAuthorDropdown = false;
-    },
-    handleClickOutside(event) {
-      if (this.showAuthorDropdown && !this.$refs.authorGroup.contains(event.target)) {
-        this.showAuthorDropdown = false;
-      }
-      if (this.showCatalogDropdown && !this.$refs.catalogGroup.contains(event.target)) {
-        this.showCatalogDropdown = false;
-      }
-    },
-    addBookCopy() {
-      this.bookCopies.push({ name: "", publisher: "", quantity: 1, location: "" });
-    },
-    removeBookCopy(index) {
-      this.bookCopies.splice(index, 1);
-    },
-    submitBook() {
-      const payload = {
-        ...this.book,
-        copies: this.bookCopies
-      };
-      console.log("📘 Thêm sách:", payload);
-      alert("✅ Thêm sách thành công!");
-      this.$router.push("/admin/book-management");
-    },
-    cancelAdd() {
-      if (confirm("Bạn có chắc chắn muốn hủy?")) {
-        this.$router.push("/admin/book-management");
-      }
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useBookStore } from "@/Store/Book.store";
+import { ElMessage } from 'element-plus';
+import { useAuthorStore } from '@/Store/author.store';
+import { useCategoryBookStore } from '@/Store/category.store';
+import { usePublisherStore } from '@/Store/publisher.store';
+import { useLocationStore } from '@/Store/Location.store';
+const router = useRouter();
+
+const bookStore = useBookStore()
+// DOM Refs
+const overlay = ref(null);
+const authorGroup = ref(null);
+const catalogGroup = ref(null);
+const descriptionEditor = ref(null);
+
+// Reactive data
+const previewImage = ref(null);
+const showAuthorDropdown = ref(false);
+const showCatalogDropdown = ref(false);
+
+const book = reactive({
+  name: "",
+  authors: [],
+  catalogs: [],
+  year: new Date().getFullYear(),
+  description: "",
+  publisher: "",
+  quantity: 1,
+  location: "",
+  image: null
+});
+
+const bookCopies = ref([
+  { name: "", publisher: "", quantity: 1, location: "" }
+]);
+
+const authorOptions = ref([]);
+const catalogOptions = ref([]);
+const publisherOptions = ref([]);
+const locationOptions = ref([]);
+onMounted(async () => {
+  authorOptions.value = useAuthorStore().fetchAuthors()
+  catalogOptions.value = useCategoryBookStore().fetchCategoryBooks()
+  publisherOptions.value = usePublisherStore().fetchPublishers()
+  locationOptions.value = useLocationStore().fetchLocationBooks()
+})
+// Methods
+async function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    previewImage.value = URL.createObjectURL(file);
+
+    try {
+      const bookStore = useBookStore();
+      const result = await bookStore.uploadImageBook(file);
+
+      // ✅ Gán URL ảnh trả về từ server vào this.book.image
+      book.image = result.imgUrl;
+
+      console.log("🌄 Đường dẫn ảnh:", result.imgUrl);
+    } catch (err) {
+      alert("❌ Upload ảnh thất bại");
     }
   }
-};
+}
+function formatText(command) {
+  document.execCommand(command, false, null);
+  updateDescription();
+}
+
+function updateDescription() {
+  book.description = descriptionEditor.value.innerHTML;
+}
+
+function toggleAuthorDropdown() {
+  showAuthorDropdown.value = !showAuthorDropdown.value;
+  showCatalogDropdown.value = false;
+}
+
+function toggleCatalogDropdown() {
+  showCatalogDropdown.value = !showCatalogDropdown.value;
+  showAuthorDropdown.value = false;
+}
+
+function handleClickOutside(event) {
+  if (showAuthorDropdown.value && !authorGroup.value.contains(event.target)) {
+    showAuthorDropdown.value = false;
+  }
+  if (showCatalogDropdown.value && !catalogGroup.value.contains(event.target)) {
+    showCatalogDropdown.value = false;
+  }
+}
+
+function addBookCopy() {
+  bookCopies.value.push({ name: "", publisher: "", quantity: 1, location: "" });
+}
+
+function removeBookCopy(index) {
+  bookCopies.value.splice(index, 1);
+}
+
+function submitBook() {
+  try {
+    const data = {
+      TenSach: book.name,
+      NamXuatBan: book.year,
+      MoTa: book.description,
+      image: book.image,
+      TacGia: []
+    }
+  } catch (err) {
+    ElMessage.error('Lỗi khi thêm sách.')
+  }
+}
+
+function cancelAdd() {
+  if (confirm("Bạn có chắc chắn muốn hủy?")) {
+    router.push("/admin/book-management");
+  }
+}
 </script>
+
 
 <style scoped>
 .overlay {
@@ -215,6 +260,7 @@ export default {
   padding: 120px 20px 20px;
   z-index: 1;
 }
+
 .book-management {
   width: 65%;
   max-width: 65%;
@@ -225,20 +271,24 @@ export default {
   font-family: 'Segoe UI', sans-serif;
   z-index: 2;
 }
+
 .title {
   text-align: center;
   font-size: 28px;
   margin-bottom: 25px;
   color: #2c3e50;
 }
+
 .form-group {
   margin-bottom: 18px;
 }
+
 .preview-img img {
   max-width: 200px;
   border-radius: 8px;
   border: 1px solid #ddd;
 }
+
 .button-group .add-btn,
 .button-group .cancel-btn {
   padding: 12px 25px;
@@ -249,26 +299,33 @@ export default {
   border: none;
   transition: 0.3s;
 }
+
 .add-btn {
   background-color: #27ae60;
   color: white;
 }
+
 .add-btn:hover {
   background-color: #219150;
 }
+
 .cancel-btn {
   background-color: #e74c3c;
   color: white;
 }
+
 .cancel-btn:hover {
   background-color: #c0392b;
 }
+
 .dropdown-multi {
   position: relative;
 }
+
 .dropdown-toggle {
   cursor: pointer;
 }
+
 .dropdown-list {
   position: absolute;
   z-index: 1000;
@@ -281,18 +338,22 @@ export default {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   max-height: 540px;
 }
+
 .dropdown-item {
   display: flex;
   align-items: center;
   padding: 6px 10px;
   cursor: pointer;
 }
+
 .dropdown-item:hover {
   background: #f2f2f2;
 }
+
 .dropdown-item input[type="checkbox"] {
   margin-right: 10px;
 }
+
 .circle {
   display: inline-block;
   width: 10px;
@@ -301,6 +362,7 @@ export default {
   border-radius: 50%;
   margin-right: 8px;
 }
+
 .editable-area {
   min-height: 150px;
   border: 1px solid #ccc;
@@ -318,22 +380,26 @@ export default {
     padding: 20px;
     border-radius: 12px;
   }
+
   .title {
     font-size: 22px;
   }
+
   .button-group {
     flex-direction: column;
   }
+
   .button-group .add-btn,
   .button-group .cancel-btn {
     width: 100%;
   }
+
   .copy-section {
-  border: 1px solid #c7c7c7;
-  border-radius: 8px;
-  padding: 16px;
-  background: #f9f9f9;
-  margin-bottom: 16px;
-}
+    border: 1px solid #c7c7c7;
+    border-radius: 8px;
+    padding: 16px;
+    background: #f9f9f9;
+    margin-bottom: 16px;
+  }
 }
 </style>
