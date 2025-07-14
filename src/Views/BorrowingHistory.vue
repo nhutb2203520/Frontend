@@ -31,7 +31,7 @@
             <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
             <td>
               <button v-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'" class="btn btn-sm btn-primary"
-                @click="extendBorrow(borrow.MaMuonSach, capitalizeWords(borrow.MaSach?.TenSach))">
+                @click="extendBorrow(borrow.MaMuonSach, capitalizeWords(borrow.MaSachCopy.MaSach?.TenSach))">
                 Gia hạn
               </button>
               <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'" class="btn btn-sm btn-danger"
@@ -39,7 +39,7 @@
                 Huỷ mượn
               </button>
               <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'" class="btn btn-sm btn-success"
-                @click="goToBookDetail(borrow.MaSach?.MaSach)">
+                @click="goToBookDetail(borrow.MaSachCopy.MaSach?.MaSach)">
                 Mượn lại
               </button>
             </td>

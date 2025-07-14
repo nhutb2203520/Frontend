@@ -28,7 +28,9 @@ export const useBorrowBookStore = defineStore("borrowBook", {
       this.setError(null);
       try {
         const response = await api.get("/borrows");
-        this.setBorrowBooks(response.data.danhsachmuon);
+        if (response.data.danhsachmuon) {
+          this.setBorrowBooks(response.data.danhsachmuon);
+        }
         return response.data.danhsachmuon;
       } catch (err) {
         this.setError(err.message);
@@ -72,6 +74,59 @@ export const useBorrowBookStore = defineStore("borrowBook", {
       this.setError(null);
       try {
         const response = await api.patch(`/borrows/extend/${MaMuonSach}`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async fetchBorrowBooksForAdmin() {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await api.get("/borrows/admin");
+        if (response.data.danhsachmuon) {
+          this.setBorrowBooks(response.data.danhsachmuon);
+        }
+        return response.data.danhsachmuon;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async updateBorrowBook(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await api.patch(`/borrows/${data.MaMuonSach}`, data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async fetchBorrowBookDeadline() {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await api.get(`/borrows/borrows-deadline`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async sendEmailRemind(MaMuonSach) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await api.post(
+          `/borrows/send-email-remind/${MaMuonSach}`
+        );
         return response.data;
       } catch (err) {
         this.setError(err.message);

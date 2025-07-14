@@ -154,7 +154,7 @@ const getComponent = (label) => {
 };
 const handleGenre = (genre) => {
   searchFilterStore.setGenre(genre)
-  router.push('/catalogbook');
+  router.replace('/catalogbook');
 
 };
 

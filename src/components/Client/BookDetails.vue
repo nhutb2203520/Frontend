@@ -20,8 +20,12 @@
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
                 <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
-                <p><strong>Loại sách:</strong> {{ capitalizeWords(book.MaLoai?.TenLoai) }}</p>
+                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}
+                </p>
                 <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
+                <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
+                <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}
+                </p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
 
                 <!-- Nút hành động -->
@@ -65,7 +69,7 @@
                     </span>
                   </td>
                   <td>
-                    <input type="radio" :value="copy._id" v-model="selectedCopyId"
+                    <input type="radio" :value="copy._id" name="sachCopy" v-model="selectedCopyId"
                       :disabled="(copy.SoQuyen - copy.SoLuongDaMuon) <= 0" />
                   </td>
                 </tr>

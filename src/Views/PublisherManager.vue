@@ -87,10 +87,10 @@ onMounted(() => {
   publisherStore.fetchPublishers()
 })
 
-const totalPublishers = computed(() => publisherStore.publishers.length)
+const totalPublishers = computed(() => publisherStore.publishers?.length || 0)
 
 const filteredPublishers = computed(() => {
-  return publisherStore.publishers.filter((p) =>
+  return publisherStore.publishers?.filter((p) =>
     p.TenNXB.toLowerCase().includes(searchKeyword.value.toLowerCase())
   )
 })
