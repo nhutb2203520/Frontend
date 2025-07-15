@@ -30,14 +30,14 @@
                   {{
                     book.authors.length
                       ? authorOptions
-                        .filter(author => book.authors.includes(author._id))
-                        .map(author => capitalizeWords(author.TenTG))
-                        .join(', ')
+                          .filter(author => book.authors.includes(author._id))
+                          .map(author => capitalizeWords(author.TenTG))
+                          .join(', ')
                       : 'Chọn tác giả'
                   }}
                 </div>
                 <div v-if="showAuthorDropdown" class="dropdown-list">
-                  <label v-for="author in authorOptions" :key="author" class="dropdown-item">
+                  <label v-for="author in authorOptions" :key="author._id" class="dropdown-item">
                     <input type="checkbox" :value="author._id" v-model="book.authors" />
                     <span class="circle"></span> {{ capitalizeWords(author.TenTG) }}
                   </label>
@@ -50,12 +50,14 @@
               <label>Loại sách:</label>
               <div class="dropdown-multi">
                 <div class="form-control dropdown-toggle" @click.stop="toggleCatalogDropdown">
-                  {{book.catalogs.length ?
-                    catalogOptions
-                      .filter(catalog => book.catalogs.includes(catalog._id))
-                      .map(catalog => capitalizeWords(catalog.TenLoai))
-                      .join(', ')
-                    : 'Chọn loại sách'}}
+                  {{
+                    book.catalogs.length
+                      ? catalogOptions
+                          .filter(catalog => book.catalogs.includes(catalog._id))
+                          .map(catalog => capitalizeWords(catalog.TenLoai))
+                          .join(', ')
+                      : 'Chọn loại sách'
+                  }}
                 </div>
                 <div v-if="showCatalogDropdown" class="dropdown-list">
                   <label v-for="catalog in catalogOptions" :key="catalog._id" class="dropdown-item">
@@ -77,12 +79,11 @@
               <label>Mô tả:</label>
               <div class="format-buttons mb-2">
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('bold')"><b>B</b></button>
-                <button type="button" class="btn btn-outline-dark btn-sm"
-                  @click="formatText('italic')"><i>I</i></button>
-                <button type="button" class="btn btn-outline-dark btn-sm"
-                  @click="formatText('underline')"><u>U</u></button>
+                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
+                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
               </div>
               <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription">
+                <p><br></p>
               </div>
             </div>
 
@@ -91,8 +92,7 @@
             <div v-for="(copy, index) in bookCopies" :key="index" class="copy-section">
               <div class="form-group">
                 <label>Tên sách copy:</label>
-                <input type="text" v-model="copy.name" required class="form-control"
-                  :placeholder="`Tên copy ${index + 1}`" />
+                <input type="text" v-model="copy.name" required class="form-control" :placeholder="`Tên copy ${index + 1}`" />
               </div>
               <div class="form-group">
                 <label>Nhà xuất bản:</label>
@@ -111,8 +111,7 @@
                 <label>Vị trí sách:</label>
                 <select v-model="copy.location" class="form-control">
                   <option disabled value="">-- Chọn vị trí --</option>
-                  <option v-for="loc in locationOptions" :key="loc" :value="loc._id">{{ capitalizeWords(loc.TenViTri) }}
-                  </option>
+                  <option v-for="loc in locationOptions" :key="loc._id" :value="loc._id">{{ capitalizeWords(loc.TenViTri) }}</option>
                 </select>
               </div>
               <div class="text-end">
@@ -138,23 +137,33 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useBookStore } from "@/Store/Book.store";
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { useBookStore } from '@/Store/Book.store';
 import { useAuthorStore } from '@/Store/author.store';
 import { useCategoryBookStore } from '@/Store/category.store';
 import { usePublisherStore } from '@/Store/publisher.store';
 import { useLocationStore } from '@/Store/Location.store';
-import { capitalizeWords } from '@/utils/stringUtils'
-const router = useRouter();
+import { ElMessage } from 'element-plus';
+import { capitalizeWords } from '@/utils/stringUtils';
+import TurndownService from 'turndown';
 
-const bookStore = useBookStore()
-// DOM Refs
+const turndownService = new TurndownService({ headingStyle: 'atx' });
+
+// ✅ Thêm rule để hỗ trợ <u> => __underline__
+turndownService.addRule('underline', {
+  filter: ['u'],
+  replacement: function (content) {
+    return '__' + content + '__';
+  }
+});
+
+const router = useRouter();
+const bookStore = useBookStore();
+
 const overlay = ref(null);
 const authorGroup = ref(null);
 const catalogGroup = ref(null);
 const descriptionEditor = ref(null);
 
-// Reactive data
 const previewImage = ref(null);
 const showAuthorDropdown = ref(false);
 const showCatalogDropdown = ref(false);
@@ -165,52 +174,54 @@ const book = reactive({
   catalogs: [],
   year: new Date().getFullYear(),
   description: "",
-  publisher: "",
-  quantity: 1,
-  location: "",
   image: null
 });
 
-const bookCopies = ref([
-  { name: "", publisher: "", quantity: 1, location: "" }
-]);
+const bookCopies = ref([{ name: "", publisher: "", quantity: 1, location: "" }]);
 
 const authorOptions = ref([]);
 const catalogOptions = ref([]);
 const publisherOptions = ref([]);
 const locationOptions = ref([]);
+
 onMounted(async () => {
-  authorOptions.value = await useAuthorStore().fetchAuthors()
-  catalogOptions.value = await useCategoryBookStore().fetchCategoryBooks()
-  publisherOptions.value = await usePublisherStore().fetchPublishers()
-  locationOptions.value = await useLocationStore().fetchLocationBooks()
-})
-// Methods
+  authorOptions.value = await useAuthorStore().fetchAuthors();
+  catalogOptions.value = await useCategoryBookStore().fetchCategoryBooks();
+  publisherOptions.value = await usePublisherStore().fetchPublishers();
+  locationOptions.value = await useLocationStore().fetchLocationBooks();
+
+  descriptionEditor.value.innerHTML = "<p><br></p>";
+});
+
 async function handleImageUpload(event) {
   const file = event.target.files[0];
   if (file) {
     previewImage.value = URL.createObjectURL(file);
-
     try {
-      const bookStore = useBookStore();
       const result = await bookStore.uploadImageBook(file);
-
-      // ✅ Gán URL ảnh trả về từ server vào this.book.image
       book.image = result.imgUrl;
-
-      console.log("🌄 Đường dẫn ảnh:", result.imgUrl);
     } catch (err) {
       alert("❌ Upload ảnh thất bại");
     }
   }
 }
+
+function updateDescription() {
+  let htmlContent = descriptionEditor.value.innerHTML;
+
+  // Fix lỗi xuống dòng đầu
+  if (htmlContent.trim() === '<br>' || htmlContent.trim() === '') {
+    book.description = '';
+    return;
+  }
+
+  const markdown = turndownService.turndown(htmlContent);
+  book.description = markdown.replace(/\n{2,}/g, '\n').trim();
+}
+
 function formatText(command) {
   document.execCommand(command, false, null);
   updateDescription();
-}
-
-function updateDescription() {
-  book.description = descriptionEditor.value.innerHTML;
 }
 
 function toggleAuthorDropdown() {
@@ -255,38 +266,25 @@ async function submitBook() {
         MaViTri: copy.location,
         MaNXB: copy.publisher
       }))
-    }
-    const res = await bookStore.addOneBook(data)
+    };
+    const res = await bookStore.addOneBook(data);
     if (res.message === 'Thêm sách và bản sao thành công.') {
-      ElMessage.success(res.message)
-      router.push({ name: 'BookManagement' })
+      ElMessage.success(res.message);
+      router.push({ name: 'BookManagement' });
     } else {
-      ElMessage.error(res.message || 'Lỗi trong khi thêm sách')
+      ElMessage.error(res.message || 'Lỗi trong khi thêm sách');
     }
   } catch (err) {
-    ElMessage.error('Lỗi khi thêm sách.')
+    ElMessage.error('Lỗi khi thêm sách.');
   }
 }
 
 function cancelAdd() {
-  ElMessageBox.confirm(
-    'Bạn có chắc chắn muốn hủy thao tác thêm sách?',
-    'Xác nhận',
-    {
-      confirmButtonText: 'Đồng ý',
-      cancelButtonText: 'Hủy',
-      type: 'warning',
-      confirmButtonClass: 'el-button--danger'
-    }
-  )
-    .then(() => {
-      router.push('/admin/book-management')
-    })
-    .catch(() => {
-    })
+  if (confirm("Bạn có chắc chắn muốn hủy?")) {
+    router.push("/admin/book-management");
+  }
 }
 </script>
-
 
 <style scoped>
 .overlay {
