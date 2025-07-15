@@ -110,5 +110,29 @@ export const useBookStore = defineStore("book", {
         this.setLoading(false);
       }
     },
+    async deleteOneBook(MaSach) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.delete(`/books/${MaSach}`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async updateBook(MaSach, data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.patch(`/books/${MaSach}`, data);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
   },
 });

@@ -30,11 +30,14 @@
         <div class="scrollable-list">
           <ul>
             <li v-for="book in filteredBooks" :key="book.MaSach" @click="toggleBook(book)" class="book-item">
-              <strong>{{ book.TenSach }}</strong>
+              <strong>{{ capitalizeWords(book.TenSach) }}</strong>
 
               <div v-if="selectedBook?.MaSach === book.MaSach" class="book-detail">
-                <p><strong>ID:</strong> {{ book.MaSach }}</p>
-                <p><strong>Tên sách:</strong> {{ book.TenSach }}</p>
+                <p><strong>Mã sách:</strong> {{ book.MaSach }}</p>
+                <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
+                <p><strong>Tác giả:</strong> {{book.TacGia.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
+                <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
+
                 <div class="detail-actions">
                   <button class="btn btn-warning" @click.stop="editBook(book)">✏️ Chỉnh sửa</button>
                   <button class="btn btn-danger" @click.stop="deleteBook(book)">🗑️ Xóa</button>
@@ -49,10 +52,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import SideBarAD from '@/components/Admin/SideBarAD.vue';
 import { useBookStore } from '@/Store/Book.store';
+import { capitalizeWords } from '@/utils/stringUtils'
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const router = useRouter();
 const route = useRoute();
@@ -67,8 +72,16 @@ onMounted(async () => {
   const res = await bookStore.fetchBooks()
   books.value = res.danhsachsach
 })
+watch(() => route.name, async (newRoute) => {
+  if (newRoute === 'BookManagement') {
+    const res = await bookStore.fetchBooks()
+    books.value = res.danhsachsach
+  }
+},
+  { immediate: true })
 const totalBooks = computed(() => books.value.length);
 const filteredBooks = computed(() => {
+  selectedBook.value = null
   return books.value.filter((book) =>
     book.TenSach.toLowerCase().includes(searchKeyword.value.toLowerCase())
   );
@@ -79,29 +92,50 @@ function handleSidebarToggle(isOpen) {
 }
 
 function goToAddBook() {
+  selectedBook.value = null
   router.push({ name: 'AddBook' });
 }
 
 function goToManageLocation() {
+  selectedBook.value = null
   router.push({ name: 'LocationManagement' });
 }
 
 function goToManageAuthor() {
+  selectedBook.value = null
   router.push({ name: 'AuthorManagement' });
 }
 
 function toggleBook(book) {
-  selectedBook.value = selectedBook.value?.id === book.id ? null : book;
+  selectedBook.value = selectedBook.value?.MaSach === book.MaSach ? null : book;
 }
 
 function editBook(book) {
-  router.push({ name: 'EditBook', params: { id: book.id } });
+  router.push({ name: 'EditBook', params: { id: book.MaSach } });
 }
 
-function deleteBook(book) {
-  if (confirm(`Bạn có chắc chắn muốn xóa sách "${book.name}" không?`)) {
-    books.value = books.value.filter((b) => b.id !== book.id);
-    selectedBook.value = null;
+async function deleteBook(book) {
+  await ElMessageBox.confirm(
+    `Bạn có chắc chắn muốn xóa quyển sách "${book.TenSach}"?`,
+    'Xác nhận xóa sách',
+    {
+      confirmButtonText: 'Đồng ý',
+      cancelButtonText: 'Hủy',
+      type: 'warning',
+      confirmButtonClass: 'el-button--danger'
+    }
+  )
+  try {
+    const res = await bookStore.deleteOneBook(book.MaSach)
+    if (res.message === 'Xóa sách thành công.') {
+      ElMessage.success(`Xóa sách tên ${book.TenSach} và tất cả các bản sao thành công.`)
+      const fetch = await bookStore.fetchBooks()
+      books.value = fetch.danhsachsach
+    } else {
+      ElMessage.error(res.message || 'Xóa sách thất bại.')
+    }
+  } catch (err) {
+    ElMessage.error('Lỗi trong quá trình xóa sách.')
   }
 }
 </script>

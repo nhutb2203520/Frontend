@@ -58,7 +58,7 @@
                     : 'Chọn loại sách'}}
                 </div>
                 <div v-if="showCatalogDropdown" class="dropdown-list">
-                  <label v-for="catalog in catalogOptions" :key="catalog" class="dropdown-item">
+                  <label v-for="catalog in catalogOptions" :key="catalog._id" class="dropdown-item">
                     <input type="checkbox" :value="catalog._id" v-model="book.catalogs" />
                     <span class="circle"></span> {{ capitalizeWords(catalog.TenLoai) }}
                   </label>
@@ -139,7 +139,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBookStore } from "@/Store/Book.store";
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useAuthorStore } from '@/Store/author.store';
 import { useCategoryBookStore } from '@/Store/category.store';
 import { usePublisherStore } from '@/Store/publisher.store';
@@ -259,7 +259,7 @@ async function submitBook() {
     const res = await bookStore.addOneBook(data)
     if (res.message === 'Thêm sách và bản sao thành công.') {
       ElMessage.success(res.message)
-      router.replace('admin/book-management')
+      router.push({ name: 'BookManagement' })
     } else {
       ElMessage.error(res.message || 'Lỗi trong khi thêm sách')
     }
@@ -269,9 +269,21 @@ async function submitBook() {
 }
 
 function cancelAdd() {
-  if (confirm("Bạn có chắc chắn muốn hủy?")) {
-    router.push("/admin/book-management");
-  }
+  ElMessageBox.confirm(
+    'Bạn có chắc chắn muốn hủy thao tác thêm sách?',
+    'Xác nhận',
+    {
+      confirmButtonText: 'Đồng ý',
+      cancelButtonText: 'Hủy',
+      type: 'warning',
+      confirmButtonClass: 'el-button--danger'
+    }
+  )
+    .then(() => {
+      router.push('/admin/book-management')
+    })
+    .catch(() => {
+    })
 }
 </script>
 
@@ -426,13 +438,13 @@ function cancelAdd() {
   .button-group .cancel-btn {
     width: 100%;
   }
+}
 
-  .copy-section {
-    border: 1px solid #c7c7c7;
-    border-radius: 8px;
-    padding: 16px;
-    background: #f9f9f9;
-    margin-bottom: 16px;
-  }
+.copy-section {
+  border: 1px solid #c7c7c7;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f9f9f9;
+  margin-bottom: 16px;
 }
 </style>
