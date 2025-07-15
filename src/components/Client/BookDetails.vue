@@ -1,34 +1,27 @@
 <template>
   <div class="layout-wrapper py-4">
-    <!-- Sidebar -->
     <SideBar @toggle="sidebarOpen = $event" @allBooks="handleAllBooks" @authorSelected="handleAuthor"
       @genreSelected="handleGenre" @publisherSelected="handlePublisher" @yearSelected="handleYear" />
 
-    <!-- Main Content -->
     <div :class="['main-content', { collapsed: !sidebarOpen }]">
       <div>
         <div v-if="book" class="book-card shadow-lg rounded-4 p-4 text-light">
           <h4 class="text-info fw-bold text-center mb-4">📘 Thông tin chi tiết sách</h4>
 
           <div class="row">
-            <!-- Hình ảnh sách -->
             <div class="col-md-5 d-flex justify-content-center align-items-center">
               <img :src="'http://localhost:3000' + book.image" alt="Ảnh sách" class="book-image rounded" />
             </div>
 
-            <!-- Thông tin sách -->
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
                 <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
-                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}
-                </p>
+                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}</p>
                 <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
                 <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
-                <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}
-                </p>
+                <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}</p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
 
-                <!-- Nút hành động -->
                 <div class="d-flex flex-wrap gap-3 mt-3">
                   <button class="btn btn-outline-info" @click="borrowBook">📚 Mượn sách</button>
                   <button v-if="selectedCopy" class="btn btn-outline-light" @click="showLocation = !showLocation">
@@ -36,7 +29,6 @@
                   </button>
                 </div>
 
-                <!-- Vị trí sách -->
                 <div v-if="showLocation" class="mt-3 book-info">
                   <p><strong>Vị trí:</strong> {{ selectedCopy.MaViTri?.TenViTri || 'Không rõ' }}</p>
                   <p><strong>Mô tả:</strong> {{ selectedCopy.MaViTri?.MoTa || 'Không rõ' }}</p>
@@ -45,7 +37,6 @@
             </div>
           </div>
 
-          <!-- Bảng bản sao sách -->
           <div class="mt-4">
             <h5 class="fw-bold text-white mb-2">📄 Danh sách bản sao sách</h5>
             <table class="table table-bordered table-dark table-striped rounded">
@@ -77,14 +68,18 @@
             </table>
           </div>
 
-          <!-- Mô tả sách -->
           <div class="mt-4 p-3 bg-secondary-subtle rounded shadow-sm">
             <h5 class="fw-bold text-black mb-2">📝 Mô tả sách</h5>
-            <p class="text-black">{{ book.MoTa || 'Chưa có mô tả.' }}</p>
+           <div class="text-black description-text">
+            <template v-for="(seg, idx) in descriptionSegments" :key="idx">
+              <span v-if="seg.text !== '\n'" :class="seg.class">{{ seg.text }}</span>
+              <br v-else />
+            </template>
+          </div>
+
           </div>
         </div>
 
-        <!-- Không tìm thấy sách -->
         <div v-else class="text-center text-danger py-5">
           <h4>Không tìm thấy sách với mã: {{ $route.params.MaSach }}</h4>
         </div>
@@ -116,20 +111,69 @@ export default {
       selectedCopyId: null,
     };
   },
+  computed: {
+    selectedCopy() {
+      return this.sachCopies.find(copy => copy._id === this.selectedCopyId) || null;
+    },
+    descriptionSegments() {
+      const raw = this.book?.MoTa || '';
+      if (!raw) return [];
+
+      const lines = raw.split('\n'); // Tách từng dòng
+      const segments = [];
+      const regex = /\*\*([^*]+?)\*\*|__([^_]+?)__|_([^_]+?)_|\*([^*]+?)\*/g;
+
+      lines.forEach((line, lineIndex) => {
+        let lastIndex = 0;
+        let match;
+
+        while ((match = regex.exec(line)) !== null) {
+          // Thêm phần trước match
+          if (match.index > lastIndex) {
+            const beforeText = line.slice(lastIndex, match.index);
+            if (beforeText.trim()) {
+              segments.push({ text: beforeText, class: '' });
+            }
+          }
+
+          // Xử lý markdown
+          if (match[1]) {
+            segments.push({ text: match[1], class: 'fw-bold' }); // **bold**
+          } else if (match[2]) {
+            segments.push({ text: match[2], class: 'text-decoration-underline' }); // __underline__
+          } else if (match[3] || match[4]) {
+            segments.push({ text: match[3] || match[4], class: 'fst-italic' }); // _italic_ hoặc *italic*
+          }
+
+          lastIndex = regex.lastIndex;
+        }
+
+        // Phần còn lại sau match cuối
+        if (lastIndex < line.length) {
+          const remainingText = line.slice(lastIndex);
+          if (remainingText.trim()) {
+            segments.push({ text: remainingText, class: '' });
+          }
+        }
+
+        // Thêm phần xuống dòng thủ công
+        segments.push({ text: '\n', class: 'newline' });
+      });
+
+      return segments;
+    }
+
+  },
   async mounted() {
     const MaSach = this.$route.params.MaSach;
     try {
       const bookStore = useBookStore();
       const response = await bookStore.fetchBookByMaSach(MaSach);
       this.book = response.sach;
-      this.sachCopies = response.sachCopies
+      this.sachCopies = response.sachCopies;
     } catch (err) {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;
-    }
-  }, computed: {
-    selectedCopy() {
-      return this.sachCopies.find(copy => copy._id === this.selectedCopyId) || null;
     }
   },
   methods: {
@@ -221,5 +265,22 @@ export default {
 .badge {
   font-size: 0.9rem;
   padding: 5px 10px;
+}
+
+.description-text {
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.description-text .fw-bold {
+  font-weight: bold;
+}
+
+.description-text .fst-italic {
+  font-style: italic;
+}
+
+.description-text .text-decoration-underline {
+  text-decoration: underline;
 }
 </style>
