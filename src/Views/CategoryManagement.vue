@@ -69,26 +69,34 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import NavBarAD from '@/components/Admin/NavBarAD.vue'
 import SideBarAD from '@/components/Admin/SideBarAD.vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { useCategoryBookStore } from '@/Store/category.store'
 import { capitalizeWords } from '@/utils/stringUtils'
+import { useRoute } from 'vue-router'
 const categoryBookStore = useCategoryBookStore()
 const searchKeyword = ref('')
 const selectedCategory = ref(null)
 const editingCategoryId = ref(null)
 const showAddForm = ref(false)
-
+const route = useRoute()
 const newCategory = ref({ TenLoai: '', MoTa: '' })
 const editedCategory = ref({ TenLoai: '', MoTa: '' })
 const categories = ref([])
 const nextId = ref(5)
 onMounted(async () => {
-  categories.value = await categoryBookStore.fetchCategoryBooks()
+  const data = await categoryBookStore.fetchCategoryBooks()
+  categories.value = Array.isArray(data) ? data : []
 })
-const totalCategories = computed(() => categories.value.length)
+watch(() => route.name, async (newRoute) => {
+  if (newRoute === 'CategoryManagement') {
+    const res = await categoryBookStore.fetchCategoryBooks()
+    categories.value = Array.isArray(res) ? res : []
+  }
+}, { immediate: true })
+const totalCategories = computed(() => categories.value.length || 0)
 const filteredCategories = computed(() => {
   return categories.value.filter(cat =>
     cat.TenLoai.toLowerCase().includes(searchKeyword.value.toLowerCase())
@@ -181,7 +189,8 @@ async function deleteCategory(cat) {
     const res = await categoryBookStore.deleteCategoryBook(cat.MaLoai)
     if (res.message === 'Đã xóa loại sách thành công.') {
       ElMessage.success(`Xóa loại sách tên ${cat.TenLoai} thành công.`)
-      categories.value = await categoryBookStore.fetchCategoryBooks()
+      const data = await categoryBookStore.fetchCategoryBooks()
+      categories.value = Array.isArray(data) ? data : []
     } else {
       ElMessage.error(res.message)
     }

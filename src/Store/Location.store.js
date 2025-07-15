@@ -24,7 +24,8 @@ export const useLocationStore = defineStore("location", {
       try {
         const response = await axios.post("/positions", data);
         if (response.data.vitri) {
-          this.locations.push(response.data.vitri);
+          if (!Array.isArray(this.locations)) this.locations = [];
+          this.addLocationBook(response.data.vitri);
         }
         return response.data;
       } catch (err) {

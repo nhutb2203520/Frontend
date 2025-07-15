@@ -96,7 +96,7 @@
               </div>
               <div class="form-group">
                 <label>Nhà xuất bản:</label>
-                <select v-model="copy.publisher" class="form-control">
+                <select v-model="copy.publisher" class="form-control" required>
                   <option disabled value="">-- Chọn NXB --</option>
                   <option v-for="publisher in publisherOptions" :key="publisher._id" :value="publisher">
                     {{ capitalizeWords(publisher.TenNXB) }}
@@ -109,7 +109,7 @@
               </div>
               <div class="form-group">
                 <label>Vị trí sách:</label>
-                <select v-model="copy.location" class="form-control">
+                <select v-model="copy.location" class="form-control" required>
                   <option disabled value="">-- Chọn vị trí --</option>
                   <option v-for="loc in locationOptions" :key="loc" :value="loc._id">{{ capitalizeWords(loc.TenViTri) }}
                   </option>
@@ -257,6 +257,7 @@ async function submitBook() {
       }))
     }
     const res = await bookStore.addOneBook(data)
+    console.log('add book ', res)
     if (res.message === 'Thêm sách và bản sao thành công.') {
       ElMessage.success(res.message)
       router.push({ name: 'BookManagement' })

@@ -29,6 +29,7 @@ export const useBorrowBookStore = defineStore("borrowBook", {
       try {
         const response = await api.get("/borrows");
         if (response.data.danhsachmuon) {
+          if (!Array.isArray(this.borrowBooks)) this.borrowBooks = [];
           this.setBorrowBooks(response.data.danhsachmuon);
         }
         return response.data.danhsachmuon;

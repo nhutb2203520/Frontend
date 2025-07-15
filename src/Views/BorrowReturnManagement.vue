@@ -115,14 +115,21 @@ const statusLabels = {
 
 async function reloadBorrowList() {
   const result = await borrowBookStore.fetchBorrowBooksForAdmin();
-  borrowList.value = result.map((entry) => convertEntry(entry));
+  if (Array.isArray(result)) {
+    borrowList.value = result.map((entry) => convertEntry(entry));
+  } else {
+    borrowList.value = []; // fallback an empty array
+  }
 }
 
 async function loadOverdueList() {
   const res = await borrowBookStore.fetchBorrowBookDeadline();
-  const result = res.danhsachphieumuon;
+  const result = res?.danhsachphieumuon;
+
   if (Array.isArray(result)) {
     overdueList.value = result.map((entry) => convertEntry(entry));
+  } else {
+    overdueList.value = [];
   }
 }
 
