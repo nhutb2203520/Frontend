@@ -101,7 +101,8 @@ export const useBookStore = defineStore("book", {
       try {
         const response = await axios.post(`/books`, data);
         if (response.data.sach) {
-          this.addBook(response.data.sach);
+          if (!Array.isArray(this.books)) this.books = [];
+          this.books.push(response.data.sach);
         }
         return response.data;
       } catch (err) {

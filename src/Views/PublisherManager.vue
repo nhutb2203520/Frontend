@@ -49,8 +49,8 @@
 
                 <div v-else>
                   <p><strong>Mã NXB:</strong> {{ pub.MaNXB }}</p>
-                  <p><strong>Tên NXB:</strong> {{ pub.TenNXB }}</p>
-                  <p><strong>Địa chỉ:</strong> {{ pub.DiaChi }}</p>
+                  <p><strong>Tên NXB:</strong> {{ capitalizeWords(pub.TenNXB) }}</p>
+                  <p><strong>Địa chỉ:</strong> {{ capitalizeWords(pub.DiaChi) }}</p>
                   <div class="detail-actions">
                     <button class="btn btn-warning" @click.stop="editPublisher(pub)">✏️ Chỉnh sửa</button>
                     <button class="btn btn-danger" @click.stop="deletePublisher(pub)">🗑️ Xóa</button>

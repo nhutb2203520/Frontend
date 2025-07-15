@@ -68,16 +68,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { useLocationStore } from '@/Store/Location.store'
 import { capitalizeWords } from '@/utils/stringUtils'
+import { useRoute } from 'vue-router'
 const locationStore = useLocationStore()
 const searchKeyword = ref('')
 const selectedLocation = ref(null)
 const editingLocationId = ref(null)
 const showAddForm = ref(false)
-
+const route = useRoute()
 const newLocation = ref({ TenViTri: '', MoTa: '' })
 const editedLocation = ref({ TenViTri: '', MoTa: '' })
 
@@ -85,8 +86,15 @@ const locations = ref([])
 
 let nextId = ref(5)
 onMounted(async () => {
-  locations.value = await locationStore.fetchLocationBooks()
+  const data = await locationStore.fetchLocationBooks()
+  locations.value = Array.isArray(data) ? data : []
 })
+watch(() => route.name, async (newRoute) => {
+  if (newRoute === 'LocationManagement') {
+    const res = await locationStore.fetchLocationBooks()
+    locations.value = Array.isArray(res) ? res : []
+  }
+}, { immediate: true })
 const totalLocations = computed(() => locations.value.length)
 
 const filteredLocations = computed(() => {
@@ -181,7 +189,8 @@ async function deleteLocation(loc) {
     const res = await locationStore.deleteLocationBook(loc.MaViTri)
     if (res.message === 'Đã xóa vị trí thành công.') {
       ElMessage.success(`Xóa vị trí tên ${loc.TenViTri} thành công.`)
-      locations.value = await locationStore.fetchLocationBooks()
+      const data = await locationStore.fetchLocationBooks()
+      locations.value = Array.isArray(data) ? data : []
     } else {
       ElMessage.error(res.message)
     }

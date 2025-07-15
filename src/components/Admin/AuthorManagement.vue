@@ -58,21 +58,29 @@
 
 <script setup>
 import { useAuthorStore } from '@/Store/author.store'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { capitalizeWords } from '@/utils/stringUtils'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRoute } from 'vue-router'
 const authorStore = useAuthorStore()
 const searchKeyword = ref('')
 const showAddForm = ref(false)
 const selectedAuthor = ref(null)
 const editingAuthorId = ref(null)
-
+const route = useRoute()
 const newAuthor = ref({ TenTG: '', MoTa: '' })
 const editedAuthor = ref({ TenTG: '', MoTa: '' })
 const authors = ref([])
 onMounted(async () => {
-  authors.value = await authorStore.fetchAuthors()
+  const data = await authorStore.fetchAuthors()
+  authors.value = Array.isArray(data) ? data : []
 })
+watch(() => route.name, async (newRoute) => {
+  if (newRoute === 'AuthorManagement') {
+    const res = await authorStore.fetchAuthors()
+    authors.value = Array.isArray(res) ? res : []
+  }
+}, { immediate: true })
 
 const totalAuthors = computed(() => authors.value.length)
 
@@ -104,6 +112,8 @@ const addAuthor = async () => {
     if (res.message === 'Thêm tác giả thành công.') {
       ElMessage.success('Thêm tác giả thành công.')
       toggleAddForm()
+      const data = await authorStore.fetchAuthors()
+      authors.value = Array.isArray(data) ? data : []
     } else {
       ElMessage.error(res.message)
     }
@@ -149,7 +159,8 @@ const saveEdit = async (id) => {
       ElMessage.success('Cập nhật tác giả thành công.')
       selectedAuthor.value = null
       editingAuthorId.value = null
-      authors.value = await authorStore.fetchAuthors()
+      const data = await authorStore.fetchAuthors()
+      authors.value = Array.isArray(data) ? data : []
     } else {
       ElMessage.error(res.message)
     }
@@ -174,7 +185,8 @@ const deleteAuthor = async (author) => {
     const res = await authorStore.deleteAuthor(author._id)
     if (res.message === 'Xóa tác giả thành công.') {
       ElMessage.success(`Xóa tác giả tên ${author.TenTG} thành công.`)
-      authors.value = await authorStore.fetchAuthors()
+      const data = await authorStore.fetchAuthors()
+      authors.value = Array.isArray(data) ? data : []
     } else {
       ElMessage.error(res.message)
     }

@@ -14,7 +14,11 @@ export const useCategoryBookStore = defineStore("categoryBook", {
     async fetchCategoryBooks() {
       try {
         const response = await axios.get("/categorys");
-        this.setCategoryBooks(response.data.danhsachloaisach);
+        if (response.data.danhsachloaisach) {
+          if (!Array.isArray(this.categorys)) this.categorys = [];
+          this.setCategoryBooks(response.data.danhsachloaisach);
+        }
+
         return response.data.danhsachloaisach;
       } catch (err) {
         console.log(err.message);

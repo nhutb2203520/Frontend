@@ -70,16 +70,15 @@ const books = ref([]);
 
 onMounted(async () => {
   const res = await bookStore.fetchBooks()
-  books.value = res.danhsachsach
+  books.value = Array.isArray(res.danhsachsach) ? res.danhsachsach : []
 })
 watch(() => route.name, async (newRoute) => {
   if (newRoute === 'BookManagement') {
     const res = await bookStore.fetchBooks()
-    books.value = res.danhsachsach
+    books.value = Array.isArray(res.danhsachsach) ? res.danhsachsach : []
   }
-},
-  { immediate: true })
-const totalBooks = computed(() => books.value.length);
+}, { immediate: true })
+const totalBooks = computed(() => books.value.length || 0);
 const filteredBooks = computed(() => {
   selectedBook.value = null
   return books.value.filter((book) =>
@@ -130,7 +129,8 @@ async function deleteBook(book) {
     if (res.message === 'Xóa sách thành công.') {
       ElMessage.success(`Xóa sách tên ${book.TenSach} và tất cả các bản sao thành công.`)
       const fetch = await bookStore.fetchBooks()
-      books.value = fetch.danhsachsach
+      selectedBook.value = null
+      books.value = Array.isArray(fetch.danhsachsach) ? fetch.danhsachsach : []
     } else {
       ElMessage.error(res.message || 'Xóa sách thất bại.')
     }

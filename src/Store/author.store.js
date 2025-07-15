@@ -41,6 +41,7 @@ export const useAuthorStore = defineStore("author", {
       try {
         const response = await axios.post("/authors", data);
         if (response.data.tacgia) {
+          if (!Array.isArray(this.authors)) this.authors = [];
           this.addAuthor(response.data.tacgia);
         }
         return response.data;
