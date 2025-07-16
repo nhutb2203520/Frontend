@@ -10,8 +10,8 @@
     </div>
 
     <div class="position-relative bg-secondary bg-opacity-25 rounded shadow p-4 overflow-hidden">
-      <div v-if="books.length > 0" class="row g-4 flex-nowrap overflow-hidden" style="transition: transform 0.6s;"
-        :style="{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }">
+      <div v-if="books.length > 0" class="row g-4 flex-nowrap overflow-hidden"
+        :style="{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`, transition: 'transform 0.6s' }">
         <div v-for="(book, index) in books" :key="index" class="col-12 col-sm-6 col-md-4 col-lg-custom">
           <BookCard :book="book" :hoverEffect="true" />
         </div>
@@ -35,109 +35,95 @@
   </div>
 </template>
 
-<script>
-import BookCard from '@/components/BookCard.vue';
+<script setup>
+import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useBookStore } from '@/Store/Book.store';
-export default {
-  name: 'NewBook',
-  components: {
-    BookCard
-  },
-  data() {
-    return {
-      currentIndex: 0,
-      itemsPerView: 5,
-      allBooks: [],   // chứa toàn bộ sách
-      books: []
-    };
-  }, props: {
-    selectedAuthor: {
-      type: String,
-      default: null
-    },
-    selectedGenre: {
-      type: String,
-      default: null
-    },
-    selectedPublisher: {
-      type: String,
-      default: null
-    },
-    selectedYear: {
-      type: String,
-      default: null
-    }
-  },
-  watch: {
-    selectedAuthor: 'filterBooks',
-    selectedGenre: 'filterBooks',
-    selectedPublisher: 'filterBooks',
-    selectedYear: 'filterBooks'
-  },
-  computed: {
-    maxIndex() {
-      return Math.max(0, this.books.length - this.itemsPerView);
-    }
-  },
-  methods: {
-    filterBooks() {
-      const author = this.selectedAuthor?.toLowerCase();
-      const genre = this.selectedGenre?.toLowerCase();
-      const publisher = this.selectedPublisher?.toLowerCase();
-      const year = this.selectedYear;
+import BookCard from '@/components/BookCard.vue';
+import { toRefs } from 'vue';
 
-      this.books = this.allBooks.filter(book => {
-        const matchAuthor = !author || (Array.isArray(book.TacGia) &&
-          book.TacGia.some(tg => tg.TenTG?.toLowerCase().includes(author)));
-        const matchGenre = !genre || book.MaLoai?.TenLoai?.toLowerCase().includes(genre);
-        const matchPublisher = !publisher || book.MaNXB?.TenNXB?.toLowerCase().includes(publisher);
-        const matchYear = !year || String(book.NamXuatBan) === year;
+const props = defineProps({
+  selectedAuthor: String,
+  selectedGenre: String,
+  selectedPublisher: String,
+  selectedYear: String
+});
 
-        return matchAuthor && matchGenre && matchPublisher && matchYear;
-      });
+const { selectedAuthor, selectedGenre, selectedPublisher, selectedYear } = toRefs(props);
 
-      // Reset slide nếu cần
-      this.currentIndex = 0;
-    },
-    nextSlide() {
-      if (this.currentIndex < this.maxIndex) this.currentIndex++;
-    },
-    prevSlide() {
-      if (this.currentIndex > 0) this.currentIndex--;
-    },
-    goToSlide(index) {
-      this.currentIndex = Math.min(index, this.maxIndex);
-    },
-    updateItemsPerView() {
-      const width = window.innerWidth;
-      if (width < 768) this.itemsPerView = 1;
-      else if (width < 1024) this.itemsPerView = 2;
-      else if (width < 1200) this.itemsPerView = 3;
-      else if (width < 1400) this.itemsPerView = 4;
-      else this.itemsPerView = 5;
+const currentIndex = ref(0);
+const itemsPerView = ref(5);
 
-      if (this.currentIndex > this.maxIndex) {
-        this.currentIndex = this.maxIndex;
-      }
-    }
-  },
-  async mounted() {
-    this.updateItemsPerView();
-    window.addEventListener('resize', this.updateItemsPerView);
-    try {
-      const bookStore = useBookStore();
-      const result = await bookStore.fetchBooksNew(); // Giả sử có phương thức fetchNewBooks trong Book.store;
-      this.allBooks = result;
-      this.books = result;
-    } catch (error) {
-      console.error('Lỗi khi lấy sách mới:', error);
-      this.books = []; // Đặt mảng sách là rỗng nếu có lỗi
-    }
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.updateItemsPerView);
+const allBooks = ref([]);
+const books = ref([]);
+
+const maxIndex = computed(() =>
+  Math.max(0, books.value.length - itemsPerView.value)
+);
+
+const filterBooks = () => {
+  const author = selectedAuthor.value?.toLowerCase();
+  const genre = selectedGenre.value?.toLowerCase();
+  const publisher = selectedPublisher.value?.toLowerCase();
+  const year = selectedYear.value;
+
+  books.value = allBooks.value.filter(book => {
+    const matchAuthor = !author || (Array.isArray(book.TacGia) &&
+      book.TacGia.some(tg => tg.TenTG?.toLowerCase().includes(author)));
+    const matchGenre = !genre || book.MaLoai?.TenLoai?.toLowerCase().includes(genre);
+    const matchPublisher = !publisher || book.MaNXB?.TenNXB?.toLowerCase().includes(publisher);
+    const matchYear = !year || String(book.NamXuatBan) === year;
+
+    return matchAuthor && matchGenre && matchPublisher && matchYear;
+  });
+
+  currentIndex.value = 0;
+};
+
+const nextSlide = () => {
+  if (currentIndex.value < maxIndex.value) currentIndex.value++;
+};
+
+const prevSlide = () => {
+  if (currentIndex.value > 0) currentIndex.value--;
+};
+
+const goToSlide = (index) => {
+  currentIndex.value = Math.min(index, maxIndex.value);
+};
+
+const updateItemsPerView = () => {
+  const width = window.innerWidth;
+  if (width < 768) itemsPerView.value = 1;
+  else if (width < 1024) itemsPerView.value = 2;
+  else if (width < 1200) itemsPerView.value = 3;
+  else if (width < 1400) itemsPerView.value = 4;
+  else itemsPerView.value = 5;
+
+  if (currentIndex.value > maxIndex.value) {
+    currentIndex.value = maxIndex.value;
   }
 };
+
+watch([selectedAuthor, selectedGenre, selectedPublisher, selectedYear], filterBooks);
+
+onMounted(async () => {
+  updateItemsPerView();
+  window.addEventListener('resize', updateItemsPerView);
+
+  try {
+    const bookStore = useBookStore();
+    const result = await bookStore.fetchBooksNew(); // API lấy sách mới
+    allBooks.value = Array.isArray(result) ? result : [];
+    books.value = Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('Lỗi khi lấy sách mới:', error);
+    books.value = [];
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateItemsPerView);
+});
 </script>
 
 <style scoped>
@@ -149,7 +135,6 @@ export default {
   .col-lg-custom {
     flex: 0 0 auto;
     width: 20%;
-    /* 100% / 5 = 20% mỗi quyển */
   }
 }
 </style>

@@ -184,14 +184,16 @@ onMounted(async () => {
   const authorStore = useAuthorStore();
   const bookStore = useBookStore();
 
-  const categories = await categoryStore.fetchCategoryBooks();
+  const cats = await categoryStore.fetchCategoryBooks();
+  const categories = Array.isArray(cats) ? cats : []
   sections.value[1].items = categories.map(cat => capitalizeWords(cat.TenLoai));
 
-  const publishers = await publisherStore.fetchPublishers();
+  const pubs = await publisherStore.fetchPublishers();
+  const publishers = Array.isArray(pubs) ? pubs : []
   sections.value[2].items = publishers.map(pub => capitalizeWords(pub.TenNXB));
 
   const res = await bookStore.fetchBooks();
-  const books = res.danhsachsach
+  const books = Array.isArray(res.danhsachsach) ? res.danhsachsach : []
   const years = books.map(book => parseInt(book.NamXuatBan)).filter(year => !isNaN(year));
   const minYear = Math.min(...years);
   const currentYear = new Date().getFullYear();
@@ -201,7 +203,8 @@ onMounted(async () => {
   }
   sections.value[3].items = yearList;
 
-  const authors = await authorStore.fetchAuthors();
+  const auts = await authorStore.fetchAuthors();
+  const authors = Array.isArray(auts) ? auts : []
   sections.value[4].items = authors.map(author => capitalizeWords(author.TenTG));
 });
 function resetSidebarSelections() {

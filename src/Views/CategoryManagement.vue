@@ -21,7 +21,7 @@
           <div class="reader-list">
             <h3>Danh sách loại sách</h3>
 
-            <div v-if="showAddForm" class="add-form">
+            <div v-if="showAddForm" class="add-form" @keyup.enter="addCategory">
               <input v-model="newCategory.TenLoai" placeholder="Nhập tên loại sách" />
               <textarea v-model="newCategory.MoTa" placeholder="Nhập mô tả loại sách" rows="2" />
               <div class="detail-actions">

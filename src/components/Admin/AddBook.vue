@@ -30,9 +30,9 @@
                   {{
                     book.authors.length
                       ? authorOptions
-                          .filter(author => book.authors.includes(author._id))
-                          .map(author => capitalizeWords(author.TenTG))
-                          .join(', ')
+                        .filter(author => book.authors.includes(author._id))
+                        .map(author => capitalizeWords(author.TenTG))
+                        .join(', ')
                       : 'Chọn tác giả'
                   }}
                 </div>
@@ -53,9 +53,9 @@
                   {{
                     book.catalogs.length
                       ? catalogOptions
-                          .filter(catalog => book.catalogs.includes(catalog._id))
-                          .map(catalog => capitalizeWords(catalog.TenLoai))
-                          .join(', ')
+                        .filter(catalog => book.catalogs.includes(catalog._id))
+                        .map(catalog => capitalizeWords(catalog.TenLoai))
+                        .join(', ')
                       : 'Chọn loại sách'
                   }}
                 </div>
@@ -79,8 +79,10 @@
               <label>Mô tả:</label>
               <div class="format-buttons mb-2">
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('bold')"><b>B</b></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('italic')"><i>I</i></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('underline')"><u>U</u></button>
               </div>
               <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription">
                 <p><br></p>
@@ -92,7 +94,8 @@
             <div v-for="(copy, index) in bookCopies" :key="index" class="copy-section">
               <div class="form-group">
                 <label>Tên sách copy:</label>
-                <input type="text" v-model="copy.name" required class="form-control" :placeholder="`Tên copy ${index + 1}`" />
+                <input type="text" v-model="copy.name" required class="form-control"
+                  :placeholder="`Tên copy ${index + 1}`" />
               </div>
               <div class="form-group">
                 <label>Nhà xuất bản:</label>
@@ -111,7 +114,8 @@
                 <label>Vị trí sách:</label>
                 <select v-model="copy.location" class="form-control" required>
                   <option disabled value="">-- Chọn vị trí --</option>
-                  <option v-for="loc in locationOptions" :key="loc._id" :value="loc._id">{{ capitalizeWords(loc.TenViTri) }}</option>
+                  <option v-for="loc in locationOptions" :key="loc._id" :value="loc._id">{{
+                    capitalizeWords(loc.TenViTri) }}</option>
                 </select>
               </div>
               <div class="text-end">

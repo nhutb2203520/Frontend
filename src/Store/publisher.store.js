@@ -43,6 +43,7 @@ export const usePublisherStore = defineStore("publisher", {
       try {
         const response = await axios.post("/publishers", data);
         if (response.data.nxb) {
+          if (!Array.isArray(this.publishers)) this.publishers = [];
           this.addPublisher(response.data.nxb);
         }
         console.log(response.data);

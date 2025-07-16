@@ -42,7 +42,11 @@ export const useBookStore = defineStore("book", {
       this.setError(null);
       try {
         const response = await axios.get("/books/hot");
-        this.setBooks(response.data.danhsachsach);
+        if (response.data.danhsachsach) {
+          if (!Array.isArray(this.books)) this.books = [];
+          this.setBooks(response.data.danhsachsach);
+        }
+
         return response.data.danhsachsach;
       } catch (err) {
         this.setError(err.message);
