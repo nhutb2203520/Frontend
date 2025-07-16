@@ -5,7 +5,7 @@ import { useAuthStore } from "./auth.store";
 
 export const useAdminStore = defineStore("admin", {
   state: () => ({
-    adminInfo: sessionStorage.getItem("adminInfo") || " ",
+    adminInfo: sessionStorage.getItem("adminInfo") || "",
   }),
 
   actions: {

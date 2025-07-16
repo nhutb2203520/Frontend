@@ -94,7 +94,6 @@ const books = ref([])
 onMounted(async () => {
   const dataBook = await bookStore.fetchBooks()
   books.value = Array.isArray(dataBook.danhsachsach) ? dataBook.danhsachsach : []
-  console.log(books.value)
   const data = await categoryBookStore.fetchCategoryBooks()
   categories.value = Array.isArray(data) ? data : []
 })

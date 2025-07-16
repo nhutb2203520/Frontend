@@ -30,7 +30,7 @@ import AddReader from "@/components/Admin/AddReader.vue";
 import UpdateAccount from "@/components/Client/UpdateAccount.vue";
 import ChangePassAD from "@/components/Admin/ChangePassAD.vue";
 import UpdateAccountAD from "@/components/Admin/UpdateAccountAD.vue";
-
+import { useAdminStore } from "@/Store/Admin.store";
 const routes = [
   // --------- Client routes ---------
   {
@@ -206,4 +206,22 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const adminStore = useAdminStore();
+  if (to.path === "/admin/signin") {
+    return next();
+  }
+  // Kiểm tra nếu route bắt đầu bằng "/admin"
+  if (to.path.startsWith("/admin")) {
+    if (adminStore.adminInfo) {
+      // ✅ Đã đăng nhập → cho đi tiếp
+      next();
+    } else {
+      next({ name: "Signin Admin" });
+    }
+  } else {
+    // 🔓 Các route khác cho đi thoải mái
+    next();
+  }
+});
 export default router;

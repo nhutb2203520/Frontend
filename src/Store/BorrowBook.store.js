@@ -6,6 +6,7 @@ export const useBorrowBookStore = defineStore("borrowBook", {
     borrowBooks: [],
     loading: false,
     error: null,
+    pendingCount: 0,
   }),
   actions: {
     setBorrowBooks(borrowBooks) {
@@ -90,6 +91,9 @@ export const useBorrowBookStore = defineStore("borrowBook", {
         if (response.data.danhsachmuon) {
           this.setBorrowBooks(response.data.danhsachmuon);
         }
+        this.pendingCount = this.borrowBooks.filter(
+          (borrow) => borrow.MaTrangThai?.TenTrangThai === "chờ lấy"
+        ).length;
         return response.data.danhsachmuon;
       } catch (err) {
         this.setError(err.message);
@@ -97,6 +101,12 @@ export const useBorrowBookStore = defineStore("borrowBook", {
         this.setLoading(false);
       }
     },
+    updatePendingCount() {
+      this.pendingCount = this.borrowList.filter(
+        (b) => b.MaTrangThai?.TenTrangThai === "chờ lấy"
+      ).length;
+    },
+
     async updateBorrowBook(data) {
       this.setLoading(true);
       this.setError(null);

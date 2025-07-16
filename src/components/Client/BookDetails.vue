@@ -101,7 +101,7 @@ import { capitalizeWords } from '@/utils/stringUtils';
 import { useSearchFilterStore } from '@/Store/SearchFilter.store';
 import { useBorrowBookStore } from '@/Store/BorrowBook.store';
 import { ElMessage } from 'element-plus';
-
+import { useAuthStore } from '@/Store/auth.store';
 export default {
   name: 'BookDetails',
   components: { SideBar, Footer },
@@ -202,6 +202,11 @@ export default {
       this.$router.replace('/catalogbook');
     },
     async borrowBook() {
+      if (!useAuthStore().accessToken) {
+        ElMessage.warning('Vui lòng nhập để đăng ký mượn sách.')
+        this.$router.push({ name: 'Signin User' })
+        return
+      }
       if (!this.selectedCopyId) {
         ElMessage.warning('Vui lòng chọn một bản sao sách để mượn!');
         return;
