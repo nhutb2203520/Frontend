@@ -27,10 +27,7 @@
             <div class="form-control dropdown-toggle" @click.stop="toggleAuthorDropdown">
               {{
                 book.author.length
-                  ? authorOptions
-                    .filter(author => book.author.includes(author._id))
-                    .map(author => capitalizeWords(author.TenTG))
-                    .join(', ')
+                  ? authorOptions.filter(author => book.author.includes(author._id)).map(author => capitalizeWords(author.TenTG)).join(', ')
                   : 'Chọn tác giả'
               }}
             </div>
@@ -49,10 +46,7 @@
             <div class="form-control dropdown-toggle" @click.stop="toggleCatalogDropdown">
               {{
                 book.catalogs.length
-                  ? categoryOptions
-                    .filter(cat => book.catalogs.includes(cat._id))
-                    .map(cat => capitalizeWords(cat.TenLoai))
-                    .join(', ')
+                  ? categoryOptions.filter(cat => book.catalogs.includes(cat._id)).map(cat => capitalizeWords(cat.TenLoai)).join(', ')
                   : 'Chọn loại sách'
               }}
             </div>
@@ -72,7 +66,19 @@
 
         <div class="form-group">
           <label>Mô tả:</label>
-          <textarea v-model="book.description" rows="4"></textarea>
+          <div class="format-buttons mb-2">
+            <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('bold')"><b>B</b></button>
+            <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
+            <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
+          </div>
+          <div 
+            ref="descriptionEditor" 
+            class="editable-area" 
+            contenteditable="true" 
+            @input="updateDescription"
+            @keydown="handleKeydown"
+            @paste="handlePaste"
+          ></div>
         </div>
 
         <h2 class="title">Sách Copy</h2>
@@ -117,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { usePublisherStore } from '@/Store/publisher.store';
@@ -126,37 +132,46 @@ import { useBookStore } from '@/Store/Book.store';
 import { capitalizeWords } from '@/utils/stringUtils';
 import { useCategoryBookStore } from '@/Store/category.store';
 import { useAuthorStore } from '@/Store/author.store';
+import TurndownService from 'turndown';
+
+const turndownService = new TurndownService();
+turndownService.addRule('underline', {
+  filter: ['u'],
+  replacement: content => `__${content}__`
+});
 
 const route = useRoute();
 const router = useRouter();
-
 const previewImage = ref(null);
 const showAuthorDropdown = ref(false);
 const showCatalogDropdown = ref(false);
-const authorGroup = ref(null);
-const catalogGroup = ref(null);
-const book = reactive({
-  id: null,
-  name: '',
-  author: [],
-  catalogs: [],
-  year: new Date().getFullYear(),
-  description: '',
-  image: null,
+const descriptionEditor = ref(null);
+const previewImageBeforeUpdate = ref('');
+const book = reactive({ 
+  id: null, 
+  name: '', 
+  author: [], 
+  catalogs: [], 
+  year: new Date().getFullYear(), 
+  description: '', 
+  image: null 
 });
-
-const categoryOptions = ref([]);
 const bookCopies = ref([]);
+const categoryOptions = ref([]);
 const publisherOptions = ref([]);
 const locationOptions = ref([]);
 const authorOptions = ref([]);
-const previewImageBeforeUpdate = ref('')
+
+// Reactive state for editor content
+const editorContent = ref('');
+const isUpdating = ref(false);
+
 onMounted(async () => {
   authorOptions.value = await useAuthorStore().fetchAuthors();
   categoryOptions.value = await useCategoryBookStore().fetchCategoryBooks();
   publisherOptions.value = await usePublisherStore().fetchPublishers();
   locationOptions.value = await useLocationStore().fetchLocationBooks();
-  fetchBook();
+  await fetchBook();
 });
 
 async function fetchBook() {
@@ -170,76 +185,244 @@ async function fetchBook() {
   book.description = bookDetail.sach.MoTa;
   book.image = bookDetail.sach.image;
   previewImageBeforeUpdate.value = book.image;
-
-  bookCopies.value = bookDetail.sachCopies?.map(copy => ({
-    _id: copy._id,
-    name: capitalizeWords(copy.TenLoaiBanSao),
-    quantity: copy.SoQuyen,
-    publisher: copy.MaNXB,
-    location: copy.MaViTri,
+  bookCopies.value = bookDetail.sachCopies?.map(copy => ({ 
+    _id: copy._id, 
+    name: capitalizeWords(copy.TenLoaiBanSao), 
+    quantity: copy.SoQuyen, 
+    publisher: copy.MaNXB, 
+    location: copy.MaViTri 
   }));
+  
+  // Initialize editor content
+  editorContent.value = book.description;
+  
+  // Convert markdown to HTML and set to editor after DOM is ready
+  await nextTick();
+  if (descriptionEditor.value && book.description) {
+    const htmlContent = markdownToHTML(book.description);
+    descriptionEditor.value.innerHTML = htmlContent;
+  }
 }
 
 async function handleImageUpload(event) {
   const file = event.target.files[0];
   if (file) {
     previewImage.value = URL.createObjectURL(file);
-
     try {
-      const bookStore = useBookStore();
-      const result = await bookStore.uploadImageBook(file);
-
-      // ✅ Gán URL ảnh trả về từ server vào this.book.image
+      const result = await useBookStore().uploadImageBook(file);
       book.image = result.imgUrl;
-
-      console.log("🌄 Đường dẫn ảnh:", result.imgUrl);
-    } catch (err) {
-      alert("❌ Upload ảnh thất bại");
+    } catch {
+      alert('❌ Upload ảnh thất bại');
     }
   }
 }
 
-async function updateBook() {
-  const BanSao = bookCopies.value.map(copy => ({
-    _id: copy._id,
-    TenLoaiBanSao: copy.name,
-    SoQuyen: copy.quantity,
-    MaNXB: copy.publisher?._id,
-    MaViTri: copy.location?._id,
-  }));
-
-  const data = {
-    TenSach: book.name.trim(),
-    TacGia: book.author,
-    MaLoai: book.catalogs,
-    NamXuatBan: book.year,
-    MoTa: book.description,
-    image: book.image,
-    BanSao,
-  };
-
-  try {
-    const result = await useBookStore().updateBook(book.id, data);
-    if (result.message === 'Cập nhật sách và các bản sao thành công.') {
-      ElMessage.success(result.message)
-      router.push('/admin/book-management');
-    } else {
-      ElMessage.error(result.message || 'Cập nhật sách thất bại');
-    }
-  } catch (err) {
-    console.error(err);
-    ElMessage.error('Có lỗi xảy ra khi cập nhật sách!');
+function updateDescription() {
+  if (isUpdating.value) return;
+  
+  isUpdating.value = true;
+  
+  const html = descriptionEditor.value.innerHTML;
+  if (html.trim() === '<br>' || html.trim() === '') {
+    book.description = '';
+    editorContent.value = '';
+    isUpdating.value = false;
+    return;
   }
+  
+  try {
+    // Use custom HTML to markdown conversion
+    const markdown = htmlToMarkdown(html);
+    book.description = markdown;
+    editorContent.value = markdown;
+  } catch (error) {
+    console.error('Error converting HTML to markdown:', error);
+    // Fallback to turndown service
+    const markdown = turndownService.turndown(html);
+    book.description = markdown.trim();
+    editorContent.value = markdown.trim();
+  }
+  
+  isUpdating.value = false;
+}
+
+// Function to convert markdown to HTML
+function markdownToHTML(markdown) {
+  if (!markdown) return '';
+  
+  return markdown
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/__([^_]+)__/g, '<u>$1</u>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+}
+
+// Function to convert HTML back to markdown (improved)
+function htmlToMarkdown(html) {
+  if (!html) return '';
+  
+  return html
+    .replace(/<strong[^>]*>([^<]+)<\/strong>/g, '**$1**')
+    .replace(/<b[^>]*>([^<]+)<\/b>/g, '**$1**')
+    .replace(/<u[^>]*>([^<]+)<\/u>/g, '__$1__')
+    .replace(/<em[^>]*>([^<]+)<\/em>/g, '*$1*')
+    .replace(/<i[^>]*>([^<]+)<\/i>/g, '*$1*')
+    .replace(/<br\s*\/?>/g, '\n')
+    .replace(/<div[^>]*>/g, '\n')
+    .replace(/<\/div>/g, '')
+    .replace(/<p[^>]*>/g, '')
+    .replace(/<\/p>/g, '\n')
+    .trim();
+}
+
+function handleKeydown(event) {
+  if (event.key === 'Enter') {
+    // Prevent default behavior and handle manually
+    event.preventDefault();
+    
+    // Insert a line break
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    
+    // Create a new line element
+    const br = document.createElement('br');
+    range.insertNode(br);
+    
+    // Move cursor after the break
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    // Update the description
+    updateDescription();
+  }
+}
+
+function handlePaste(event) {
+  event.preventDefault();
+  
+  // Get plain text from clipboard
+  const text = event.clipboardData.getData('text/plain');
+  
+  // Insert plain text at cursor position
+  const selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(document.createTextNode(text));
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+  
+  updateDescription();
+}
+
+function formatText(command) {
+  // Store current cursor position
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return;
+  
+  // Apply formatting
+  document.execCommand(command, false, null);
+  
+  // Update the description
+  updateDescription();
+}
+
+// Computed property to display formatted segments
+const displayDescriptionSegments = computed(() => {
+  const raw = editorContent.value || '';
+  if (!raw) return [];
+  
+  const lines = raw.split('\n');
+  const segments = [];
+  const regex = /\*\*([^*]+)\*\*|__([^_]+)__|_([^_]+)_|\*([^*]+)\*/g;
+
+  lines.forEach((line, lineIndex) => {
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = regex.exec(line)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        const beforeText = line.slice(lastIndex, match.index);
+        if (beforeText) {
+          segments.push({ text: beforeText, class: '' });
+        }
+      }
+      
+      // Add formatted text
+      if (match[1]) {
+        // Bold: **text**
+        segments.push({ text: match[1], class: 'fw-bold' });
+      } else if (match[2]) {
+        // Underline: __text__
+        segments.push({ text: match[2], class: 'text-decoration-underline' });
+      } else if (match[3] || match[4]) {
+        // Italic: _text_ or *text*
+        segments.push({ text: match[3] || match[4], class: 'fst-italic' });
+      }
+      
+      lastIndex = regex.lastIndex;
+    }
+    
+    // Add remaining text after last match
+    if (lastIndex < line.length) {
+      const remainingText = line.slice(lastIndex);
+      if (remainingText) {
+        segments.push({ text: remainingText, class: '' });
+      }
+    }
+    
+    // Add line break except for the last line
+    if (lineIndex < lines.length - 1) {
+      segments.push({ text: '\n', class: '' });
+    }
+  });
+  
+  return segments;
+});
+
+function updateBook() {
+  const BanSao = bookCopies.value.map(copy => ({ 
+    _id: copy._id, 
+    TenLoaiBanSao: copy.name, 
+    SoQuyen: copy.quantity, 
+    MaNXB: copy.publisher?._id, 
+    MaViTri: copy.location?._id 
+  }));
+  
+  const data = { 
+    TenSach: book.name.trim(), 
+    TacGia: book.author, 
+    MaLoai: book.catalogs, 
+    NamXuatBan: book.year, 
+    MoTa: book.description, 
+    image: book.image, 
+    BanSao 
+  };
+  
+  useBookStore().updateBook(book.id, data)
+    .then(result => {
+      if (result.message.includes('thành công')) {
+        ElMessage.success(result.message);
+        router.push('/admin/book-management');
+      } else {
+        ElMessage.error(result.message || 'Cập nhật thất bại');
+      }
+    })
+    .catch(() => ElMessage.error('Có lỗi xảy ra khi cập nhật sách!'));
 }
 
 function cancelEdit() {
   ElMessageBox.confirm('Bạn có chắc chắn muốn hủy chỉnh sửa sách và quay lại không?', 'Xác nhận', {
     confirmButtonText: 'Đồng ý',
     cancelButtonText: 'Hủy',
-    type: 'warning',
-  }).then(() => {
-    router.push('/admin/book-management');
-  });
+    type: 'warning'
+  }).then(() => router.push('/admin/book-management'));
 }
 
 function addBookCopy() {
@@ -262,6 +445,79 @@ function toggleCatalogDropdown() {
 </script>
 
 <style scoped>
+.description-text {
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.description-text .fw-bold {
+  font-weight: bold;
+}
+
+.description-text .fst-italic {
+  font-style: italic;
+}
+
+.description-text .text-decoration-underline {
+  text-decoration: underline;
+}
+
+.editable-area {
+  min-height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
+  outline: none;
+  background-color: #fff;
+  font-family: inherit;
+}
+
+.editable-area:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.editable-area strong {
+  font-weight: bold;
+}
+
+.editable-area em {
+  font-style: italic;
+}
+
+.editable-area u {
+  text-decoration: underline;
+}
+
+.format-buttons {
+  margin-bottom: 8px;
+}
+
+.format-buttons button {
+  margin-right: 5px;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #212529;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.format-buttons button:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.format-buttons button:active {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
 .overlay {
   position: fixed;
   top: 0;
