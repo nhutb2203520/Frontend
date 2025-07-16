@@ -4,7 +4,6 @@
       <h2 class="fst-italic">LỊCH SỬ MƯỢN SÁCH</h2>
     </div>
 
-    <!-- Responsive Table -->
     <div class="table-responsive">
       <table class="table table-bordered text-center">
         <thead class="table-light">
@@ -19,27 +18,66 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(borrow, index) in borrowDetails" :key="index">
+          <tr
+            v-for="(borrow, index) in borrowDetails"
+            :key="index"
+            :class="{ 'table-danger': isOverdue(borrow) }"
+          >
             <td>{{ index + 1 }}</td>
             <td>
-              <strong>{{ capitalizeWords(borrow.MaSachCopy?.MaSach.TenSach) }}</strong><br />
-              <em>Tác giả: {{capitalizeWords(borrow.MaSachCopy.MaSach?.TacGia?.map(tg => tg.TenTG).join(', '))}}</em>
+              <strong>{{ capitalizeWords(borrow.MaSachCopy?.MaSach?.TenSach) }}</strong><br />
+              <em>
+                Tác giả:
+                {{
+                  capitalizeWords(
+                    borrow.MaSachCopy.MaSach?.TacGia?.map(tg => tg.TenTG).join(', ')
+                  )
+                }}
+              </em>
             </td>
-            <td>{{ borrow.MaSachCopy.TenLoaiBanSao }}</td>
+            <td>{{ borrow.MaSachCopy?.TenLoaiBanSao }}</td>
             <td>{{ formatDate(borrow.NgayMuon) }}</td>
             <td>{{ formatDate(borrow.NgayTra) }}</td>
-            <td>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</td>
             <td>
-              <button v-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'" class="btn btn-sm btn-primary"
-                @click="extendBorrow(borrow.MaMuonSach, capitalizeWords(borrow.MaSachCopy.MaSach?.TenSach))">
+              <span v-if="isOverdue(borrow)" class="text-danger fw-bold">Quá hạn</span>
+              <span v-else>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</span>
+            </td>
+
+            <td>
+              <!-- Nếu quá hạn -->
+              <div v-if="isOverdue(borrow)">
+                <p class="text-danger fw-bold mb-1">
+                  📢 Sách này đã quá hạn {{ overdueDays(borrow) }} ngày.
+                </p>
+                <small class="text-danger">
+                  Vui lòng trả sách tại thư viện để tránh bị xử lý.
+                </small>
+              </div>
+
+              <!-- Nếu trạng thái là đã lấy và chưa quá hạn -->
+              <button
+                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'"
+                class="btn btn-sm btn-primary"
+                @click="extendBorrow(borrow.MaMuonSach, borrow.MaSachCopy.MaSach?.TenSach)"
+              >
                 Gia hạn
               </button>
-              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'" class="btn btn-sm btn-danger"
-                @click="cancelBorrow(borrow.MaMuonSach)">
+
+              <!-- Nếu chờ lấy -->
+              <button
+                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'"
+                class="btn btn-sm btn-danger"
+                @click="cancelBorrow(borrow.MaMuonSach)"
+              >
                 Huỷ mượn
               </button>
-              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'" class="btn btn-sm btn-success"
-                @click="goToBookDetail(borrow.MaSachCopy.MaSach?.MaSach)">
+
+              <!-- Nếu đã trả -->
+              <button
+                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'"
+                class="btn btn-sm btn-success"
+                @click="goToBookDetail(borrow.MaSachCopy.MaSach?.MaSach)"
+              >
                 Mượn lại
               </button>
             </td>
@@ -52,20 +90,37 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import dayjs from 'dayjs';
+
 import { useBorrowBookStore } from '@/Store/BorrowBook.store';
 import { capitalizeWords } from '@/utils/stringUtils';
 import { formatDate } from '@/utils/formatDate';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { useRouter } from 'vue-router';
 
-const router = useRouter()
-const borrowDetails = ref([]);
 const borrowBookStore = useBorrowBookStore();
+const borrowDetails = ref([]);
+const router = useRouter();
+
 onMounted(async () => {
   borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
 });
 
-// Các hành động
+const isOverdue = (borrow) => {
+  const status = borrow.MaTrangThai?.TenTrangThai;
+  if (status !== 'đã lấy') return false;
+  const today = dayjs().startOf('day');
+  const dueDate = dayjs(borrow.NgayTra).startOf('day');
+  return today.isAfter(dueDate);
+};
+
+const overdueDays = (borrow) => {
+  if (!borrow.NgayTra) return 0;
+  const today = dayjs().startOf('day');
+  const due = dayjs(borrow.NgayTra).startOf('day');
+  return today.diff(due, 'day');
+};
+
 const extendBorrow = async (maMuon, tenSach) => {
   try {
     await ElMessageBox.confirm(
@@ -77,7 +132,7 @@ const extendBorrow = async (maMuon, tenSach) => {
         type: 'success',
       }
     );
-    const res = await borrowBookStore.extendBorrowBook(maMuon)
+    const res = await borrowBookStore.extendBorrowBook(maMuon);
     if (res.message === 'Gia hạn mượn sách thành công.') {
       ElMessage.success(`Gia hạn quyển sách ${tenSach} thành công.`);
       borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
@@ -88,10 +143,10 @@ const extendBorrow = async (maMuon, tenSach) => {
     if (err !== 'cancel') {
       ElMessage.error('Đã xảy ra lỗi khi gia hạn phiếu mượn');
     } else {
-      ElMessage.error('Hủy thao tác gia hạn.');
+      ElMessage.info('Hủy thao tác gia hạn.');
     }
   }
-}
+};
 
 const cancelBorrow = async (maMuon) => {
   try {
@@ -115,14 +170,14 @@ const cancelBorrow = async (maMuon) => {
     if (err !== 'cancel') {
       ElMessage.error('Đã xảy ra lỗi khi huỷ phiếu mượn');
     } else {
-      ElMessage.error('Hủy thao tác hủy đăng ký mượn.');
+      ElMessage.info('Hủy thao tác hủy đăng ký mượn.');
     }
   }
 };
 
 const goToBookDetail = (maSach) => {
-  router.push(`/book/${maSach}`)
-}
+  router.push(`/book/${maSach}`);
+};
 </script>
 
 <style scoped>
@@ -133,7 +188,6 @@ const goToBookDetail = (maSach) => {
   box-sizing: border-box;
   background-color: #7d8287ae;
   font-size: 20px;
-  /* Giảm cỡ chữ toàn bộ */
 }
 
 .header {
@@ -150,7 +204,6 @@ table td {
   vertical-align: middle;
   border: 1px solid black !important;
   white-space: normal;
-  /* Cho phép xuống dòng */
   font-size: 30px;
   word-break: break-word;
 }
@@ -159,10 +212,13 @@ table td {
   background-color: #808385 !important;
 }
 
-/* Responsive font scaling */
+.table-danger {
+  background-color: #ffe5e5 !important;
+}
+
 @media (max-width: 992px) {
   .borrowing-slip {
-    font-size: 18 px;
+    font-size: 18px;
     padding: 20px;
   }
 
