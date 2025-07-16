@@ -16,8 +16,8 @@
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
                 <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
-                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}</p>
-                <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
+                <p><strong>Loại sách:</strong> {{ book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ') }}</p>
+                <p><strong>Tác giả:</strong> {{ book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ') }}</p>
                 <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
                 <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}</p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
@@ -70,13 +70,12 @@
 
           <div class="mt-4 p-3 bg-secondary-subtle rounded shadow-sm">
             <h5 class="fw-bold text-black mb-2">📝 Mô tả sách</h5>
-           <div class="text-black description-text">
-            <template v-for="(seg, idx) in descriptionSegments" :key="idx">
-              <span v-if="seg.text !== '\n'" :class="seg.class">{{ seg.text }}</span>
-              <br v-else />
-            </template>
-          </div>
-
+            <div class="text-black description-text">
+              <template v-for="(seg, idx) in descriptionSegments" :key="idx">
+                <span v-if="seg.text !== '\n'" :class="seg.class" v-text="seg.text"></span>
+                <br v-else />
+              </template>
+            </div>
           </div>
         </div>
 
@@ -119,50 +118,45 @@ export default {
       const raw = this.book?.MoTa || '';
       if (!raw) return [];
 
-      const lines = raw.split('\n'); // Tách từng dòng
+      const lines = raw.split('\n');
       const segments = [];
       const regex = /\*\*([^*]+?)\*\*|__([^_]+?)__|_([^_]+?)_|\*([^*]+?)\*/g;
 
-      lines.forEach((line, lineIndex) => {
+      lines.forEach((line) => {
         let lastIndex = 0;
         let match;
 
         while ((match = regex.exec(line)) !== null) {
-          // Thêm phần trước match
           if (match.index > lastIndex) {
             const beforeText = line.slice(lastIndex, match.index);
-            if (beforeText.trim()) {
+            if (beforeText) {
               segments.push({ text: beforeText, class: '' });
             }
           }
 
-          // Xử lý markdown
           if (match[1]) {
-            segments.push({ text: match[1], class: 'fw-bold' }); // **bold**
+            segments.push({ text: match[1], class: 'fw-bold' });
           } else if (match[2]) {
-            segments.push({ text: match[2], class: 'text-decoration-underline' }); // __underline__
+            segments.push({ text: match[2], class: 'text-decoration-underline' });
           } else if (match[3] || match[4]) {
-            segments.push({ text: match[3] || match[4], class: 'fst-italic' }); // _italic_ hoặc *italic*
+            segments.push({ text: match[3] || match[4], class: 'fst-italic' });
           }
 
           lastIndex = regex.lastIndex;
         }
 
-        // Phần còn lại sau match cuối
         if (lastIndex < line.length) {
           const remainingText = line.slice(lastIndex);
-          if (remainingText.trim()) {
+          if (remainingText) {
             segments.push({ text: remainingText, class: '' });
           }
         }
 
-        // Thêm phần xuống dòng thủ công
         segments.push({ text: '\n', class: 'newline' });
       });
 
       return segments;
     }
-
   },
   async mounted() {
     const MaSach = this.$route.params.MaSach;
@@ -270,6 +264,7 @@ export default {
 .description-text {
   line-height: 1.6;
   word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .description-text .fw-bold {
