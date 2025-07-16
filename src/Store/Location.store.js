@@ -9,7 +9,7 @@ export const useLocationStore = defineStore("location", {
       this.locations = locations;
     },
     addLocationBook(location) {
-      this.categorys.push(location);
+      this.locations.push(location);
     },
     async fetchLocationBooks() {
       try {
@@ -24,14 +24,17 @@ export const useLocationStore = defineStore("location", {
       try {
         const response = await axios.post("/positions", data);
         if (response.data.vitri) {
-          if (!Array.isArray(this.locations)) this.locations = [];
           this.addLocationBook(response.data.vitri);
+          return response.data.vitri; // ✅ Trả về đối tượng vitri đúng định dạng
+        } else {
+          return { error: response.data.message };
         }
-        return response.data;
       } catch (err) {
         console.log(err.message);
+        return { error: err.message };
       }
     },
+
     async updateLocationBook(data) {
       try {
         const response = await axios.patch(`/positions/${data.MaViTri}`, data);

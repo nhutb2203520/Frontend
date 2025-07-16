@@ -37,7 +37,7 @@ export const usePublisherStore = defineStore("publisher", {
         this.setLoading(false);
       }
     },
-    async addPublisher(data) {
+    async addOnePublisher(data) {
       this.setLoading(true);
       this.setError(null);
       try {
@@ -46,7 +46,7 @@ export const usePublisherStore = defineStore("publisher", {
           if (!Array.isArray(this.publishers)) this.publishers = [];
           this.addPublisher(response.data.nxb);
         }
-        console.log(response.data);
+        
         return response.data;
       } catch (err) {
         this.setError(err.message);

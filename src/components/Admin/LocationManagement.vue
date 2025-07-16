@@ -116,26 +116,29 @@ function cancelAdd() {
 
 const addLocation = async () => {
   if (!newLocation.value.TenViTri.trim()) {
-    ElMessage.warning('⚠️ Vui lòng nhập tên vị trí.')
-    return
+    ElMessage.warning('⚠️ Vui lòng nhập tên vị trí.');
+    return;
   }
+
   try {
     const data = {
       TenViTri: newLocation.value.TenViTri,
       MoTa: newLocation.value.MoTa || ' '
-    }
-    const res = await locationStore.addLocationBook(data)
-    if (res.message === 'Thêm vị trí thành công.') {
-      ElMessage.success('Thêm ví trí thành công.')
-      locations.value = await locationStore.fetchLocationBooks()
-      toggleAddForm()
+    };
+    const res = await locationStore.addLocationBook(data);
+
+    if (res && res._id) {
+      ElMessage.success('🎉 Thêm vị trí thành công.');
+      locations.value = await locationStore.fetchLocationBooks(); // cập nhật lại danh sách
+      toggleAddForm(); // ẩn form
     } else {
-      ElMessage.error(res.message)
+      ElMessage.error(res?.message || '❌ Thêm vị trí thất bại.');
     }
   } catch (error) {
-    ElMessage.error('Đã xảy ra lỗi khi thêm.')
+    ElMessage.error('❌ Đã xảy ra lỗi khi thêm vị trí.');
   }
-}
+};
+
 
 function toggleLocation(loc) {
   showAddForm.value = false
