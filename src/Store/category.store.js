@@ -24,7 +24,7 @@ export const useCategoryBookStore = defineStore("categoryBook", {
         console.log(err.message);
       }
     },
-    async addCategoryBook(data) {
+    async addOneCategoryBook(data) {
       try {
         const response = await axios.post("/categorys", data);
         if (response.data.loaisach) {

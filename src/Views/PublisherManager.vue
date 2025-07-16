@@ -124,7 +124,7 @@ async function addPublisher() {
   }
   console.log(newPublisher)
   try {
-    const response = await publisherStore.addPublisher({
+    const response = await publisherStore.addOnePublisher({
       TenNXB: newPublisher.value.TenNXB,
       DiaChi: newPublisher.value.DiaChi
     })

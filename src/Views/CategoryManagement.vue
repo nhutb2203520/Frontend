@@ -132,7 +132,7 @@ const addCategory = async () => {
       TenLoai: newCategory.value.TenLoai,
       MoTa: newCategory.value.MoTa || ' '
     }
-    const res = await categoryBookStore.addCategoryBook(data)
+    const res = await categoryBookStore.addOneCategoryBook(data)
     if (res.message === 'Thêm loại sách thành công.') {
       ElMessage.success('Thêm loại sách thành công.')
       categories.value = await categoryBookStore.fetchCategoryBooks()
