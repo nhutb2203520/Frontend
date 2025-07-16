@@ -25,10 +25,8 @@ export const useLocationStore = defineStore("location", {
         const response = await axios.post("/positions", data);
         if (response.data.vitri) {
           this.addLocationBook(response.data.vitri);
-          return response.data.vitri; // ✅ Trả về đối tượng vitri đúng định dạng
-        } else {
-          return { error: response.data.message };
         }
+        return response.data;
       } catch (err) {
         console.log(err.message);
         return { error: err.message };

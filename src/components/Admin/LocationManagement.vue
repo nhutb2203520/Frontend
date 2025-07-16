@@ -127,15 +127,15 @@ const addLocation = async () => {
     };
     const res = await locationStore.addLocationBook(data);
 
-    if (res && res._id) {
-      ElMessage.success('🎉 Thêm vị trí thành công.');
-      locations.value = await locationStore.fetchLocationBooks(); // cập nhật lại danh sách
-      toggleAddForm(); // ẩn form
+    if (res.message === 'Thêm vị trí thành công.') {
+      ElMessage.success('Thêm vị trí thành công.');
+      locations.value = await locationStore.fetchLocationBooks();
+      toggleAddForm();
     } else {
       ElMessage.error(res?.message || '❌ Thêm vị trí thất bại.');
     }
   } catch (error) {
-    ElMessage.error('❌ Đã xảy ra lỗi khi thêm vị trí.');
+    ElMessage.error('Đã xảy ra lỗi khi thêm vị trí.');
   }
 };
 

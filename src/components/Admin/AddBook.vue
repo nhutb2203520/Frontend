@@ -28,7 +28,9 @@
               <div class="d-flex gap-2">
                 <div class="dropdown-multi flex-grow-1">
                   <div class="form-control dropdown-toggle" @click.stop="toggleAuthorDropdown">
-                    {{ book.authors.length ? authorOptions.filter(author => book.authors.includes(author._id)).map(author => capitalizeWords(author.TenTG)).join(', ') : 'Chọn tác giả' }}
+                    {{book.authors.length ? authorOptions.filter(author =>
+                      book.authors.includes(author._id)).map(author => capitalizeWords(author.TenTG)).join(', ')
+                      : 'Chọn tác giả'}}
                   </div>
                   <div v-if="showAuthorDropdown" class="dropdown-list">
                     <label v-for="author in authorOptions" :key="author._id" class="dropdown-item">
@@ -53,7 +55,8 @@
               <div class="d-flex gap-2">
                 <div class="dropdown-multi flex-grow-1">
                   <div class="form-control dropdown-toggle" @click.stop="toggleCatalogDropdown">
-                    {{ book.catalogs.length ? catalogOptions.filter(c => book.catalogs.includes(c._id)).map(c => capitalizeWords(c.TenLoai)).join(', ') : 'Chọn loại sách' }}
+                    {{book.catalogs.length ? catalogOptions.filter(c => book.catalogs.includes(c._id)).map(c =>
+                      capitalizeWords(c.TenLoai)).join(', ') : 'Chọn loại sách'}}
                   </div>
                   <div v-if="showCatalogDropdown" class="dropdown-list">
                     <label v-for="catalog in catalogOptions" :key="catalog._id" class="dropdown-item">
@@ -83,8 +86,10 @@
               <label>Mô tả:</label>
               <div class="format-buttons mb-2">
                 <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('bold')"><b>B</b></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
-                <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('italic')"><i>I</i></button>
+                <button type="button" class="btn btn-outline-dark btn-sm"
+                  @click="formatText('underline')"><u>U</u></button>
               </div>
               <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription">
                 <p><br></p>
@@ -96,7 +101,8 @@
             <div v-for="(copy, index) in bookCopies" :key="index" class="copy-section">
               <div class="form-group">
                 <label>Tên sách copy:</label>
-                <input type="text" v-model="copy.name" required class="form-control" :placeholder="`Tên copy ${index + 1}`" />
+                <input type="text" v-model="copy.name" required class="form-control"
+                  :placeholder="`Tên copy ${index + 1}`" />
               </div>
               <div class="form-group">
                 <label>Nhà xuất bản:</label>
@@ -107,13 +113,15 @@
                       {{ capitalizeWords(publisher.TenNXB) }}
                     </option>
                   </select>
-                  <button type="button" class="btn btn-outline-primary btn-sm" @click="showAddPublisher = true">+ NXB</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm" @click="showAddPublisher = true">+
+                    NXB</button>
                 </div>
                 <div v-if="showAddPublisher" class="mt-2">
                   <input v-model="newPublisher.TenNXB" class="form-control mb-1" placeholder="Tên NXB" />
                   <textarea v-model="newPublisher.DiaChi" class="form-control mb-2" placeholder="Địa chỉ"></textarea>
                   <button type="button" class="btn btn-success btn-sm" @click="addPublisher">Lưu</button>
-                  <button type="button" class="btn btn-secondary btn-sm ms-2" @click="showAddPublisher = false">Hủy</button>
+                  <button type="button" class="btn btn-secondary btn-sm ms-2"
+                    @click="showAddPublisher = false">Hủy</button>
                 </div>
               </div>
               <div class="form-group">
@@ -129,13 +137,15 @@
                       {{ capitalizeWords(loc.TenViTri) }}
                     </option>
                   </select>
-                  <button type="button" class="btn btn-outline-primary btn-sm" @click="showAddLocation = true">+ Vị trí</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm" @click="showAddLocation = true">+ Vị
+                    trí</button>
                 </div>
                 <div v-if="showAddLocation" class="mt-2">
                   <input v-model="newLocation.TenViTri" class="form-control mb-1" placeholder="Tên vị trí" />
                   <textarea v-model="newLocation.MoTa" class="form-control mb-2" placeholder="Mô tả"></textarea>
                   <button type="button" class="btn btn-success btn-sm" @click="addLocation">Lưu</button>
-                  <button type="button" class="btn btn-secondary btn-sm ms-2" @click="showAddLocation = false">Hủy</button>
+                  <button type="button" class="btn btn-secondary btn-sm ms-2"
+                    @click="showAddLocation = false">Hủy</button>
                 </div>
               </div>
               <div class="text-end">
@@ -280,7 +290,6 @@ const addAuthor = async () => {
 
   if (addedAuthor && addedAuthor._id) {
     ElMessage.success('Thêm tác giả thành công');
-    authorOptions.value.push(addedAuthor);
     newAuthor.TenTG = '';
     newAuthor.MoTa = '';
     showAddAuthor.value = false;
@@ -298,11 +307,10 @@ const addCategoryBook = async () => {
 
   const res = await categoryStore.addOneCategoryBook(newCatalog);
 
-  const addedCatalog = res?.loaisach; // ✅ dùng đúng key: loaisach
-  
+
+
   if (res.message == 'Thêm loại sách thành công.') {
     ElMessage.success('Thêm loại sách thành công');
-    catalogOptions.value.push(addedCatalog);
     newCatalog.TenLoai = '';
     newCatalog.MoTa = '';
     showAddCatalog.value = false;
@@ -312,17 +320,15 @@ const addCategoryBook = async () => {
 };
 
 
-const addPublisher = async () => { 
-  if (!newPublisher.TenNXB) {
-    ElMessage.warning("Vui lòng nhập tên nhà xuất bản.");
+const addPublisher = async () => {
+  if (!newPublisher.TenNXB || !newPublisher.DiaChi) {
+    ElMessage.warning("Vui lòng nhập đầy đủ thông tin nhà xuất bản.");
     return;
   }
 
   const res = await publisherStore.addOnePublisher(newPublisher);  // 👈 Gọi API
   if (res.message === 'Thêm nhà xuất bản thành công') {
-        
     ElMessage.success('Thêm nhà xuất bản thành công');
-    publisherOptions.value.push(res.nxb);  // 👈 Cập nhật dropdown
     showAddPublisher.value = false;
     newPublisher.TenNXB = '';
     newPublisher.DiaChi = '';
@@ -337,10 +343,10 @@ const addLocation = async () => {
   }
 
   const res = await locationStore.addLocationBook(newLocation);
-  
-  if (res && res._id) {
+  console.log(res)
+  if (res.message === 'Thêm vị trí thành công.') {
     ElMessage.success('Thêm vị trí thành công');
-    locationOptions.value.push(res); // ✅ hiển thị trong select ngay
+    locationOptions.value = await locationStore.fetchLocationBooks()
     newLocation.TenViTri = '';
     newLocation.MoTa = '';
     showAddLocation.value = false;
@@ -391,163 +397,163 @@ const cancelAdd = () => {
 
 
 
-  <style scoped>
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(20, 20, 20, 0.263);
-    overflow-y: auto;
-    padding: 120px 20px 20px;
-    z-index: 1;
-  }
+<style scoped>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 20, 0.263);
+  overflow-y: auto;
+  padding: 120px 20px 20px;
+  z-index: 1;
+}
 
+.book-management {
+  width: 65%;
+  max-width: 65%;
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 2;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.preview-img img {
+  max-width: 200px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.button-group .add-btn,
+.button-group .cancel-btn {
+  padding: 12px 25px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+
+.add-btn {
+  background-color: #27ae60;
+  color: white;
+}
+
+.add-btn:hover {
+  background-color: #219150;
+}
+
+.cancel-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #c0392b;
+}
+
+.dropdown-multi {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-list {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  width: 100%;
+  overflow-y: auto;
+  margin-top: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-height: 540px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #f2f2f2;
+}
+
+.dropdown-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.circle {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #888;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.editable-area {
+  min-height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.5;
+  outline: none;
+  background-color: #fff;
+}
+
+@media (max-width: 768px) {
   .book-management {
-    width: 65%;
-    max-width: 65%;
-    background: #fff;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    font-family: 'Segoe UI', sans-serif;
-    z-index: 2;
+    padding: 20px;
+    border-radius: 12px;
   }
 
   .title {
-    text-align: center;
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #2c3e50;
+    font-size: 22px;
   }
 
-  .form-group {
-    margin-bottom: 18px;
-  }
-
-  .form-group label {
-    margin-bottom: 6px;
-    font-weight: bold;
-  }
-
-  .preview-img img {
-    max-width: 200px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+  .button-group {
+    flex-direction: column;
   }
 
   .button-group .add-btn,
   .button-group .cancel-btn {
-    padding: 12px 25px;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    transition: 0.3s;
-  }
-
-  .add-btn {
-    background-color: #27ae60;
-    color: white;
-  }
-
-  .add-btn:hover {
-    background-color: #219150;
-  }
-
-  .cancel-btn {
-    background-color: #e74c3c;
-    color: white;
-  }
-
-  .cancel-btn:hover {
-    background-color: #c0392b;
-  }
-
-  .dropdown-multi {
-    position: relative;
-  }
-
-  .dropdown-toggle {
-    cursor: pointer;
-  }
-
-  .dropdown-list {
-    position: absolute;
-    z-index: 1000;
-    background: white;
-    border: 1px solid #ccc;
     width: 100%;
-    overflow-y: auto;
-    margin-top: 4px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    max-height: 540px;
   }
+}
 
-  .dropdown-item {
-    display: flex;
-    align-items: center;
-    padding: 6px 10px;
-    cursor: pointer;
-  }
-
-  .dropdown-item:hover {
-    background: #f2f2f2;
-  }
-
-  .dropdown-item input[type="checkbox"] {
-    margin-right: 10px;
-  }
-
-  .circle {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border: 2px solid #888;
-    border-radius: 50%;
-    margin-right: 8px;
-  }
-
-  .editable-area {
-    min-height: 150px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 8px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    line-height: 1.5;
-    outline: none;
-    background-color: #fff;
-  }
-
-  @media (max-width: 768px) {
-    .book-management {
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .title {
-      font-size: 22px;
-    }
-
-    .button-group {
-      flex-direction: column;
-    }
-
-    .button-group .add-btn,
-    .button-group .cancel-btn {
-      width: 100%;
-    }
-  }
-
-  .copy-section {
-    border: 1px solid #c7c7c7;
-    border-radius: 8px;
-    padding: 16px;
-    background: #f9f9f9;
-    margin-bottom: 16px;
-  }
-  </style>
+.copy-section {
+  border: 1px solid #c7c7c7;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f9f9f9;
+  margin-bottom: 16px;
+}
+</style>
