@@ -99,7 +99,9 @@ onMounted(async () => {
   categories.value = Array.isArray(data) ? data : []
 })
 const countBooksByCategory = (categoryId) => {
-  return books.value.filter(book => book.MaLoai === categoryId).length
+  return books.value.filter(book => {
+    return Array.isArray(book.MaLoai) && book.MaLoai.some(loai => loai._id === categoryId)
+  }).length
 }
 watch(() => route.name, async (newRoute) => {
   if (newRoute === 'CategoryManagement') {

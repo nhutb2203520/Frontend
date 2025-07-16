@@ -83,8 +83,8 @@ const showAddForm = ref(false)
 const newPublisher = ref({ TenNXB: '', DiaChi: '' })
 const editedPublisher = ref({ TenNXB: '', DiaChi: '' })
 
-onMounted(() => {
-  publisherStore.fetchPublishers()
+onMounted(async () => {
+  await publisherStore.fetchPublishers()
 })
 
 const totalPublishers = computed(() => publisherStore.publishers?.length || 0)

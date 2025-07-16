@@ -42,6 +42,7 @@
                 <div v-else>
                   <p><strong>Tên tác giả:</strong> {{ capitalizeWords(author.TenTG) }}</p>
                   <p><strong>Mô tả:</strong> {{ author.MoTa }}</p>
+                  <p><strong>Số sách có trong thư viện:</strong> {{ countBooksByAuthor(author._id) }}</p>
                   <div class="detail-actions">
                     <button class="btn btn-warning" @click.stop="editAuthor(author)">✏️ Chỉnh sửa</button>
                     <button class="btn btn-danger" @click.stop="deleteAuthor(author)">🗑️ Xóa</button>
@@ -62,19 +63,29 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { capitalizeWords } from '@/utils/stringUtils'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRoute } from 'vue-router'
+import { useBookStore } from '@/Store/Book.store'
 const authorStore = useAuthorStore()
 const searchKeyword = ref('')
 const showAddForm = ref(false)
 const selectedAuthor = ref(null)
 const editingAuthorId = ref(null)
+const bookStore = useBookStore()
+const books = ref([])
 const route = useRoute()
 const newAuthor = ref({ TenTG: '', MoTa: '' })
 const editedAuthor = ref({ TenTG: '', MoTa: '' })
 const authors = ref([])
 onMounted(async () => {
+  const dataBook = await bookStore.fetchBooks()
+  books.value = Array.isArray(dataBook.danhsachsach) ? dataBook.danhsachsach : []
   const data = await authorStore.fetchAuthors()
   authors.value = Array.isArray(data) ? data : []
 })
+const countBooksByAuthor = (authorId) => {
+  return books.value.filter(book => {
+    return Array.isArray(book.TacGia) && book.TacGia.some(author => author._id === authorId)
+  }).length
+}
 watch(() => route.name, async (newRoute) => {
   if (newRoute === 'AuthorManagement') {
     const res = await authorStore.fetchAuthors()
