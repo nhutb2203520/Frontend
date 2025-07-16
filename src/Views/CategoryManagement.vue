@@ -52,6 +52,8 @@
                       <p><strong>MaLoai:</strong> {{ cat.MaLoai }}</p>
                       <p><strong>Tên loại sách:</strong> {{ cat.TenLoai }}</p>
                       <p><strong>Mô tả:</strong> {{ cat.MoTa }}</p>
+                      <p><strong>Số lượng sách thuộc thể loại {{ cat.TenLoai }} có trong thư viện:</strong>
+                        {{ countBooksByCategory(cat._id) }}</p>
                       <div class="detail-actions">
                         <button class="btn btn-warning" @click.stop="editCategory(cat)">✏️ Chỉnh sửa</button>
                         <button class="btn btn-danger" @click.stop="deleteCategory(cat)">🗑️ Xóa</button>
@@ -76,6 +78,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import { useCategoryBookStore } from '@/Store/category.store'
 import { capitalizeWords } from '@/utils/stringUtils'
 import { useRoute } from 'vue-router'
+import { useBookStore } from '@/Store/Book.store'
 const categoryBookStore = useCategoryBookStore()
 const searchKeyword = ref('')
 const selectedCategory = ref(null)
@@ -85,11 +88,19 @@ const route = useRoute()
 const newCategory = ref({ TenLoai: '', MoTa: '' })
 const editedCategory = ref({ TenLoai: '', MoTa: '' })
 const categories = ref([])
-const nextId = ref(5)
+const bookStore = useBookStore()
+const books = ref([])
+
 onMounted(async () => {
+  const dataBook = await bookStore.fetchBooks()
+  books.value = Array.isArray(dataBook.danhsachsach) ? dataBook.danhsachsach : []
+  console.log(books.value)
   const data = await categoryBookStore.fetchCategoryBooks()
   categories.value = Array.isArray(data) ? data : []
 })
+const countBooksByCategory = (categoryId) => {
+  return books.value.filter(book => book.MaLoai === categoryId).length
+}
 watch(() => route.name, async (newRoute) => {
   if (newRoute === 'CategoryManagement') {
     const res = await categoryBookStore.fetchCategoryBooks()
