@@ -100,7 +100,7 @@
           <select v-model="copy.location">
             <option disabled value="">-- Chọn vị trí --</option>
             <option v-for="loc in locationOptions" :key="loc._id" :value="loc">
-              {{ loc.TenViTri || loc }}
+              {{ capitalizeWords(loc.TenViTri) || loc }}
             </option>
           </select>
 
