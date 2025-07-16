@@ -16,10 +16,12 @@
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
                 <p><strong>Tên sách:</strong> {{ capitalizeWords(book.TenSach) }}</p>
-                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}</p>
+                <p><strong>Loại sách:</strong> {{book.MaLoai?.map(loai => capitalizeWords(loai.TenLoai)).join(', ')}}
+                </p>
                 <p><strong>Tác giả:</strong> {{book.TacGia?.map(tg => capitalizeWords(tg.TenTG)).join(', ')}}</p>
                 <p><strong>Năm xuất bản:</strong> {{ book.NamXuatBan }}</p>
-                <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}</p>
+                <p v-if="selectedCopy"><strong>Nhà xuất bản:</strong> {{ capitalizeWords(selectedCopy.MaNXB?.TenNXB) }}
+                </p>
                 <p><strong>Số lượt mượn:</strong> {{ book.SoLuotMuon }}</p>
 
                 <div class="d-flex flex-wrap gap-3 mt-3">
@@ -30,7 +32,7 @@
                 </div>
 
                 <div v-if="showLocation" class="mt-3 book-info">
-                  <p><strong>Vị trí:</strong> {{ selectedCopy.MaViTri?.TenViTri || 'Không rõ' }}</p>
+                  <p><strong>Vị trí:</strong> {{ capitalizeWords(selectedCopy.MaViTri?.TenViTri) || 'Không rõ' }}</p>
                   <p><strong>Mô tả:</strong> {{ selectedCopy.MaViTri?.MoTa || 'Không rõ' }}</p>
                 </div>
               </div>
@@ -70,12 +72,12 @@
 
           <div class="mt-4 p-3 bg-secondary-subtle rounded shadow-sm">
             <h5 class="fw-bold text-black mb-2">📝 Mô tả sách</h5>
-           <div class="text-black description-text">
-            <template v-for="(seg, idx) in descriptionSegments" :key="idx">
-              <span v-if="seg.text !== '\n'" :class="seg.class">{{ seg.text }}</span>
-              <br v-else />
-            </template>
-          </div>
+            <div class="text-black description-text">
+              <template v-for="(seg, idx) in descriptionSegments" :key="idx">
+                <span v-if="seg.text !== '\n'" :class="seg.class">{{ seg.text }}</span>
+                <br v-else />
+              </template>
+            </div>
 
           </div>
         </div>

@@ -101,7 +101,7 @@
                 <label>Nhà xuất bản:</label>
                 <select v-model="copy.publisher" class="form-control" required>
                   <option disabled value="">-- Chọn NXB --</option>
-                  <option v-for="publisher in publisherOptions" :key="publisher._id" :value="publisher">
+                  <option v-for="publisher in publisherOptions" :key="publisher._id" :value="publisher._id">
                     {{ capitalizeWords(publisher.TenNXB) }}
                   </option>
                 </select>
@@ -114,8 +114,8 @@
                 <label>Vị trí sách:</label>
                 <select v-model="copy.location" class="form-control" required>
                   <option disabled value="">-- Chọn vị trí --</option>
-                  <option v-for="loc in locationOptions" :key="loc._id" :value="loc._id">{{
-                    capitalizeWords(loc.TenViTri) }}</option>
+                  <option v-for="loc in locationOptions" :key="loc._id" :value="loc._id">
+                    {{ capitalizeWords(loc.TenViTri) }}</option>
                 </select>
               </div>
               <div class="text-end">
