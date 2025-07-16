@@ -151,8 +151,6 @@ import { capitalizeWords } from '@/utils/stringUtils';
 import TurndownService from 'turndown';
 
 const turndownService = new TurndownService({ headingStyle: 'atx' });
-
-// ✅ Thêm rule để hỗ trợ <u> => __underline__
 turndownService.addRule('underline', {
   filter: ['u'],
   replacement: function (content) {
@@ -205,7 +203,7 @@ async function handleImageUpload(event) {
       const result = await bookStore.uploadImageBook(file);
       book.image = result.imgUrl;
     } catch (err) {
-      alert("❌ Upload ảnh thất bại");
+      ElMessage.error("❌ Upload ảnh thất bại");
     }
   }
 }
@@ -213,7 +211,6 @@ async function handleImageUpload(event) {
 function updateDescription() {
   let htmlContent = descriptionEditor.value.innerHTML;
 
-  // Fix lỗi xuống dòng đầu
   if (htmlContent.trim() === '<br>' || htmlContent.trim() === '') {
     book.description = '';
     return;
@@ -255,7 +252,64 @@ function removeBookCopy(index) {
   bookCopies.value.splice(index, 1);
 }
 
+// ✅ Hàm kiểm tra toàn bộ form trước khi submit
+function validateForm() {
+  if (!book.name.trim()) {
+    ElMessage.warning("Vui lòng nhập tên sách");
+    return false;
+  }
+
+  if (!book.image) {
+    ElMessage.warning("Vui lòng chọn ảnh sách");
+    return false;
+  }
+
+  if (book.authors.length === 0) {
+    ElMessage.warning("Vui lòng chọn ít nhất một tác giả");
+    return false;
+  }
+
+  if (book.catalogs.length === 0) {
+    ElMessage.warning("Vui lòng chọn ít nhất một loại sách");
+    return false;
+  }
+
+  if (!book.year || book.year < 1000 || book.year > 2100) {
+    ElMessage.warning("Vui lòng nhập năm xuất bản hợp lệ");
+    return false;
+  }
+
+  if (!book.description.trim()) {
+    ElMessage.warning("Vui lòng nhập mô tả");
+    return false;
+  }
+
+  for (let i = 0; i < bookCopies.value.length; i++) {
+    const copy = bookCopies.value[i];
+    if (!copy.name.trim()) {
+      ElMessage.warning(`Tên sách copy thứ ${i + 1} không được để trống`);
+      return false;
+    }
+    if (!copy.publisher) {
+      ElMessage.warning(`Vui lòng chọn nhà xuất bản cho bản sao thứ ${i + 1}`);
+      return false;
+    }
+    if (!copy.quantity || copy.quantity < 1) {
+      ElMessage.warning(`Số lượng bản sao thứ ${i + 1} phải lớn hơn 0`);
+      return false;
+    }
+    if (!copy.location) {
+      ElMessage.warning(`Vui lòng chọn vị trí cho bản sao thứ ${i + 1}`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
 async function submitBook() {
+  if (!validateForm()) return;
+
   try {
     const data = {
       TenSach: book.name,
@@ -270,8 +324,8 @@ async function submitBook() {
         MaViTri: copy.location,
         MaNXB: copy.publisher
       }))
-
     };
+
     const res = await bookStore.addOneBook(data);
 
     if (res.message === 'Thêm sách và bản sao thành công.') {
