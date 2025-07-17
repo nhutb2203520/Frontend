@@ -18,11 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(borrow, index) in borrowDetails"
-            :key="index"
-            :class="{ 'table-danger': isOverdue(borrow) }"
-          >
+          <tr v-for="(borrow, index) in borrowDetails" :key="index" :class="{ 'table-danger': isOverdue(borrow) }">
             <td>{{ index + 1 }}</td>
             <td>
               <strong>{{ capitalizeWords(borrow.MaSachCopy?.MaSach?.TenSach) }}</strong><br />
@@ -55,31 +51,24 @@
               </div>
 
               <!-- Nếu trạng thái là đã lấy và chưa quá hạn -->
-              <button
-                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'"
-                class="btn btn-sm btn-primary"
-                @click="extendBorrow(borrow.MaMuonSach, borrow.MaSachCopy.MaSach?.TenSach)"
-              >
+              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã lấy'" class="btn btn-sm btn-primary"
+                @click="extendBorrow(borrow.MaMuonSach, borrow.MaSachCopy.MaSach?.TenSach)">
                 Gia hạn
               </button>
-
               <!-- Nếu chờ lấy -->
-              <button
-                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'"
-                class="btn btn-sm btn-danger"
-                @click="cancelBorrow(borrow.MaMuonSach)"
-              >
+              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'chờ lấy'" class="btn btn-sm btn-danger"
+                @click="cancelBorrow(borrow.MaMuonSach)">
                 Huỷ mượn
               </button>
 
               <!-- Nếu đã trả -->
-              <button
-                v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'"
-                class="btn btn-sm btn-success"
-                @click="goToBookDetail(borrow.MaSachCopy.MaSach?.MaSach)"
-              >
+              <button v-else-if="borrow.MaTrangThai?.TenTrangThai === 'đã trả'" class="btn btn-sm btn-success"
+                @click="goToBookDetail(borrow.MaSachCopy.MaSach?.MaSach)">
                 Mượn lại
               </button>
+              <p v-if="borrow.DaGiaHan && borrow.MaTrangThai?.TenTrangThai === 'đã lấy' && !isOverdue(borrow)"
+                class="text-secondary gia-han-note">
+                Đã gia hạn</p>
             </td>
           </tr>
         </tbody>
@@ -204,8 +193,12 @@ table td {
   vertical-align: middle;
   border: 1px solid black !important;
   white-space: normal;
-  font-size: 30px;
+  font-size: 24px;
   word-break: break-word;
+}
+
+table td {
+  font-size: 20px;
 }
 
 .table thead th {
@@ -254,5 +247,11 @@ table td {
   h2 {
     font-size: 20px;
   }
+}
+
+.gia-han-note {
+  font-size: 14px !important;
+  font-style: italic;
+  margin-bottom: 5px;
 }
 </style>
