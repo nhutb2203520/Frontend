@@ -13,9 +13,10 @@
         </div>
 
         <!-- Tin nhắn -->
-        <div class="chat-messages">
+        <div class="chat-messages" ref="chatMessages">
           <div v-for="(msg, index) in messages" :key="index" :class="msg.sender === 'user' ? 'msg-user' : 'msg-bot'">
-            <span>{{ msg.text }}</span>
+            <span v-if="msg.sender === 'user'">{{ msg.text }}</span>
+            <span v-else v-html="msg.text" @click="handleMessageClick"></span>
           </div>
         </div>
 
@@ -64,14 +65,13 @@ export default {
       this.$nextTick(() => this.scrollToBottom());
 
       try {
-        const MaDocGia = localStorage.getItem("MaDocGia") || "guest"; // hoặc lấy từ Pinia/Vuex
-        const res = await axios.post("http://localhost:3000/chatbot", {
+        const res = await axios.post("http://localhost:5000/api/chatbot/chat", {
           message: text,
         });
 
         this.messages.push({
           sender: "bot",
-          text: res.data.answer || "🤖 Tôi không hiểu ý bạn, hãy hỏi rõ hơn nhé.",
+          text: res.data.response || "🤖 Tôi không hiểu ý bạn, hãy hỏi rõ hơn nhé.",
         });
       } catch (err) {
         console.error("Chat error:", err);
@@ -82,6 +82,18 @@ export default {
       }
 
       this.$nextTick(() => this.scrollToBottom());
+    },
+    handleMessageClick(event) {
+      // Kiểm tra nếu click vào element có class "detail-link"
+      if (event.target.classList.contains('detail-link')) {
+        const bookId = event.target.getAttribute('data-book-id');
+        if (bookId) {
+          // Đóng chat trước khi navigate
+          this.closeChat();
+          // Sử dụng router để chuyển trang
+          this.$router.push(`/book/${bookId}`);
+        }
+      }
     },
     scrollToBottom() {
       const container = this.$el.querySelector(".chat-messages");
@@ -162,11 +174,15 @@ export default {
 }
 
 .msg-user {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
 
 .msg-bot {
-  text-align: left;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .msg-user span,
@@ -184,6 +200,19 @@ export default {
 .msg-user span {
   background-color: #007bff;
   color: white;
+}
+
+/* Style cho link "Xem chi tiết" */
+.msg-bot span :deep(.detail-link) {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.msg-bot span :deep(.detail-link):hover {
+  color: #0056b3;
+  text-decoration: none;
 }
 
 .chat-input-area {

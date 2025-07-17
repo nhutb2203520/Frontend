@@ -25,6 +25,15 @@
 
             <Footer />
             <Chat />
+            <div data-aos="fade-left" data-aos-duration="1000" v-if="showAssistantMessage"
+                class="assistant-bubble shadow rounded d-flex align-items-start">
+                <div class="message-text">
+                    🧠 <strong>Tôi là trợ lý ảo của thư viện</strong><br />
+                    Bạn cần giúp gì?
+                </div>
+                <button @click="showAssistantMessage = false" class="btn-close btn-sm ms-2 mt-1"
+                    aria-label="Close"></button>
+            </div>
         </div>
     </div>
 </template>
@@ -43,6 +52,7 @@ import BookForYou from '@/components/Client/BookForYou.vue';
 import SearchBook from '@/components/Client/SearchBook.vue';
 import Footer from '@/components/Client/Footer.vue';
 import Chat from '@/components/Client/Chat.vue';
+const showAssistantMessage = ref(true);
 
 const route = useRoute();
 const sidebarRef = ref(null);
@@ -133,6 +143,34 @@ function handleAllBooks() {
 </script>
 
 <style scoped>
+.assistant-message {
+    background-color: #e0f4ff;
+    border-left: 5px solid #0dcaf0;
+}
+
+.assistant-bubble {
+    position: fixed;
+    bottom: 90px;
+    right: 40px;
+    max-width: 250px;
+    height: 70px;
+    background: #e0f4ff;
+    border-left: 4px solid #0dcaf0;
+    padding: 12px 12px;
+    font-size: 11px;
+    z-index: 1050;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.assistant-bubble:hover {
+    background-color: #91d0ff;
+    transform: scale(1.1) rotate(1.5deg);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.45);
+}
+
+
 .main-content {
     transition: margin-left 0.3s ease;
     margin-top: 0 !important;
