@@ -24,6 +24,7 @@ onMounted(() => {
         readerStore.setInfoReader(decodeToken(token).HoTen)
         // Điều hướng đến dashboard
         router.push('/')
+        authStore.startRefreshLoop()
         ElMessage.success('Đăng nhập thành công.')
     } else {
         // Nếu không có token, điều hướng về trang login
