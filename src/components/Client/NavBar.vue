@@ -2,7 +2,7 @@
     <nav class="navbar navbar-expand-lg bg-primary text-white">
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Logo -->
-            <div class="navbar-left d-flex align-items-center">
+            <div class="navbar-left ">
                 <router-link to="/" replace class="navbar-logo d-flex align-items-center">
                     <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
                     <span class="title text-white pt-4">QUẢN LÝ THƯ VIỆN NLN</span>
@@ -28,6 +28,16 @@
                     </router-link>
 
                 </li>
+                
+                <li>
+                    <router-link to="/favoritebook" replace
+                        :class="{ active: $route.path === '/favoritebook' }">
+                        Sách Yêu Thích
+                    </router-link>
+
+                </li>
+
+
             </ul>
 
             <!-- Bên phải -->
