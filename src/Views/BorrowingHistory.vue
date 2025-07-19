@@ -73,6 +73,10 @@
           </tr>
         </tbody>
       </table>
+      <div v-if="!borrowDetails" class="text-center empty-borrow-notice">
+        Bạn chưa đăng ký hoặc mượn quyển sách nào.
+      </div>
+
     </div>
   </div>
 </template>
@@ -90,7 +94,6 @@ import { formatDate } from '@/utils/formatDate';
 const borrowBookStore = useBorrowBookStore();
 const borrowDetails = ref([]);
 const router = useRouter();
-
 onMounted(async () => {
   borrowDetails.value = await borrowBookStore.fetchBorrowBooksForUser();
 });
@@ -253,5 +256,18 @@ table td {
   font-size: 14px !important;
   font-style: italic;
   margin-bottom: 5px;
+}
+
+.empty-borrow-notice {
+  background-color: #85b7e9;
+  color: #333;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #d0d7de;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  margin: 2rem auto;
+  font-size: 1.1rem;
+  font-weight: bolder;
 }
 </style>

@@ -7,12 +7,19 @@
         <!-- Ảnh minh họa -->
         <div class="form-group">
           <label>Ảnh sách:</label>
-          <input type="file" accept="image/*" @change="handleImageUpload" />
-          <div v-if="previewImage" class="preview-img">
-            <img :src="previewImage" alt="Ảnh sách" />
+          <input type="file" accept="image/*" multiple @change="handleImagesUpload" />
+          <div v-if="previewImages.length > 0" class="preview-img mt-2 d-flex flex-wrap gap-2">
+            <div v-for="(src, idx) in previewImages" :key="idx" class="img-thumb-wrapper">
+              <img :src="src" alt="Xem trước" class="img-thumbnail" />
+            </div>
           </div>
-          <div v-else-if="previewImageBeforeUpdate" class="preview-img">
+          <!-- <div v-else-if="previewImageBeforeUpdate" class="preview-img">
             <img :src="'http://localhost:3000' + previewImageBeforeUpdate" alt="Ảnh sách" />
+          </div> -->
+          <div v-else-if="previewImageBeforeUpdate" class="preview-img mt-2 d-flex flex-wrap gap-2">
+            <div v-for="(src, idx) in previewImageBeforeUpdate" :key="idx" class="img-thumb-wrapper">
+              <img :src="'http://localhost:3000' + src" alt="ảnh sách" class="img-thumbnail" />
+            </div>
           </div>
         </div>
 
@@ -27,7 +34,8 @@
             <div class="form-control dropdown-toggle" @click.stop="toggleAuthorDropdown">
               {{
                 book.author.length
-                  ? authorOptions.filter(author => book.author.includes(author._id)).map(author => capitalizeWords(author.TenTG)).join(', ')
+                  ? authorOptions.filter(author => book.author.includes(author._id)).map(author =>
+                    capitalizeWords(author.TenTG)).join(', ')
                   : 'Chọn tác giả'
               }}
             </div>
@@ -46,7 +54,8 @@
             <div class="form-control dropdown-toggle" @click.stop="toggleCatalogDropdown">
               {{
                 book.catalogs.length
-                  ? categoryOptions.filter(cat => book.catalogs.includes(cat._id)).map(cat => capitalizeWords(cat.TenLoai)).join(', ')
+                  ? categoryOptions.filter(cat => book.catalogs.includes(cat._id)).map(cat =>
+                    capitalizeWords(cat.TenLoai)).join(', ')
                   : 'Chọn loại sách'
               }}
             </div>
@@ -71,14 +80,8 @@
             <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('italic')"><i>I</i></button>
             <button type="button" class="btn btn-outline-dark btn-sm" @click="formatText('underline')"><u>U</u></button>
           </div>
-          <div 
-            ref="descriptionEditor" 
-            class="editable-area" 
-            contenteditable="true" 
-            @input="updateDescription"
-            @keydown="handleKeydown"
-            @paste="handlePaste"
-          ></div>
+          <div ref="descriptionEditor" class="editable-area" contenteditable="true" @input="updateDescription"
+            @keydown="handleKeydown" @paste="handlePaste"></div>
         </div>
 
         <h2 class="title">Sách Copy</h2>
@@ -140,21 +143,23 @@ turndownService.addRule('underline', {
   replacement: content => `__${content}__`
 });
 
+const bookStore = useBookStore()
 const route = useRoute();
 const router = useRouter();
-const previewImage = ref(null);
+const previewImages = ref([]);
+const imagesToUpload = ref([]); // chứa File(s)
 const showAuthorDropdown = ref(false);
 const showCatalogDropdown = ref(false);
 const descriptionEditor = ref(null);
-const previewImageBeforeUpdate = ref('');
-const book = reactive({ 
-  id: null, 
-  name: '', 
-  author: [], 
-  catalogs: [], 
-  year: new Date().getFullYear(), 
-  description: '', 
-  image: null 
+const previewImageBeforeUpdate = ref([]);
+const book = reactive({
+  id: null,
+  name: '',
+  author: [],
+  catalogs: [],
+  year: new Date().getFullYear(),
+  description: '',
+  image: []
 });
 const bookCopies = ref([]);
 const categoryOptions = ref([]);
@@ -185,17 +190,17 @@ async function fetchBook() {
   book.description = bookDetail.sach.MoTa;
   book.image = bookDetail.sach.image;
   previewImageBeforeUpdate.value = book.image;
-  bookCopies.value = bookDetail.sachCopies?.map(copy => ({ 
-    _id: copy._id, 
-    name: capitalizeWords(copy.TenLoaiBanSao), 
-    quantity: copy.SoQuyen, 
-    publisher: copy.MaNXB, 
-    location: copy.MaViTri 
+  bookCopies.value = bookDetail.sachCopies?.map(copy => ({
+    _id: copy._id,
+    name: capitalizeWords(copy.TenLoaiBanSao),
+    quantity: copy.SoQuyen,
+    publisher: copy.MaNXB,
+    location: copy.MaViTri
   }));
-  
+
   // Initialize editor content
   editorContent.value = book.description;
-  
+
   // Convert markdown to HTML and set to editor after DOM is ready
   await nextTick();
   if (descriptionEditor.value && book.description) {
@@ -204,24 +209,29 @@ async function fetchBook() {
   }
 }
 
-async function handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    previewImage.value = URL.createObjectURL(file);
+const handleImagesUpload = async (event) => {
+  const files = Array.from(event.target.files);
+  imagesToUpload.value = files;
+  previewImages.value = files.map(f => URL.createObjectURL(f));
+  // upload từng file
+  const urls = [];
+  for (const file of files) {
     try {
-      const result = await useBookStore().uploadImageBook(file);
-      book.image = result.imgUrl;
-    } catch {
-      alert('❌ Upload ảnh thất bại');
+      const res = await bookStore.uploadImageBook(file);
+      urls.push(res.imgUrl);
+    } catch (err) {
+      ElMessage.error('Lỗi upload ảnh ' + file.name);
     }
   }
-}
+  book.image = urls;
+};
+
 
 function updateDescription() {
   if (isUpdating.value) return;
-  
+
   isUpdating.value = true;
-  
+
   const html = descriptionEditor.value.innerHTML;
   if (html.trim() === '<br>' || html.trim() === '') {
     book.description = '';
@@ -229,7 +239,7 @@ function updateDescription() {
     isUpdating.value = false;
     return;
   }
-  
+
   try {
     // Use custom HTML to markdown conversion
     const markdown = htmlToMarkdown(html);
@@ -242,14 +252,14 @@ function updateDescription() {
     book.description = markdown.trim();
     editorContent.value = markdown.trim();
   }
-  
+
   isUpdating.value = false;
 }
 
 // Function to convert markdown to HTML
 function markdownToHTML(markdown) {
   if (!markdown) return '';
-  
+
   return markdown
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/__([^_]+)__/g, '<u>$1</u>')
@@ -261,7 +271,7 @@ function markdownToHTML(markdown) {
 // Function to convert HTML back to markdown (improved)
 function htmlToMarkdown(html) {
   if (!html) return '';
-  
+
   return html
     .replace(/<strong[^>]*>([^<]+)<\/strong>/g, '**$1**')
     .replace(/<b[^>]*>([^<]+)<\/b>/g, '**$1**')
@@ -280,21 +290,21 @@ function handleKeydown(event) {
   if (event.key === 'Enter') {
     // Prevent default behavior and handle manually
     event.preventDefault();
-    
+
     // Insert a line break
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
-    
+
     // Create a new line element
     const br = document.createElement('br');
     range.insertNode(br);
-    
+
     // Move cursor after the break
     range.setStartAfter(br);
     range.setEndAfter(br);
     selection.removeAllRanges();
     selection.addRange(range);
-    
+
     // Update the description
     updateDescription();
   }
@@ -302,10 +312,10 @@ function handleKeydown(event) {
 
 function handlePaste(event) {
   event.preventDefault();
-  
+
   // Get plain text from clipboard
   const text = event.clipboardData.getData('text/plain');
-  
+
   // Insert plain text at cursor position
   const selection = window.getSelection();
   if (selection.rangeCount > 0) {
@@ -316,7 +326,7 @@ function handlePaste(event) {
     selection.removeAllRanges();
     selection.addRange(range);
   }
-  
+
   updateDescription();
 }
 
@@ -324,10 +334,10 @@ function formatText(command) {
   // Store current cursor position
   const selection = window.getSelection();
   if (!selection.rangeCount) return;
-  
+
   // Apply formatting
   document.execCommand(command, false, null);
-  
+
   // Update the description
   updateDescription();
 }
@@ -336,7 +346,7 @@ function formatText(command) {
 const displayDescriptionSegments = computed(() => {
   const raw = editorContent.value || '';
   if (!raw) return [];
-  
+
   const lines = raw.split('\n');
   const segments = [];
   const regex = /\*\*([^*]+)\*\*|__([^_]+)__|_([^_]+)_|\*([^*]+)\*/g;
@@ -344,7 +354,7 @@ const displayDescriptionSegments = computed(() => {
   lines.forEach((line, lineIndex) => {
     let lastIndex = 0;
     let match;
-    
+
     while ((match = regex.exec(line)) !== null) {
       // Add text before the match
       if (match.index > lastIndex) {
@@ -353,7 +363,7 @@ const displayDescriptionSegments = computed(() => {
           segments.push({ text: beforeText, class: '' });
         }
       }
-      
+
       // Add formatted text
       if (match[1]) {
         // Bold: **text**
@@ -365,10 +375,10 @@ const displayDescriptionSegments = computed(() => {
         // Italic: _text_ or *text*
         segments.push({ text: match[3] || match[4], class: 'fst-italic' });
       }
-      
+
       lastIndex = regex.lastIndex;
     }
-    
+
     // Add remaining text after last match
     if (lastIndex < line.length) {
       const remainingText = line.slice(lastIndex);
@@ -376,35 +386,35 @@ const displayDescriptionSegments = computed(() => {
         segments.push({ text: remainingText, class: '' });
       }
     }
-    
+
     // Add line break except for the last line
     if (lineIndex < lines.length - 1) {
       segments.push({ text: '\n', class: '' });
     }
   });
-  
+
   return segments;
 });
 
 function updateBook() {
-  const BanSao = bookCopies.value.map(copy => ({ 
-    _id: copy._id, 
-    TenLoaiBanSao: copy.name, 
-    SoQuyen: copy.quantity, 
-    MaNXB: copy.publisher?._id, 
-    MaViTri: copy.location?._id 
+  const BanSao = bookCopies.value.map(copy => ({
+    _id: copy._id,
+    TenLoaiBanSao: copy.name,
+    SoQuyen: copy.quantity,
+    MaNXB: copy.publisher?._id,
+    MaViTri: copy.location?._id
   }));
-  
-  const data = { 
-    TenSach: book.name.trim(), 
-    TacGia: book.author, 
-    MaLoai: book.catalogs, 
-    NamXuatBan: book.year, 
-    MoTa: book.description, 
-    image: book.image, 
-    BanSao 
+
+  const data = {
+    TenSach: book.name.trim(),
+    TacGia: book.author,
+    MaLoai: book.catalogs,
+    NamXuatBan: book.year,
+    MoTa: book.description,
+    image: book.image,
+    BanSao
   };
-  
+
   useBookStore().updateBook(book.id, data)
     .then(result => {
       if (result.message.includes('thành công')) {
@@ -670,5 +680,10 @@ function toggleCatalogDropdown() {
   border: 2px solid #888;
   border-radius: 50%;
   margin-right: 8px;
+}
+
+.img-thumbnail {
+  width: 200px;
+  height: 250px;
 }
 </style>

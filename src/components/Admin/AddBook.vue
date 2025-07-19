@@ -10,10 +10,13 @@
             <!-- 1. Ảnh sách -->
             <div class="form-group">
               <label>Ảnh sách:</label>
-              <input type="file" accept="image/*" @change="handleImageUpload" class="form-control" />
-              <div v-if="previewImage" class="preview-img mt-2">
-                <img :src="previewImage" alt="Xem trước ảnh" class="img-thumbnail" />
+              <input type="file" accept="image/*" @change="handleImagesUpload" multiple class="form-control" />
+              <div v-if="previewImages.length" class="preview-img mt-2 d-flex flex-wrap gap-2">
+                <div v-for="(src, idx) in previewImages" :key="idx" class="img-thumb-wrapper">
+                  <img :src="src" alt="Xem trước" class="img-thumbnail" />
+                </div>
               </div>
+
             </div>
 
             <!-- 2. Tên sách -->
@@ -193,7 +196,9 @@ const authorGroup = ref(null);
 const catalogGroup = ref(null);
 const descriptionEditor = ref(null);
 
-const previewImage = ref(null);
+const previewImages = ref([]); // chứa URLs preview
+const imagesToUpload = ref([]); // chứa File(s)
+
 const showAuthorDropdown = ref(false);
 const showCatalogDropdown = ref(false);
 
@@ -213,7 +218,7 @@ const book = reactive({
   catalogs: [],
   year: new Date().getFullYear(),
   description: '',
-  image: null
+  image: []
 });
 
 const bookCopies = ref([{ name: '', publisher: '', quantity: 1, location: '' }]);
@@ -236,18 +241,23 @@ onMounted(async () => {
   locationOptions.value = await locationStore.fetchLocationBooks();
 });
 
-const handleImageUpload = async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    previewImage.value = URL.createObjectURL(file);
+const handleImagesUpload = async (event) => {
+  const files = Array.from(event.target.files);
+  imagesToUpload.value = files;
+  previewImages.value = files.map(f => URL.createObjectURL(f));
+  // upload từng file
+  const urls = [];
+  for (const file of files) {
     try {
-      const result = await bookStore.uploadImageBook(file);
-      book.image = result.imgUrl;
+      const res = await bookStore.uploadImageBook(file);
+      urls.push(res.imgUrl);
     } catch (err) {
-      ElMessage.error('Lỗi khi upload ảnh');
+      ElMessage.error('Lỗi upload ảnh ' + file.name);
     }
   }
+  book.image = urls;
 };
+
 
 const updateDescription = () => {
   const html = descriptionEditor.value.innerHTML;
@@ -398,6 +408,11 @@ const cancelAdd = () => {
 
 
 <style scoped>
+.img-thumbnail {
+  width: 200px;
+  height: 250px;
+}
+
 .overlay {
   position: fixed;
   top: 0;

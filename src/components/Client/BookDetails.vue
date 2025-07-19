@@ -9,9 +9,20 @@
           <h4 class="text-info fw-bold text-center mb-4">📘 Thông tin chi tiết sách</h4>
 
           <div class="row">
-            <div class="col-md-5 d-flex justify-content-center align-items-center">
-              <img :src="'http://localhost:3000' + book.image" alt="Ảnh sách" class="book-image rounded" />
+            <div class="col-md-5 d-flex flex-column align-items-center">
+              <!-- Ảnh chính -->
+              <img :src="currentImage" alt="Ảnh sách" class="book-image rounded mb-3" />
+
+              <!-- Ảnh nhỏ -->
+              <div class="thumb-list d-flex flex-wrap justify-content-center gap-2">
+                <img v-for="(img, idx) in bookImages" :key="idx" :src="'http://localhost:3000' + img"
+                  @click="currentImage = 'http://localhost:3000' + img" class="thumb-img rounded border"
+                  :class="{ 'border-info': currentImage === 'http://localhost:3000' + img }"
+                  style="width: 60px; height: 80px; object-fit: cover; cursor: pointer;" />
+              </div>
             </div>
+
+
 
             <div class="col-md-7 mt-4 mt-md-0">
               <div class="book-info ps-2">
@@ -27,6 +38,9 @@
 
                 <div class="d-flex flex-wrap gap-3 mt-3">
                   <button class="btn btn-outline-info" @click="borrowBook">📚 Mượn sách</button>
+                  <button :class="[isFavorite ? 'btn unfavorite-btn' : 'btn favorite-btn']" @click="toggleFavorite">
+                    {{ isFavorite ? '💔 Bỏ yêu thích' : '❤️ Yêu thích' }}
+                  </button>
                   <button v-if="selectedCopy" class="btn btn-outline-light" @click="showLocation = !showLocation">
                     {{ showLocation ? '🙈 Ẩn vị trí sách' : '📍 Xem vị trí sách' }}
                   </button>
@@ -112,6 +126,10 @@ export default {
       book: null,
       sachCopies: [],
       selectedCopyId: null,
+      currentImage: '', // ảnh đang hiển thị chính
+      bookImages: [],  // mảng chứa danh sách ảnh
+      //test favorite book
+      isFavorite: false
     };
   },
   computed: {
@@ -169,6 +187,11 @@ export default {
       const response = await bookStore.fetchBookByMaSach(MaSach);
       this.book = response.sach;
       this.sachCopies = response.sachCopies;
+      const base = 'http://localhost:3000';
+      const images = this.book?.image || [];
+
+      this.bookImages = images;
+      this.currentImage = base + images[0];
     } catch (err) {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;
@@ -224,6 +247,11 @@ export default {
         ElMessage.error(err?.message || 'Đã xảy ra lỗi');
       }
     },
+    toggleFavorite() {
+      this.isFavorite = !this.isFavorite;
+      ElMessage.success(this.isFavorite ? 'Đã thêm vào yêu thích' : 'Đã bỏ khỏi yêu thích');
+      // TODO: Gọi API lưu nếu cần
+    },
   },
 };
 </script>
@@ -252,8 +280,8 @@ export default {
 }
 
 .book-image {
-  max-width: 100%;
-  max-height: 400px;
+  width: 250px;
+  height: 350px;
   object-fit: contain;
   border: 1px solid #444;
   padding: 10px;
@@ -286,5 +314,35 @@ export default {
 
 .description-text .text-decoration-underline {
   text-decoration: underline;
+}
+
+.thumb-img:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+.favorite-btn {
+  border: 1px solid #ff4d6d;
+  color: #ff4d6d;
+  background: transparent;
+  transition: 0.3s ease;
+}
+
+.favorite-btn:hover {
+  background-color: #ff4d6d;
+  color: #fff;
+}
+
+.unfavorite-btn {
+  background-color: #f04161;
+  color: #fff;
+  border: 1px solid #ff4d6d;
+  transition: 0.3s ease;
+}
+
+.unfavorite-btn:hover {
+  background-color: #e63956;
+  border-color: #e63956;
 }
 </style>
