@@ -101,6 +101,11 @@ const routes = [
     name: "Reset Password",
     component: () => import("@/Views/Reset-Password.vue"),
   },
+  {
+    path: "/auth/callback",
+    name: "AuthCallback",
+    component: () => import("@/components/Client/AuthCallback.vue"),
+  },
 
   // --------- Admin routes (bắt đầu bằng /admin) ---------
   {

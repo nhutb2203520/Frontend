@@ -41,7 +41,7 @@
         <button class="action-btn update" @click="$router.push('/account-user/update-account')">
           Cập nhật
         </button>
-        <button class="action-btn password" @click="$router.push('/account-user/change-password')">
+        <button v-if="!isGoogle" class="action-btn password" @click="$router.push('/account-user/change-password')">
           Đổi mật khẩu
         </button>
         <button class="action-btn delete" @click="handleDeleteAccount">
@@ -59,9 +59,11 @@ import { useReaderStore } from '@/Store/Reader.store';
 import { formatDate } from '../utils/formatDate'
 import { capitalizeWords } from '../utils/stringUtils'
 import { useAuthStore } from '@/Store/auth.store';
+import { decodeToken } from '@/utils/decode'
 const userInfo = ref(null);
 const authStore = useAuthStore();
 const readerStore = useReaderStore();
+const isGoogle = decodeToken(authStore.accessToken).type
 onMounted(async () => {
   try {
     const res = await readerStore.getMyAccount();

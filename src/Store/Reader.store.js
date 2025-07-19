@@ -11,6 +11,10 @@ export const useReaderStore = defineStore("reader", {
     error: null,
   }),
   actions: {
+    setInfoReader(hoTen) {
+      this.infoReader = hoTen;
+      sessionStorage.setItem("infoReader", hoTen);
+    },
     setReaders(readers) {
       this.readers = readers;
     },
