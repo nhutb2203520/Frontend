@@ -5,7 +5,7 @@
             <div class="navbar-left ">
                 <router-link to="/" replace class="navbar-logo d-flex align-items-center">
                     <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
-                    <span class="title text-white pt-4">QUẢN LÝ THƯ VIỆN NLN</span>
+                    <span class="title text-white ">QUẢN LÝ THƯ VIỆN NLN</span>
                 </router-link>
             </div>
 
@@ -28,10 +28,9 @@
                     </router-link>
 
                 </li>
-                
+
                 <li>
-                    <router-link to="/favoritebook" replace
-                        :class="{ active: $route.path === '/favoritebook' }">
+                    <router-link to="/favoritebook" replace :class="{ active: $route.path === '/favoritebook' }">
                         Sách Yêu Thích
                     </router-link>
 
