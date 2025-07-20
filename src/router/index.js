@@ -31,6 +31,7 @@ import UpdateAccount from "@/components/Client/UpdateAccount.vue";
 import ChangePassAD from "@/components/Admin/ChangePassAD.vue";
 import UpdateAccountAD from "@/components/Admin/UpdateAccountAD.vue";
 import { useAdminStore } from "@/Store/Admin.store";
+import FavoriteBook from "@/Views/FavoriteBook.vue";
 const routes = [
   // --------- Client routes ---------
   {
@@ -75,6 +76,11 @@ const routes = [
         next();
       }
     },
+  },
+  {
+    path: "/favoritebook",
+    name: "FavoriteBook",
+    component: FavoriteBook,
   },
   {
     path: "/account-user",
