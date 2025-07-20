@@ -5,6 +5,7 @@ import axios from "../utils/axios";
 export const useBookStore = defineStore("book", {
   state: () => ({
     books: [],
+    booksFavorite: [],
     loading: false,
     error: null,
   }),
@@ -133,6 +134,49 @@ export const useBookStore = defineStore("book", {
       try {
         const response = await axios.patch(`/books/${MaSach}`, data);
         return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async addBookFavorite(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.post(`/books-favorite/${data.MaSachId}`);
+        if (response.data.bookFavorite) {
+          if (!Array.isArray(this.booksFavorite)) this.booksFavorite = [];
+          this.booksFavorite.push(response.data.bookFavorite);
+        }
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async deleteBookFavorite(data) {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.delete(`/books-favorite/${data.MaSachId}`);
+        return response.data;
+      } catch (err) {
+        this.setError(err.message);
+      } finally {
+        this.setLoading(false);
+      }
+    },
+    async getAllBookFavorite() {
+      this.setLoading(true);
+      this.setError(null);
+      try {
+        const response = await axios.get(`/books-favorite`);
+        if (response.data.bookFavoriteList) {
+          this.booksFavorite = response.data.bookFavoriteList;
+        }
+        return response.data.bookFavoriteList;
       } catch (err) {
         this.setError(err.message);
       } finally {

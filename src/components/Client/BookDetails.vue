@@ -38,7 +38,8 @@
 
                 <div class="d-flex flex-wrap gap-3 mt-3">
                   <button class="btn btn-outline-info" @click="borrowBook">📚 Mượn sách</button>
-                  <button :class="[isFavorite ? 'btn unfavorite-btn' : 'btn favorite-btn']" @click="toggleFavorite">
+                  <button :class="[isFavorite ? 'btn unfavorite-btn' : 'btn favorite-btn']"
+                    @click="toggleFavorite(book)">
                     {{ isFavorite ? '💔 Bỏ yêu thích' : '❤️ Yêu thích' }}
                   </button>
                   <button v-if="selectedCopy" class="btn btn-outline-light" @click="showLocation = !showLocation">
@@ -247,10 +248,38 @@ export default {
         ElMessage.error(err?.message || 'Đã xảy ra lỗi');
       }
     },
-    toggleFavorite() {
-      this.isFavorite = !this.isFavorite;
-      ElMessage.success(this.isFavorite ? 'Đã thêm vào yêu thích' : 'Đã bỏ khỏi yêu thích');
-      // TODO: Gọi API lưu nếu cần
+    async toggleFavorite(book) {
+      if (!useAuthStore().accessToken) {
+        ElMessage.warning('Vui lòng nhập để đăng ký mượn sách.')
+        this.$router.push({ name: 'Signin User' })
+        return
+      }
+      try {
+        this.isFavorite = !this.isFavorite;
+        const MaSachId = book._id
+        const data = {
+          MaSachId: MaSachId
+        }
+        const bookStore = useBookStore()
+        if (this.isFavorite) {
+          const result = await bookStore.addBookFavorite(data)
+          if (result.message === 'Thêm vào yêu thích thành công.') {
+            ElMessage.success('Đã thêm vào yêu thích.')
+          } else {
+            ElMessage.error(res.message || 'Thêm vào yêu thích thất bại.')
+          }
+        } else {
+          const result = await bookStore.deleteBookFavorite(data)
+          if (result.message === 'Xóa sách yêu thích thành công.') {
+            ElMessage.success('Đã bỏ khỏi yêu thích.')
+          } else {
+            ElMessage.error(res.message || 'Bỏ yêu thích thất bại.')
+          }
+        }
+      } catch (err) {
+        ElMessage.error('Lỗi khi thêm vào sách yêu thích.')
+      }
+
     },
   },
 };
