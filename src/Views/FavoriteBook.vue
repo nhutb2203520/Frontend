@@ -1,5 +1,6 @@
 <template>
   <div class="container-fluid bg-dark text-white py-5">
+    <!-- Tiêu đề -->
     <div class="text-center mb-5">
       <h2 class="text-warning fw-bold display-5">SÁCH YÊU THÍCH</h2>
       <div class="d-flex justify-content-center align-items-center gap-3">
@@ -11,8 +12,11 @@
 
     <!-- Bộ lọc theo ngày -->
     <div class="mb-4 text-end">
-      <select class="form-select w-auto d-inline-block bg-dark text-white border-warning"
-              v-model="sortOrder" @change="sortBooks">
+      <select
+        class="form-select w-auto d-inline-block bg-dark text-white border-warning"
+        v-model="sortOrder"
+        @change="sortBooks"
+      >
         <option value="desc">Mới nhất</option>
         <option value="asc">Cũ nhất</option>
       </select>
@@ -20,8 +24,11 @@
 
     <!-- Danh sách sách -->
     <div class="row g-4">
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3"
-           v-for="(book, index) in books" :key="index">
+      <div
+        class="col-1-5"
+        v-for="(book, index) in books"
+        :key="index"
+      >
         <div
           class="book-card bg-dark bg-opacity-75 border border-light rounded-3 p-3 h-100 d-flex flex-column align-items-center text-center book-hover"
         >
@@ -37,9 +44,17 @@
       </div>
     </div>
 
-    <p v-if="books.length === 0" class="text-danger text-center fw-bold fs-5 mt-4">
+    <p
+      v-if="books.length === 0"
+      class="text-danger text-center fw-bold fs-5 mt-4"
+    >
       Bạn chưa có sách yêu thích nào.
     </p>
+
+    <!-- Nút xem thêm -->
+    <div class="text-center mt-4" v-if="displayCount < allBooks.length">
+      <button class="btn btn-outline-warning" @click="loadMore">Xem thêm</button>
+    </div>
   </div>
 </template>
 
@@ -48,13 +63,15 @@ export default {
   name: 'FavoriteBookList',
   data() {
     return {
+      allBooks: [],
       books: [],
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      displayCount: 10
     };
   },
   methods: {
     loadFavoriteBooks() {
-      this.books = [
+      this.allBooks = [
         {
           id: 1,
           title: 'Nhà giả kim',
@@ -96,17 +113,57 @@ export default {
           author: 'J.K. Rowling',
           image: 'https://cdn0.fahasa.com/media/catalog/product/i/m/image_195509.jpg',
           dateAdded: '2023-06-28'
+        },
+        {
+          id: 7,
+          title: 'Bố già',
+          author: 'Mario Puzo',
+          image: 'https://cdn0.fahasa.com/media/catalog/product/b/o/bo-gia---tai-ban-2021.jpg',
+          dateAdded: '2023-06-15'
+        },
+        {
+          id: 8,
+          title: 'Tuổi thơ dữ dội',
+          author: 'Phùng Quán',
+          image: 'https://cdn0.fahasa.com/media/catalog/product/t/u/tuoi_tho_du_doi.jpg',
+          dateAdded: '2023-06-10'
+        },
+        {
+          id: 9,
+          title: 'Chí Phèo',
+          author: 'Nam Cao',
+          image: 'https://cdn0.fahasa.com/media/catalog/product/c/h/chi_pheo.jpg',
+          dateAdded: '2023-05-28'
+        },
+        {
+          id: 10,
+          title: '1984',
+          author: 'George Orwell',
+          image: 'https://cdn0.fahasa.com/media/catalog/product/1/9/1984.jpg',
+          dateAdded: '2023-04-20'
+        },
+        {
+          id: 11,
+          title: 'Tôi thấy hoa vàng trên cỏ xanh',
+          author: 'Nguyễn Nhật Ánh',
+          image: 'https://cdn0.fahasa.com/media/catalog/product/h/o/hoa-vang.jpg',
+          dateAdded: '2023-03-25'
         }
       ];
 
       this.sortBooks();
     },
     sortBooks() {
-      this.books.sort((a, b) => {
+      this.allBooks.sort((a, b) => {
         const da = new Date(a.dateAdded);
         const db = new Date(b.dateAdded);
         return this.sortOrder === 'asc' ? da - db : db - da;
       });
+      this.books = this.allBooks.slice(0, this.displayCount);
+    },
+    loadMore() {
+      this.displayCount += 10;
+      this.books = this.allBooks.slice(0, this.displayCount);
     },
     formatDate(date) {
       return new Date(date).toLocaleDateString('vi-VN');
@@ -119,6 +176,29 @@ export default {
 </script>
 
 <style scoped>
+.col-1-5 {
+  width: 20%;
+}
+@media (max-width: 1200px) {
+  .col-1-5 {
+    width: 25%;
+  }
+}
+@media (max-width: 992px) {
+  .col-1-5 {
+    width: 33.33%;
+  }
+}
+@media (max-width: 768px) {
+  .col-1-5 {
+    width: 50%;
+  }
+}
+@media (max-width: 576px) {
+  .col-1-5 {
+    width: 100%;
+  }
+}
 .book-hover {
   transition: transform 0.3s, box-shadow 0.3s;
 }
