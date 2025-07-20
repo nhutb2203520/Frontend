@@ -5,7 +5,7 @@
       <div class="navbar-left">
         <router-link to="/admin/dashboard" class="navbar-logo">
           <img src="@/assets/Logo.jpg" alt="Logo" class="logo" />
-          <span class="title text-white pt-4">QUẢN LÝ THƯ VIỆN NLN</span>
+          <span class="title text-white">QUẢN LÝ THƯ VIỆN NLN</span>
         </router-link>
       </div>
 
