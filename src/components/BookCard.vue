@@ -57,7 +57,7 @@ export default {
     async toggleFavorite() {
       if (!useAuthStore().accessToken) {
         ElMessage.warning('Vui lòng nhập để đăng ký mượn sách.')
-        this.$router.push({ name: 'Signin User' })
+        this.$router.push({ name: 'Signin User', replace: true })
         return
       }
       try {
@@ -87,9 +87,12 @@ export default {
       }
     },
     async loadData() {
-      const bookStore = useBookStore()
-      const booksFavoriteList = await bookStore.getAllBookFavorite()
-      this.isFavorite = booksFavoriteList?.some(bfa => bfa.MaSach._id === this.book?._id)
+      if (useAuthStore().accessToken) {
+        const bookStore = useBookStore()
+        const booksFavoriteList = await bookStore.getAllBookFavorite()
+        this.isFavorite = booksFavoriteList?.some(bfa => bfa.MaSach._id === this.book?._id)
+      }
+
     }
   },
   async mounted() {

@@ -81,6 +81,19 @@ const routes = [
     path: "/favoritebook",
     name: "FavoriteBook",
     component: FavoriteBook,
+    beforeEnter: (to, from, next) => {
+      const accessToken = sessionStorage.getItem("accessToken");
+      if (!accessToken) {
+        ElMessage({
+          message: "Bạn cần đăng nhập để xem sách yêu thích.",
+          type: "warning",
+        });
+        // Chuyển hướng đến trang đăng nhập nếu không có accessToken
+        next({ name: "Signin User", replace: true });
+      } else {
+        next();
+      }
+    },
   },
   {
     path: "/account-user",

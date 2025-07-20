@@ -26,7 +26,7 @@
 
         <div class="form-group">
           <label>Số điện thoại:</label>
-          <input v-model="form.phone" type="tel" pattern="[0-9]{10,11}" required />
+          <input v-model="form.phone" type="tel" pattern="[0-9]{10,11}" />
         </div>
 
         <div class="form-group">
@@ -36,7 +36,7 @@
 
         <div class="form-group">
           <label>Địa chỉ:</label>
-          <textarea v-model="form.address" rows="3" required></textarea>
+          <textarea v-model="form.address" rows="3"></textarea>
         </div>
 
         <div class="form-actions">
@@ -87,9 +87,7 @@ const validateForm = () => {
     f.fullName &&
     f.birthDate &&
     f.gender &&
-    /^\d{10,11}$/.test(f.phone) &&
-    f.email.includes('@') &&
-    f.address
+    f.email.includes('@')
   );
 };
 

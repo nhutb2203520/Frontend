@@ -159,8 +159,6 @@ function navigateTo(route) {
 onMounted(async () => {
   const data = await borrowStore.fetchBorrowBooksForAdmin()
   const list = Array.isArray(data) ? data : []
-  console.log('Borrow list:', list)
-
   const daChoDuyetCount = list.filter(record => record.MaTrangThai?.TenTrangThai === 'chờ lấy').length
   menuItems.value[0].badgeCount = daChoDuyetCount
 })

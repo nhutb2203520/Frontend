@@ -26,7 +26,7 @@
           </el-icon> <strong>Số điện thoại:</strong> {{ userInfo.SoDienThoai }}</p>
         <p v-if="userInfo"><el-icon>
             <LocationFilled />
-          </el-icon> <strong>Địa chỉ:</strong> {{ capitalizeWords(userInfo.DiaChi) }}</p>
+          </el-icon> <strong>Địa chỉ:</strong> {{ capitalizeWords(userInfo.DiaChi || '') }}</p>
         <p v-if="userInfo"><el-icon>
             <Calendar />
           </el-icon> <strong>Ngày tạo tài khoản:</strong> {{ formatDate(userInfo.createdAt) }}</p>

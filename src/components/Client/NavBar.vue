@@ -82,7 +82,9 @@
                         <router-link to="/" class="dropdown-item">Trang Chủ</router-link>
                         <router-link to="/catalogbook" class="dropdown-item">Danh Mục Sách</router-link>
                         <router-link to="/borrowinghistory" class="dropdown-item">Lịch Sử Mượn</router-link>
-
+                        <router-link to="/favoritebook" replace class="dropdown-item">
+                            Sách Yêu Thích
+                        </router-link>
                         <div v-if="$route.path === '/catalogbook'" class="mt-2">
                             <input type="text" v-model="searchKeyword" placeholder="Tìm kiếm ..."
                                 class="form-control mb-2" />
