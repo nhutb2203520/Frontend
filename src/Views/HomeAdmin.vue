@@ -86,8 +86,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  /* Gradient từ xanh đậm đến đen tạo chiều sâu */
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.6), rgba(10, 25, 47, 0.6));
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.4), rgba(10, 25, 47, 0.8));
   z-index: 1;
 }
 
