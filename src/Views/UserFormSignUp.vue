@@ -4,7 +4,8 @@
     <div class="card shadow-lg p-4 w-100" style="max-width: 700px;">
       <img src="@/assets/Logo.jpg" alt="Logo" class="img-fluid mx-auto d-block mb-4 logo_Login"
         style="max-width: 150px;" />
-      <h2 class="text-center text-primary mb-4">Đăng Ký</h2>
+      <h2 class="text-center mb-4" style="color: #3498db;
+  margin-bottom: 35px;">Đăng Ký</h2>
 
       <form @submit.prevent="submitRegister">
         <!-- Dòng 1 -->
@@ -76,13 +77,24 @@
         </div>
 
         <!-- Nút Đăng Ký -->
-        <button type="submit" class="btn btn-primary w-100">Đăng Ký</button>
+        <button type="submit" class="btn w-100 btn-register">Đăng Ký</button>
 
       </form>
       <div>
         <p class="mt-3 text-center" style="color: white;">
           Đã có tài khoản? <router-link to="/signinuser">Đăng nhập ngay</router-link>
         </p>
+      </div>
+      <div class="divider-container">
+        <div class="line"></div>
+        <span class="text">HOẶC</span>
+        <div class="line"></div>
+      </div>
+      <div class="login-container text-center">
+        <a :href="googleLoginUrl" class="login-button btn btn-primary">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" />
+          <span>Tiếp tục bằng Google</span>
+        </a>
       </div>
     </div>
   </div>
@@ -105,7 +117,8 @@ export default {
         EMAIL: "",
         PASSWORD: "",
         CONFIRM_PASSWORD: "",
-      }
+      },
+      googleLoginUrl: 'http://localhost:3000/auth/google'
     };
   },
   methods: {
@@ -167,5 +180,65 @@ export default {
 
 .card label {
   color: white;
+}
+
+.divider-container {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.text {
+  padding: 0 15px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.btn-register {
+  background-color: #3498db;
+  color: white;
+  font-weight: 700;
+}
+
+.btn-register:hover {
+  background-color: #4285F4;
+  color: white;
+}
+
+.login-button {
+  width: 445px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  justify-content: center;
+  border-radius: 5px;
+  background-color: #4285F4;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.login-button img {
+  width: 20px;
+  margin-right: 15px;
+  background: white;
+  padding: 2px;
+  border-radius: 50%;
+}
+
+.login-container {
+  margin-top: 20px;
+}
+
+.login-button:hover {
+  cursor: pointer;
+  background-color: #2d6fda;
 }
 </style>
