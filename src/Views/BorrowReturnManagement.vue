@@ -27,7 +27,7 @@
               <ul>
                 <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)"
                   class="reader-item">
-                  <strong>{{ entry.reader }}</strong> - "{{ entry.book }}" -
+                  <strong>{{ capitalizeWords(entry.reader) }}</strong> - "{{ capitalizeWords(entry.book) }}" -
                   <span :class="'text-' + (entry.isOverdue ? 'danger' : statusLabels[entry.status].color)">
                     {{ entry.isOverdue ? 'Quá hạn' : capitalizeWords(statusLabels[entry.status].text) }}
                   </span>

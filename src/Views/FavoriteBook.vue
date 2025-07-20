@@ -22,7 +22,7 @@
     <!-- Danh sách sách -->
     <div class="row g-4">
       <div class="col-1-5" v-for="(book, index) in books" :key="index">
-        <router-link :to="`/book/${book.MaSach?.MaSach}`"
+        <router-link :to="`/book/${book.MaSach?.MaSach}`" data-aos="fade-up" data-aos-duration="1000"
           class=" text-decoration-none book-card bg-dark bg-opacity-75 border border-light rounded-3 p-3 h-100 d-flex flex-column align-items-center text-center book-hover">
           <div class="ratio ratio-4x3 mb-3 rounded overflow-hidden w-100">
             <img :src="'http://localhost:3000' + book.MaSach.image[0]" :alt="book.MaSach.TenSach"
@@ -46,9 +46,12 @@
       <button class="btn btn-outline-warning" @click="loadMore">Xem thêm</button>
     </div>
   </div>
+  <Footer />
+
 </template>
 
 <script>
+import Footer from '@/components/Client/Footer.vue'
 import { useBookStore } from '@/Store/Book.store'
 import { formatDate } from '@/utils/formatDate'
 export default {
@@ -61,20 +64,30 @@ export default {
       displayCount: 10
     };
   },
+  components: {
+    Footer
+  },
   methods: {
     formatDate,
     async loadFavoriteBooks() {
-      this.allBooks = await useBookStore().getAllBookFavorite()
+      const data = await useBookStore().getAllBookFavorite()
+      this.allBooks = Array.isArray(data) ? data : []
       this.sortBooks();
     },
     sortBooks() {
-      this.allBooks.sort((a, b) => {
-        const da = new Date(a.NgayThem);
-        const db = new Date(b.NgayThem);
-        return this.sortOrder === 'asc' ? da - db : db - da;
-      });
-      this.books = this.allBooks.slice(0, this.displayCount);
-    },
+      if (this.allBooks.length > 0) {
+        this.allBooks = this.allBooks.filter(book => book.NgayThem);
+        this.allBooks.sort((a, b) => {
+          const timeA = new Date(a.createdAt).getTime();
+          const timeB = new Date(b.createdAt).getTime();
+
+          return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+        });
+
+        this.books = this.allBooks.slice(0, this.displayCount);
+      }
+    }
+    ,
     loadMore() {
       this.displayCount += 10;
       this.books = this.allBooks.slice(0, this.displayCount);

@@ -10,7 +10,7 @@
           <tr>
             <th>STT</th>
             <th>Thông tin sách</th>
-            <th>Loại CSDL</th>
+            <th>Loại</th>
             <th>Ngày mượn</th>
             <th>Ngày đến hạn trả</th>
             <th>Trạng thái sách</th>
@@ -31,7 +31,7 @@
                 }}
               </em>
             </td>
-            <td>{{ borrow.MaSachCopy?.TenLoaiBanSao }}</td>
+            <td>{{ capitalizeWords(borrow.MaSachCopy?.TenLoaiBanSao) }}</td>
             <td>{{ formatDate(borrow.NgayMuon) }}</td>
             <td>{{ formatDate(borrow.NgayTra) }}</td>
             <td>

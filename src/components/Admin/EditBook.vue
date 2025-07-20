@@ -7,7 +7,8 @@
         <!-- Ảnh minh họa -->
         <div class="form-group">
           <label>Ảnh sách:</label>
-          <input type="file" accept="image/*" multiple @change="handleImagesUpload" />
+          <small class="text-danger"><b><i>Ảnh đầu tiên là ảnh bìa.</i></b></small>
+          <input type="file" accept="image/*" multiple @change="handleImagesUpload" class="mt-1" />
           <div v-if="previewImages.length > 0" class="preview-img mt-2 d-flex flex-wrap gap-2">
             <div v-for="(src, idx) in previewImages" :key="idx" class="img-thumb-wrapper">
               <img :src="src" alt="Xem trước" class="img-thumbnail" />

@@ -1,5 +1,5 @@
 <template>
-  <footer class="footer-wrapper">
+  <footer class="footer-wrapper" data-aos="fade-up" data-aos-duration="1000">
     <div class="footer-header">
       <h2>QUẢN LÝ THƯ VIỆN NLN</h2>
     </div>

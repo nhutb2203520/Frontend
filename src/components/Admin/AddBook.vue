@@ -9,8 +9,9 @@
           <form class="book-form" @submit.prevent="submitBook">
             <!-- 1. Ảnh sách -->
             <div class="form-group">
-              <label>Ảnh sách:</label>
-              <input type="file" accept="image/*" @change="handleImagesUpload" multiple class="form-control" />
+              <label>Ảnh sách:</label><br>
+              <small class="text-danger"><b><i>Ảnh đầu tiên là ảnh bìa.</i></b></small>
+              <input type="file" accept="image/*" @change="handleImagesUpload" multiple class="form-control mt-1" />
               <div v-if="previewImages.length" class="preview-img mt-2 d-flex flex-wrap gap-2">
                 <div v-for="(src, idx) in previewImages" :key="idx" class="img-thumb-wrapper">
                   <img :src="src" alt="Xem trước" class="img-thumbnail" />

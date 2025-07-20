@@ -193,6 +193,8 @@ export default {
 
       this.bookImages = images;
       this.currentImage = base + images[0];
+      const booksFavoriteList = await bookStore.getAllBookFavorite()
+      this.isFavorite = booksFavoriteList?.some(book => book.MaSach._id === response.sach?._id)
     } catch (err) {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;
@@ -266,7 +268,7 @@ export default {
           if (result.message === 'Thêm vào yêu thích thành công.') {
             ElMessage.success('Đã thêm vào yêu thích.')
           } else {
-            ElMessage.error(res.message || 'Thêm vào yêu thích thất bại.')
+            ElMessage.error(result.message || 'Thêm vào yêu thích thất bại.')
           }
         } else {
           const result = await bookStore.deleteBookFavorite(data)
