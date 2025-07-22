@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid bg-dark text-white py-5">
     <div class="text-center mb-5">
-      <h2 class="text-info fw-bold display-5">SẢN PHẨM NỔI BẬT</h2>
+      <h2 class="text-info fw-bold display-5">SÁCH NỔI BẬT</h2>
       <div class="d-flex justify-content-center align-items-center gap-3">
         <div class="bg-info" style="width: 80px; height: 2px;"></div>
         <div class="fs-3">📖</div>

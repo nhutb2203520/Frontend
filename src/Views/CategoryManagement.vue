@@ -19,7 +19,7 @@
           </div>
 
           <div class="reader-list">
-            <h3>Danh sách loại sách</h3>
+            <h3 class="text-center">Danh sách loại sách</h3>
 
             <div v-if="showAddForm" class="add-form" @keyup.enter="addCategory">
               <input v-model="newCategory.TenLoai" placeholder="Nhập tên loại sách" />

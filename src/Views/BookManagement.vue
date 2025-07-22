@@ -26,7 +26,7 @@
 
       <!-- Danh sách sách -->
       <div class="book-list">
-        <h3>Danh sách sách</h3>
+        <h3 class="text-center">Danh sách sách</h3>
         <div class="scrollable-list">
           <ul>
             <li v-for="book in filteredBooks" :key="book.MaSach" @click="toggleBook(book)" class="book-item">

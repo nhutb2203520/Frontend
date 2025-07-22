@@ -22,7 +22,7 @@
           </div>
 
           <div class="reader-list">
-            <h3>Danh sách phiếu mượn</h3>
+            <h3 class="text-center">Danh sách phiếu mượn</h3>
             <div class="scrollable-list">
               <ul>
                 <li v-for="entry in filteredBorrowList" :key="entry.id" @click="selectBorrower(entry)"

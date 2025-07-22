@@ -2,7 +2,7 @@
   <div class="overlay d-flex">
     <SideBarAD />
     <div class="flex-grow-1">
-    
+
       <div class="container-fluid px-3">
         <!-- Router View sẽ hiển thị form thêm độc giả nếu được định tuyến -->
         <router-view />
@@ -22,7 +22,7 @@
           </div>
 
           <div class="reader-list">
-            <h3>Danh sách độc giả</h3>
+            <h3 class="text-center">Danh sách độc giả</h3>
             <div class="scrollable-list">
               <ul>
                 <li v-for="reader in filteredReaders" :key="reader._id" @click="toggleReader(reader)"
