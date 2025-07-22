@@ -216,6 +216,7 @@ async function returnBook(entry) {
     if (res.message?.includes('thành công')) {
       ElMessage.success(res.message);
       await reloadBorrowList();
+      await loadOverdueList()
     } else ElMessage.error(res.message || 'Duyệt trả thất bại');
   } catch (err) {
     ElMessage.error('Lỗi khi duyệt độc giả trả sách');

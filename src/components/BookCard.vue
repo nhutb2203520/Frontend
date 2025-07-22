@@ -56,7 +56,7 @@ export default {
     // },
     async toggleFavorite() {
       if (!useAuthStore().accessToken) {
-        ElMessage.warning('Vui lòng nhập để đăng ký mượn sách.')
+        ElMessage.warning('Vui lòng đăng nhập để thêm sách vào danh sách yêu thích.')
         this.$router.push({ name: 'Signin User', replace: true })
         return
       }

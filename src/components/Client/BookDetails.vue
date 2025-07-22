@@ -229,7 +229,7 @@ export default {
     },
     async borrowBook() {
       if (!useAuthStore().accessToken) {
-        ElMessage.warning('Vui lòng nhập để đăng ký mượn sách.')
+        ElMessage.warning('Vui lòng đăng nhập để đăng ký mượn sách.')
         this.$router.push({ name: 'Signin User' })
         return
       }

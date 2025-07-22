@@ -173,6 +173,11 @@ const goToBookDetail = (maSach) => {
 </script>
 
 <style scoped>
+.fst-italic {
+  font-weight: 700;
+  color: #0b0b0b;
+}
+
 .borrowing-slip {
   border-width: 2px;
   border-color: black;

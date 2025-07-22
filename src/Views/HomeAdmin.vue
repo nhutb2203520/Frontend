@@ -86,7 +86,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.4), rgba(10, 25, 47, 0.8));
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.6), rgba(10, 25, 47, 0.6));
   z-index: 1;
 }
 
@@ -121,7 +121,7 @@ export default {
 
   color: #e0e0e0;
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
 
   cursor: pointer;
@@ -145,6 +145,7 @@ export default {
   transform: translateY(-8px);
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(99, 164, 255, 0.5);
+  color: #63a4ff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
