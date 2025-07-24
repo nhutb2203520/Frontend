@@ -193,8 +193,11 @@ export default {
 
       this.bookImages = images;
       this.currentImage = base + images[0];
-      const booksFavoriteList = await bookStore.getAllBookFavorite()
-      this.isFavorite = booksFavoriteList?.some(book => book.MaSach._id === response.sach?._id)
+      if (useAuthStore().accessToken) {
+        const booksFavoriteList = await bookStore.getAllBookFavorite()
+        this.isFavorite = booksFavoriteList?.some(book => book.MaSach._id === response.sach?._id)
+      }
+
     } catch (err) {
       console.error('Lỗi khi lấy thông tin sách:', err);
       this.book = null;

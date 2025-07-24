@@ -24,6 +24,7 @@
         XEM CHI TIẾT
       </router-link>
     </div>
+
   </div>
 </template>
 
