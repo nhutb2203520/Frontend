@@ -49,8 +49,8 @@
         <div class="policy-content">
           <h2>📜 CHÍNH SÁCH MƯỢN SÁCH CỦA THƯ VIỆN</h2>
           <h3>1. Số lượng sách được mượn</h3>
-          <p>Tại cùng thời điểm mỗi người chỉ được mượn tối đa 2 cuốn sách.</p>
-          <p>Mỗi đầu sách chỉ được mượn 1 cuốn, không được mượn trùng sách trong cùng một phiếu.</p>
+          <p>Tại cùng thời điểm mỗi người chỉ được mượn tối đa 3 cuốn sách.</p>
+          <p>Mỗi đầu sách chỉ được mượn 1 cuốn, không được mượn trùng sách trong cùng một thời gian.</p>
           <h3>2. Thời hạn mượn sách</h3>
           <p>Thời hạn mượn mỗi cuốn sách là 05 ngày kể từ ngày mượn.</p>
           <h3>3. Gia hạn mượn sách</h3>
