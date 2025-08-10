@@ -141,8 +141,8 @@ function convertEntry(entry) {
 
   return {
     id: entry._id,
-    reader: entry.MaDocGia?.HoTen || 'Không rõ',
-    book: entry.MaSachCopy?.MaSach?.TenSach || 'Không rõ',
+    reader: entry.MaDocGia?.HoTen || 'Tài khoản không tồn tại',
+    book: entry.MaSachCopy?.MaSach?.TenSach || 'Sách không tồn tại',
     status,
     isOverdue,
     borrowDate: entry.createdAt,

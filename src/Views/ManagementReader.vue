@@ -44,7 +44,7 @@
                           <Calendar />
                         </el-icon>Ngày Tạo tài khoản:</strong> {{ formatDate(reader.createdAt) }}</p>
                     <strong>Trạng thái:</strong>
-                    <span :class="reader.MaTT?.TenTT === 'active' ? 'text-success' : 'text-danger'">
+                    <span class="me-3" :class="reader.MaTT?.TenTT === 'active' ? 'text-success' : 'text-danger'">
                       {{ reader.MaTT?.TenTT === 'active' ? 'Hoạt động' : 'Bị khóa' }}
                     </span>
 
@@ -69,6 +69,7 @@ import { useReaderStore } from '@/Store/Reader.store';
 import { capitalizeWords } from '@/utils/stringUtils'
 import { formatDate } from '@/utils/formatDate';
 import { ElMessage } from 'element-plus';
+import { useBorrowBookStore } from '@/Store/BorrowBook.store';
 export default {
   components: { SideBarAD },
   data() {
@@ -122,6 +123,15 @@ export default {
     },
     async toggleStatus(reader) {
       const newStatus = reader.MaTT.TenTT === 'active' ? 'blocked' : 'active';
+      if (reader.MaTT.TenTT === 'blocked') {
+        const borrowList = await useBorrowBookStore().fetchBorrowBooksForAdmin()
+        const danhSachSachDangLay = borrowList.filter(borrow => borrow.MaTrangThai?.TenTrangThai === 'đã lấy')
+        const checkReader = danhSachSachDangLay.filter(borrow => borrow.MaDocGia?._id === reader?._id)
+        if (checkReader.length > 0) {
+          ElMessage.error('Độc giả chưa trả sách, không thể mở khóa tài khoản.')
+          return
+        }
+      }
       const data = {
         _id: reader._id,
         TrangThai: newStatus

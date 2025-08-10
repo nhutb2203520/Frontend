@@ -37,7 +37,7 @@
       <div class="action-buttons">
         <button class="action-btn update" @click="$router.push('/admin/account/update-account-ad')">Cập nhật</button>
         <button class="action-btn password" @click="$router.push('/admin/account/change-pass-ad')">Đổi mật khẩu</button>
-        <button class="action-btn delete" @click="handleDeleteAccount">Xóa tài khoản</button>
+        <!-- <button class="action-btn delete" @click="handleDeleteAccount">Xóa tài khoản</button> -->
       </div>
     </div>
   </div>

@@ -32,8 +32,8 @@
               </em>
             </td>
             <td>{{ capitalizeWords(borrow.MaSachCopy?.TenLoaiBanSao) }}</td>
-            <td>{{ formatDate(borrow.NgayMuon) }}</td>
-            <td>{{ formatDate(borrow.NgayTra) }}</td>
+            <td>{{ borrow.NgayMuon ? formatDate(borrow.NgayMuon) : "Chưa lấy sách" }}</td>
+            <td>{{ borrow.NgayTra ? formatDate(borrow.NgayTra) : "Chưa lấy sách" }}</td>
             <td>
               <span v-if="isOverdue(borrow)" class="text-danger fw-bold">Quá hạn</span>
               <span v-else>{{ capitalizeWords(borrow.MaTrangThai?.TenTrangThai) }}</span>
